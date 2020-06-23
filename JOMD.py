@@ -51,6 +51,14 @@ def get_submissions(username):
         submissions += sub_json['data']['objects']
     return submissions
 
+def calculate_points(points):
+    b = 150*(1-0.997**len(points))
+    p = 0
+    for i in range(min(100,len(points))):
+        p += (0.95**i)*points[i]
+    return b+p
+
+
 @bot.command(name='user')
 async def user(ctx,*username):
     # Beautify the errors
@@ -96,10 +104,10 @@ async def predict(ctx,*args):
     if "error" in user:
         return await ctx.send(f'{username} does not exist on DMOJ')
     
+    await ctx.send(f'Fetching Submissions. This may take a few seconds')
     subs = get_submissions(username)
 
     code_to_points = dict()
-    print("Iterating through subs")
     for i in subs:
         problem, points = i['problem'], i['points']
         if points is not None and points != 0:
@@ -107,10 +115,15 @@ async def predict(ctx,*args):
                 code_to_points[problem]=points
             elif points>code_to_points[problem]:
                 code_to_points[problem]=points
+
     points = list(code_to_points.values())
-    points.sort()
-    print(points)
-    print(len(points))
+    points.sort(reverse=True)
+    await ctx.send('Current points %.2f' % calculate_points(points))
+    for i in args[1:]:
+        points.insert(len(points),int(i))
+        points.sort(reverse=True)
+        updated_points=calculate_points(points)
+        await ctx.send('Solved %s | Updated points %.2f' % (i,updated_points))
 
 
 
