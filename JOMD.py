@@ -5,6 +5,7 @@ import json
 import requests
 import re
 import time
+import html
 
 from discord.ext import commands
 
@@ -87,16 +88,32 @@ def calculate_points(points,fully_solved):
         p += (0.95**i)*points[i]
     return b+p
 
-@bot.command(name='user')
-async def user(ctx,*username):
-    # Beautify the errors
-    if len(username) > 1:
-        return await ctx.send(f'Too many arguments, {pref}user <user>')
-    
-    if len(username) < 1:
-        return await ctx.send(f'Too few arguments, {pref}user <user>')
+def get_latest_submission(username,num):
+    response = requests.get(f'https://dmoj.ca/submissions/user/{username}/')
+    text=response.text.replace('\n','')
+    text=text.replace('<div class="time">','<div title="---s" class="time">')
+    matches=re.findall(r'<div class="submission-row" id=".*?"><div class="sub-result .*?"><div class="score">(---|.*? / .*?)</div><div class="state"><span title=".*?" class="status">(.*?)</span> \|<span class="language">(.*?)</span></div></div><div class="sub-info"><div class="name"><a href="/problem/(.*?)">(.*?)</a></div><div><span class="rating (.*?)"><a href="/user/.*?">(.*?)</a></span><span class="time"><span data-iso="(.*?)" class="time-with-rel" title="(.*?)" data-format="{time}">.*?</span></span>.*?</div></div><div class="sub-usage"><div title="(.*?)s" class="time">.*?</div><div class="memory">(.*?)</div></div>',text)
+    return matches[:num]
 
-    username=username[0]
+@bot.command(name='user')
+async def user(ctx,*args):
+    # Beautify the errors
+    if len(args) > 2:
+        return await ctx.send(f'Too many arguments, {pref}user <user> <latest submissions>')
+    
+    if len(args) < 1:
+        return await ctx.send(f'Too few arguments, {pref}user <user> <latest submissions>')
+    if len(args) == 2:
+        if not args[1].isdigit():
+            return await ctx.send(f'{args[1]} is not an integer')
+
+        if int(args[1]) > 8 :
+            return await ctx.send(f'Requesting too many submissions, Max (8)')
+
+        if int(args[1]) < 1 :
+            return await ctx.send(f'Pls no troll :>')
+
+    username=args[0]
 
     user = get_user(username)
     
@@ -119,6 +136,29 @@ async def user(ctx,*username):
     embed.add_field(name="Problems Solved", value=data['problem_count'], inline=False)
     embed.add_field(name="Rating", value=data['rating'], inline=True)
     embed.add_field(name="Contests Written", value=sum(map(is_rated,data['contests'])), inline=True)
+    await ctx.send(embed=embed)
+
+    if len(args) == 1:
+        return
+    
+    latest_subs = int(args[1])
+    print("Getting latest submissions")
+    # Send latest submissions
+    submissions = get_latest_submission(username,latest_subs)
+    print("Making embed message")
+    embed=discord.Embed(title=f"{username}'s latest submissions",color=0xfcdb05)
+    msg = ""
+    for sub in submissions:
+        print(sub)
+        embed.add_field(name=sub[0], value="%s | %s" % (sub[1],sub[2]), inline=True)
+        embed.add_field(name="%s" % html.unescape(sub[4]), value="%s" % sub[8], inline=True)
+        try:
+            float(sub[9])
+            embed.add_field(name="%.2f" % (float(sub[9])), value="%s" % sub[10], inline=True)
+        except:
+            embed.add_field(name="%s" % (sub[9]), value="%s" % sub[10], inline=True)
+        # msg+="%s | %-15s | %-10s | %-70s | %-5.2f | %-5s |\n" % (sub[1],sub[2],sub[0],html.unescape(sub[4]),float(sub[9]),sub[10])
+
     await ctx.send(embed=embed)
     return None
 
@@ -171,13 +211,8 @@ async def predict(ctx,*args):
         fully_solved_problems+=1
         points.sort(reverse=True)
         updated_points=calculate_points(points,fully_solved_problems)
-        embed.add_field(name="Solve another %sp" % i, value="Total points: %.2f" % updated_points, inline=False)
+        embed.add_field(name="Solve another %sp" % i, value="Total points: %.2fp" % updated_points, inline=False)
     await msg.edit(content='',embed=embed)
-
-
-
-    
-
 
 def main():
     print("Bot is Running")
