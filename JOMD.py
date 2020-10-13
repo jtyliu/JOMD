@@ -1,5 +1,6 @@
 import os
 import discord
+import io
 import dotenv
 import json
 import requests
@@ -10,6 +11,7 @@ import asyncio
 from bs4 import BeautifulSoup
 import math
 from db.db import JOMDdb
+from graphing.radar import radar
 import random
 
 from discord.ext import commands
@@ -445,18 +447,70 @@ async def gimmie(ctx,*args):
     embed.add_field(name='Memory', value=memory,inline=True)
     return await ctx.send(embed=embed)
     
+@bot.command(name='plot')
+async def plot(ctx,*args):
+    if len(args) < 2:
+        return await ctx.send(f'Usage: {pref}plot [type] [usernames]')
+    
+    if len(args) > 7:
+        return await ctx.send(f'Too many users! Max 6.')
 
+    usernames = []
 
-# you will only see submission details if the user solved the problem
-# @bot.event
-# async def on_message(message):
-#     if re.match(r'https://dmoj.ca/submission/(\d*)',message.content) is not None:
-#         print(message.content)
-#         submissions = re.findall(r'https://dmoj.ca/submission/(\d*)',message.content)
-#         print(submissions)
-#         for submission_id in submissions:
-#             sub = get_submission(submission_id)
-#             print(submission_id,sub)
+    for users in args[1:]:
+        user = get_user(users)
+        
+        if "error" in user:
+            return await ctx.send(f'{users} does not exist on DMOJ')
+        
+        user = user['data']['object']['username']
+        usernames.append(user)
+
+    if args[0]=='type':
+        db = JOMDdb()
+        important_types = ['Data Structures','Dynamic Programming','Graph Theory','String Algorithms',['Advanced Math','Geometry','Intermediate Math','Simple Math'],'Ad Hoc','Greedy Algorithms']
+        labels = ['Data Structures','Dynamic Programming','Graph Theory','String Algorithms','Math','Ad Hoc','Greedy Algorithms']
+        frequency = []
+        for types in important_types:
+            if type(types)==type(''):
+                problems = db.get_problem_type(types)
+            else:
+                problems = db.get_problem_types(types)
+            frequency.append(len(problems))
+        
+        data = {}
+        data['group'] = []
+        for label in labels:
+            data[label] = []
+        for username in usernames:
+            data['group'].append(username)
+        
+        max_percentage=0
+        for i in range(len(important_types)):
+            for username in usernames:
+                types = important_types[i]
+                if type(types)==type(''):
+                    problems = db.get_solved_problems_type(username,types)
+                else:
+                    problems = db.get_solved_problems_types(username,types)
+                percentage = 100*len(problems)/frequency[i]
+                max_percentage=max(max_percentage,percentage)
+                data[labels[i]].append(percentage)
+
+        radar(data,max_percentage)
+        with open('plot.png', 'rb') as file:
+            file = discord.File(io.BytesIO(file.read()), filename='plot.png')
+        embed = discord.Embed(
+                    title = ' '.join(usernames),
+                    color=0xfcdb05,
+        )
+        embed.set_image(url = f'attachment://plot.png',)
+
+        return await ctx.send(embed=embed,file=file)
+    return await ctx.send(f'Pls no Jack')
+
+    
+
 
         
 

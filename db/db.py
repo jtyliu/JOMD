@@ -60,7 +60,39 @@ class JOMDdb:
         res = self.conn.execute(query,(username,)).fetchall()
         return list(map(submission_tuple_to_dict,res))
     
-    def get_unsolvedproblems(self, username, low, high):
+    def get_solvedproblems(self, username):
+        query = ('SELECT problem.* FROM '
+                'problems problem LEFT JOIN '
+                '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
+                'submission ON submission.problem = problem.code WHERE '
+                'ifnull(submission.points, 0) == problem.points')
+        res = self.conn.execute(query,(username,)).fetchall()
+        return list(map(problem_tuple_to_dict,res))
+
+    def get_solved_problems_type(self,username,types):
+        query = ('SELECT problem.* FROM '
+                'problems problem LEFT JOIN '
+                '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
+                'submission ON submission.problem = problem.code WHERE '
+                'ifnull(submission.points, 0) == problem.points AND '
+                'problem.types like ?')
+        types = str_to_like(types)
+        res = self.conn.execute(query,(username,types,)).fetchall()
+        return list(map(problem_tuple_to_dict,res))
+    
+    def get_solved_problems_types(self,username,types):
+        query = ('SELECT problem.* FROM '
+                'problems problem LEFT JOIN '
+                '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
+                'submission ON submission.problem = problem.code WHERE '
+                'ifnull(submission.points, 0) == problem.points AND (')
+        
+        query += ' OR '.join(['problem.types like ?'] * len(types))+')'
+        types = map(str_to_like,types)
+        res = self.conn.execute(query,(username,*types,)).fetchall()
+        return list(map(problem_tuple_to_dict,res))
+
+    def get_unsolvedproblems(self, username, low=0, high=50):
         query = ('SELECT problem.* FROM '
                 'problems problem LEFT JOIN '
                 '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
@@ -69,6 +101,21 @@ class JOMDdb:
                 '(problem.points BETWEEN ? AND ?)')
         res = self.conn.execute(query,(username,low,high,)).fetchall()
         return list(map(problem_tuple_to_dict,res))
+
+    def get_problem_type(self,types):
+        query = ('SELECT * FROM problems WHERE '
+                'problems.types like ?')
+        types = str_to_like(types)
+        res = self.conn.execute(query,(types,)).fetchall()
+        return list(map(problem_tuple_to_dict,res))
+
+    def get_problem_types(self,types):
+        query = 'SELECT * FROM problems WHERE '
+        query += ' OR '.join(['problems.types like ?'] * len(types))
+        types = map(str_to_like,types)
+        res = self.conn.execute(query,(*types,)).fetchall()
+        return list(map(problem_tuple_to_dict,res))
+
     def close(self):
         self.conn.close()
 
@@ -122,3 +169,6 @@ def submission_dict_to_tuple(submission):
         submission['points'] if submission['points'] else 0.0,
         submission['result'],
     )
+
+def str_to_like(types):
+    return '%'+types+'%'
