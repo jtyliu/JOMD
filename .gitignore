@@ -1,5 +1,5 @@
 */JOMD.db
-*/__pycache__.py
+__pycache__/
 .vscode
 Test.py
 plot.png
