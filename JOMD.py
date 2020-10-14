@@ -66,7 +66,7 @@ def get_problem(problem_code):
     problem_json = None
     try:
         response = requests.get(f'https://dmoj.ca/api/v2/'
-                                'problem/{problem_code}')
+                                f'problem/{problem_code}')
         problem_json = json.loads(response.text)
     except requests.exceptions.RequestException as e:
         raise e
@@ -78,7 +78,7 @@ def get_problems(page=1):
     problem_json = None
     try:
         response = requests.get(f'https://dmoj.ca/api/v2/'
-                                'problems?page={page}')
+                                f'problems?page={page}')
         problem_json = json.loads(response.text)
     except requests.exceptions.RequestException as e:
         raise e
@@ -90,7 +90,7 @@ def get_submissions_page(username, page):
     submission_json = None
     try:
         response = requests.get(f'https://dmoj.ca/api/v2/'
-                                'submissions?user={username}&page={page}')
+                                f'submissions?user={username}&page={page}')
         submission_json = json.loads(response.text)
     except requests.exceptions.RequestException as e:
         raise e
@@ -102,6 +102,7 @@ async def get_submissions(username):
     # TODO: Refactor code and make a seperate method for db stuff
 
     sub_json = get_submissions_page(username, 1)
+    print(sub_json)
     total_submissions = sub_json['data']['total_objects']
     db = JOMDdb()
     cached_submissions = db.get_submissions(username)
@@ -171,7 +172,7 @@ def get_latest_submission(username, num):
     matches = None
     try:
         response = requests.get(f'https://dmoj.ca/'
-                                'submissions/user/{username}/')
+                                f'submissions/user/{username}/')
         soup = BeautifulSoup(response.text, features="html5lib")
         matches = list(map(parse_submission,
                            soup.find_all('div', class_='submission-row')
@@ -191,7 +192,7 @@ def get_submission(submission_id):
     submission_json = None
     try:
         response = requests.get(f'https://dmoj.ca/api/v2/'
-                                'submission/{submission_id}')
+                                f'submission/{submission_id}')
         submission_json = json.loads(response.text)
     except requests.exceptions.RequestException as e:
         raise e
@@ -229,11 +230,11 @@ async def user(ctx, *args):
     # Beautify the errors
     if len(args) > 2:
         return await ctx.send(f'Too many arguments, '
-                              '{pref}user <user> <latest submissions>')
+                              f'{pref}user <user> <latest submissions>')
 
     if len(args) < 1:
         return await ctx.send(f'Too few arguments, '
-                              '{pref}user <user> <latest submissions>')
+                              f'{pref}user <user> <latest submissions>')
 
     if len(args) == 2:
         if not is_int(args[1]):
@@ -317,11 +318,11 @@ async def predict(ctx, *args):
 
     if len(args) > 11:
         return await ctx.send(f'Too many arguments, '
-                              '{pref}predict <user> <points>')
+                              f'{pref}predict <user> <points>')
 
     if len(args) < 2:
         return await ctx.send(f'Too few arguments, '
-                              '{pref}predict <user> <points>')
+                              f'{pref}predict <user> <points>')
 
     if any(not is_int(points) for points in args[1:]):
         return await ctx.send(f'Integer points only!')
