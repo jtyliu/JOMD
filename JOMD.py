@@ -102,7 +102,6 @@ async def get_submissions(username):
     # TODO: Refactor code and make a seperate method for db stuff
 
     sub_json = get_submissions_page(username, 1)
-    print(sub_json)
     total_submissions = sub_json['data']['total_objects']
     db = JOMDdb()
     cached_submissions = db.get_submissions(username)
@@ -152,6 +151,8 @@ def get_latest_submission(username, num):
         try:
             time = float(soup.find('div', class_='time')['title'][:-1])
         except ValueError:
+            time = None
+        except KeyError:
             time = None
         memory = soup.find('div', class_='memory').text
 
@@ -522,7 +523,7 @@ async def plot(ctx, *args):
         labels = ['Data Structures', 'Dynamic Programming', 'Graph Theory', 'String Algorithms', 'Math', 'Ad Hoc', 'Greedy Algorithms']
         frequency = []
         for types in important_types:
-            if isinstance(types) == isinstance(''):
+            if isinstance(types, str):
                 problems = db.get_problem_type(types)
             else:
                 problems = db.get_problem_types(types)
@@ -539,7 +540,7 @@ async def plot(ctx, *args):
         for i in range(len(important_types)):
             for username in usernames:
                 types = important_types[i]
-                if isinstance(types) == isinstance(''):
+                if isinstance(types, str):
                     problems = db.get_solved_problems_type(username, types)
                 else:
                     problems = db.get_solved_problems_types(username, types)
