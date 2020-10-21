@@ -1,7 +1,7 @@
 import sqlite3
-from util import constants
-from util.problem import Problem
-from util.submission import Submission
+from utils import constants
+from utils.problem import Problem
+from utils.submission import Submission
 
 
 class DbConn:
@@ -55,6 +55,9 @@ class DbConn:
     def _fetchone(self, query, arg):
         return self.conn.execute(query, arg).fetchone()
 
+    def _rowcount(self, query, arg):
+        return self.conn.execute(query, arg).rowcount
+
     def cache_problem(self, problem):
         query = ('INSERT OR REPLACE INTO problems VALUES'
                  '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
@@ -78,6 +81,12 @@ class DbConn:
         query = add_conditions(query, 'problems',conditions)
         res = self._fetchone(query, (code,))
         return Problem(res)
+
+    def count_submissions(self, username):
+        query = ('SELECT DISTINCT user FROM submissions WHERE '
+                 'user = ? COLLATE NOCASE')
+        res = self._fetchone(query, (username,))
+        return res
 
     def get_submissions(self, username):
         query = ('SELECT * FROM submissions WHERE '

@@ -2,8 +2,8 @@ import requests
 import time
 import asyncio
 from bs4 import BeautifulSoup
-from util.submission import Submission
-from util.problem import Problem
+from utils.submission import Submission
+from utils.problem import Problem
 import functools
 import aiohttp
 
@@ -34,51 +34,60 @@ def rate_limit(func):
 _session = None
 
 @rate_limit
-async def _query_api(url):
+async def _query_api(url, resp_obj):
     global _session
     if _session is None:
         _session = aiohttp.ClientSession()
     async with _session.get(url) as resp:
-        resp = await resp
-        if 'error' in resp:
-            raise ApiError
+        if resp_obj == 'text':
+            resp = await resp.text()
+        if resp_obj == 'json':
+            resp = await resp.json()
+        # if 'error' in resp:  ApiError would interfere with some other stuff, might just change to error trapping
+        #     raise ApiError
         return resp
 
 
-class user:
+class user_api:
     @staticmethod
     async def get_user(username):
-        resp = await _query_api(f'https://dmoj.ca/api/v2/user/{username}').json()
+        resp = await _query_api(f'https://dmoj.ca/api/v2/user/{username}', 'json')
+        if 'error' in resp:
+            return None
         return resp['data']['object']
 
     @staticmethod
     async def get_pfp(username):
-        resp = await _query_api(f'https://dmoj.ca/user/{username}').text()
+        resp = await _query_api(f'https://dmoj.ca/user/{username}', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
 
     @staticmethod
     async def get_placement(username):
-        resp = await _query_api(f'https://dmoj.ca/user/{username}').text()
+        resp = await _query_api(f'https://dmoj.ca/user/{username}', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         rank_str = soup.find('div', class_='user-sidebar')\
                        .findChildren(recursive=False)[3].text
         rank = int(rank_str.split('#')[-1])
         return rank
 
-class submission:
+class submission_api:
     @staticmethod
     async def get_submissions_page(username, page):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
-                                f'submissions?user={username}&page={page}').json()
-        return resp['data']['object']
+                                f'submissions?user={username}&page={page}', 'json')
+        if 'error' in resp:
+            return None
+        return Submission.loads(resp['data']['object'])
 
     @staticmethod
     async def get_submission(submission_id):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
-                                f'submission/{submission_id}').json()
-        return resp['data']['object']
+                                f'submission/{submission_id}', 'json')
+        if 'error' in resp:
+            return None
+        return Submission.loads(resp['data']['object'])
 
     @staticmethod
     async def get_latest_submission(username, num):
@@ -89,7 +98,7 @@ class submission:
                         .find(class_='score').text.split('/')
             score_num, score_denom = map(int, score)
             lang = soup.find(class_='language').teqxt
-            problem_code = soup.find(class_='name')\
+            problem = soup.find(class_='name')\
                             .find('a')['href'].split('/')[-1]
             name = soup.find(class_='name').find('a').text
             date = soup.find(class_='time-with-rel')['title']
@@ -100,44 +109,49 @@ class submission:
             except KeyError:
                 time = None
             memory = soup.find('div', class_='memory').text
-
-            return {
+            res = {
                 "id": submission_id,
+                "problem": problem,
+                "user": username,
+                "date": date,
+                "language": lang,
+                "time": time,
+                "memory": memory,
+                "points": score_num/score_denom,
                 "result": result,
                 "score_num": score_num,
                 "score_denom": score_denom,
-                "points": score_num/score_denom,
-                "language": lang,
-                "problem_code": problem_code,
                 "problem_name": name,
-                "date": date,
-                "time": time,
-                "memory": memory,
             }
+            return Submission.loads(res)
         resp = await _query_api(f'https://dmoj.ca/'
-                                f'submissions/user/{username}/').text()
+                                f'submissions/user/{username}/', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         matches = list(map(parse_submission,
                            soup.find_all('div', class_='submission-row')
                            ))
         return matches[:num]
 
-class problem:
+class problem_api:
     @staticmethod
     async def get_problem(problem_code):
         resp = await _query_api(f'https://dmoj.ca/'
-                                f'api/v2/problem/{problem_code}').json()
+                                f'api/v2/problem/{problem_code}', 'json')
+        if 'error' in resp:
+            return None
         return Problem.loads(resp['data']['object'])
 
     @staticmethod
     async def get_problems(page=1):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
-                                f'problems?page={page}').json()
-        return list(map(Problem, resp['data']['object']))
+                                f'problems?page={page}', 'json')
+        if 'error' in resp:
+            return None
+        return list(map(Problem.loads, resp['data']['object']))
 
     @staticmethod
     async def get_problem_option(id):
-        resp = await _query_api(f'https://dmoj.ca/problems/?show_types=1').text()
+        resp = await _query_api(f'https://dmoj.ca/problems/?show_types=1', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         options = soup.find('select', id=id).find_all('option')
         def get_options(options):

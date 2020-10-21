@@ -262,10 +262,7 @@ async def user(ctx, *args):
                           color=0xfcdb05,)
 
     def is_rated(user):
-        if user['rating'] is None:
-            return 0
-        else:
-            return 1
+        return 'rating' in user
 
     embed.set_thumbnail(url=get_pfp(username))
     embed.add_field(name="Rank by points",
@@ -396,7 +393,7 @@ async def cache(ctx, *args):
 
 
 @bot.command(name='gimme')
-async def gimmie(ctx, *args):
+async def gimme(ctx, *args):
     if len(args) < 1:
         return await ctx.send(f'Usage: {pref}gimmie username [points] [type, comma seperated]')
 

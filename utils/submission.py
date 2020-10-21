@@ -3,6 +3,9 @@ import json
 class Submission:
 
     def __init__(self, args=None):
+        self.score_num = None
+        self.score_denom = None
+        self.problem_name = None
         if args is None:
             self.id = None
             self.problem = None
@@ -50,4 +53,7 @@ class Submission:
         submission.memory = data['memory'] if data['memory'] else 0.0
         submission.points = data['points'] if data['points'] else 0.0
         submission.result = data['result']
+        submission.score_num = data.get('score_num')
+        submission.score_denom = data.get('score_denom')
+        submission.problem_name = data.get('problem_name')
         return submission

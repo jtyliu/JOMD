@@ -1,6 +1,6 @@
-from util.db import DbConn
-from util.submission import Submission
-from util.problem import Problem
+from utils.db import DbConn
+from utils.submission import Submission
+from utils.problem import Problem
 from JOMD import get_problems,get_problem
 import time
 
