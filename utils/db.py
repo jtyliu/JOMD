@@ -75,10 +75,9 @@ class DbConn:
         submissions = map(tuple, submissions)
         self._update_many(query, submissions)
 
-    def get_problem(self, code, conditions={}):
+    def get_problem(self, code):
         query = ('SELECT * FROM problems WHERE '
                  'code = ?')
-        query = add_conditions(query, 'problems',conditions)
         res = self._fetchone(query, (code,))
         return Problem(res)
 
@@ -132,7 +131,9 @@ class DbConn:
                  '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
                  'submission ON submission.problem = problem.code WHERE '
                  'ifnull(submission.points, 0) < problem.points AND '
-                 '(problem.points BETWEEN ? AND ?)')
+                 '(problem.points BETWEEN ? AND ?) ')
+        # Temp patch, will change later
+        query += 'AND problem.is_organization_private = 0'
         args = (username, low, high,)
         res = self._fetchall(query, args)
         return list(map(Problem, res))

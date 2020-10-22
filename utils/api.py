@@ -74,12 +74,20 @@ class user_api:
 
 class submission_api:
     @staticmethod
+    async def get_submission_total(username):
+        resp = await _query_api(f'https://dmoj.ca/api/v2/'
+                                f'submissions?user={username}', 'json')
+        if 'error' in resp:
+            return None
+        return resp['data']['total_objects']
+
+    @staticmethod
     async def get_submissions_page(username, page):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
                                 f'submissions?user={username}&page={page}', 'json')
         if 'error' in resp:
             return None
-        return Submission.loads(resp['data']['object'])
+        return list(map(Submission.loads, resp['data']['objects']))
 
     @staticmethod
     async def get_submission(submission_id):
