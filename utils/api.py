@@ -102,10 +102,15 @@ class submission_api:
         def parse_submission(soup):
             submission_id = soup['id']
             result = soup.find(class_='sub-result')['class'][-1]
-            score = soup.find(class_='sub-result')\
-                        .find(class_='score').text.split('/')
-            score_num, score_denom = map(int, score)
-            lang = soup.find(class_='language').teqxt
+            try:
+                score = soup.find(class_='sub-result')\
+                            .find(class_='score').text.split('/')
+                score_num, score_denom = map(int, score)
+                points = score_num/score_denom,
+            except ValueError:
+                score_num, score_denom = 0, 0
+                points = 0
+            lang = soup.find(class_='language').text
             problem = soup.find(class_='name')\
                             .find('a')['href'].split('/')[-1]
             name = soup.find(class_='name').find('a').text
@@ -125,7 +130,7 @@ class submission_api:
                 "language": lang,
                 "time": time,
                 "memory": memory,
-                "points": score_num/score_denom,
+                "points": points,
                 "result": result,
                 "score_num": score_num,
                 "score_denom": score_denom,

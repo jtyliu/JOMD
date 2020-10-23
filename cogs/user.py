@@ -8,7 +8,7 @@ from utils.db import DbConn
 import html
 import random
 
-class UserCog(commands.Cog):
+class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -73,7 +73,7 @@ class UserCog(commands.Cog):
         for submission in submissions:
             
             embed.add_field(
-                name="%d / %d" % (submission.score_num, submission.score_denom),
+                name="%s / %s" % (str(submission.score_num), str(submission.score_denom)),
                 value="%s | %s" % (submission.result, submission.language),
                 inline=True
             )
@@ -273,9 +273,5 @@ class UserCog(commands.Cog):
         return await ctx.send(embed=embed)
 
 
-
-
-
-
 def setup(bot):
-    bot.add_cog(UserCog(bot))
+    bot.add_cog(User(bot))
