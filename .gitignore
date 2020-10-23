@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 Test.py
 plot.png
+/graphs/*
