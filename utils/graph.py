@@ -33,8 +33,6 @@ def plot_radar(data, maxval):
     plt.yticks([25, 50, 75], ["25%", "50%", "75%"], color="grey", size=7)
     plt.ylim(0, maxval*1.1)
 
-    # ------- PART 2: Add plots
-
     # Plot each individual = each line of the data
     # I don't do a loop, because plotting more than 3 groups makes the chart unreadable
 
