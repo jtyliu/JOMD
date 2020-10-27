@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import typing
-from utils.apiordb import user
+from utils.query import user
 from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
 from utils.db import DbConn
@@ -194,6 +194,9 @@ class User(commands.Cog):
         except ValueError as e:
             raise BadArgument('Point value is not an integer')
 
+    @commands.command(hidden=True)
+    async def gimmie(self, ctx, member: discord.Member):
+        return await ctx.send('%d :monkey:' % member.nick)
 
     @commands.command(usage='username [points] [problem types]')
     async def gimme(self, ctx, username : str, points : typing.Optional[point_range]=[1,50], *filters):

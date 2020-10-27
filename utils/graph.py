@@ -30,7 +30,8 @@ def plot_radar(data, maxval):
     # Draw ylabels
     ax.set_rlabel_position(0)
 
-    plt.yticks([25, 50, 75], ["25%", "50%", "75%"], color="grey", size=7)
+    scale = maxval*1.1
+    plt.yticks([scale/4, scale/2, 3*scale/4], ["%.1f%%" % (scale/4), "%.1f%%" % (scale/2), "%.1f%%" % (3*scale/4)], color="grey", size=7)
     plt.ylim(0, maxval*1.1)
 
     # Plot each individual = each line of the data

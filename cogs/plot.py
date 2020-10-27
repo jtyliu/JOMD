@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import typing
-from utils.apiordb import user
+from utils.query import user
 from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
 from utils.db import DbConn

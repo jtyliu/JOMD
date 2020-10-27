@@ -140,7 +140,7 @@ class DbConn:
 
     def get_problem_type(self, types):
         query = ('SELECT * FROM problems WHERE '
-                 'problems.types like ?')
+                 'problems.types like ? ')
         types = str_to_like(types)
         args = (types,)
         res = self._fetchall(query, args)
