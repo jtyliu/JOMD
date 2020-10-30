@@ -1,5 +1,3 @@
-import json
-
 class Submission:
 
     def __init__(self, args=None):
@@ -37,7 +35,7 @@ class Submission:
         yield self.memory if self.memory else 0.0
         yield self.points if self.points else 0.0
         yield self.result
-    
+
     def __str__(self):
         return str(tuple(self))
 

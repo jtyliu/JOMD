@@ -48,7 +48,7 @@ class DbConn:
         rc = self.conn.execute(query, arg).rowcount
         self.conn.commit()
         return rc
-    
+
     def _fetchall(self, query, args):
         return self.conn.execute(query, args).fetchall()
 
@@ -96,7 +96,8 @@ class DbConn:
     def get_solved_problems(self, username):
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '
-                 '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
+                 '(SELECT problem, max(points) points FROM submissions '
+                 'WHERE user=? GROUP BY problem) '
                  'submission ON submission.problem = problem.code WHERE '
                  'ifnull(submission.points, 0) == problem.points')
         res = self._fetchall(query, (username,))
@@ -108,8 +109,9 @@ class DbConn:
 
         query = ('SELECT submission.* FROM '
                  'problems problem LEFT JOIN '
-                 '(SELECT *, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
-                 'submission ON submission.problem = problem.code WHERE '
+                 '(SELECT *, max(points) points FROM submissions WHERE '
+                 'user=? GROUP BY problem) submission ON '
+                 'submission.problem = problem.code WHERE '
                  'ifnull(submission.points, 0) != 0 AND (')
         query += ' OR '.join(['problem.types like ?'] * len(types))+')'
         types = map(str_to_like, types)
@@ -123,8 +125,9 @@ class DbConn:
 
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '
-                 '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
-                 'submission ON submission.problem = problem.code WHERE '
+                 '(SELECT problem, max(points) points FROM submissions '
+                 'WHERE user=? GROUP BY problem) submission ON '
+                 'submission.problem = problem.code WHERE '
                  'ifnull(submission.points, 0) == problem.points AND (')
         query += ' OR '.join(['problem.types like ?'] * len(types))+')'
         types = map(str_to_like, types)
@@ -135,8 +138,9 @@ class DbConn:
     def get_unsolved_problems(self, username, low=0, high=50):
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '
-                 '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
-                 'submission ON submission.problem = problem.code WHERE '
+                 '(SELECT problem, max(points) points FROM submissions '
+                 'WHERE user=? GROUP BY problem) submission ON '
+                 'submission.problem = problem.code WHERE '
                  'ifnull(submission.points, 0) < problem.points AND '
                  '(problem.points BETWEEN ? AND ?) ')
         # Temp patch, will change later
@@ -165,10 +169,12 @@ def add_query(name, val):
         return ''
     return f' AND {name} = {val}'
 
+
 def add_conditions(query, table, conditions):
-    for k,v in conditions:
+    for k, v in conditions:
         query += add_query(table+'.'+k, v)
     return query
+
 
 def str_to_like(types):
     return '%'+types+'%'

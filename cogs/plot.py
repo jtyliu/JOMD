@@ -3,24 +3,22 @@ from discord.ext import commands
 import typing
 from utils.query import user
 from discord.ext.commands.errors import BadArgument
-from utils.api import user_api, submission_api
 from utils.db import DbConn
 from utils.graph import plot_radar, plot_bar
-from utils.problem import Problem
-import html
-import random
 import asyncio
 import io
+
 
 class Plot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
     @commands.group(brief='Graphs for analyzing DMOJ activity',
                     invoke_without_command=True)
     async def plot(self, ctx):
-        "Plot various graphs"
+        """Plot various graphs"""
         await ctx.send_help('plot')
-    
+
     def graph_type(argument) -> typing.Optional[str]:
         if '+' not in argument:
             raise BadArgument('No graph type provided')
@@ -31,42 +29,51 @@ class Plot(commands.Cog):
         raise BadArgument('Graph type not known')
 
     @plot.command(usage='[+radar,+bar] [usernames]')
-    async def type(self, ctx, graph : typing.Optional[graph_type]='radar',*usernames):
+    async def type(self, ctx, graph: typing.Optional[graph_type]='radar',
+                   *usernames):
         """Graph problems solved by popular problem types"""
 
         usernames = list(usernames)
-        datas = await asyncio.gather(*[user.get_user(username) for username in usernames])
+
+        datas = await asyncio.gather(*[user.get_user(username)
+                                     for username in usernames])
         for i in range(len(datas)):
             if datas[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
-        
+
         if len(datas) > 6:
             return await ctx.send('Too many users given, max 6')
 
         usernames = [data['username'] for data in datas]
 
         db = DbConn()
-        important_types = [['Data Structures'], ['Dynamic Programming'], ['Graph Theory'], ['String Algorithms'], ['Advanced Math', 'Geometry', 'Intermediate Math', 'Simple Math'], ['Ad Hoc'], ['Greedy Algorithms']]
-        labels = ['Data Structures', 'Dynamic Programming', 'Graph Theory', 'String Algorithms', 'Math', 'Ad Hoc', 'Greedy Algorithms']
+        important_types = [
+            ['Data Structures'], ['Dynamic Programming'], ['Graph Theory'],
+            ['String Algorithms'],
+            ['Advanced Math', 'Geometry', 'Intermediate Math', 'Simple Math'],
+            ['Ad Hoc'], ['Greedy Algorithms']
+        ]
+        labels = ['Data Structures', 'Dynamic Programming', 'Graph Theory',
+                  'String Algorithms', 'Math', 'Ad Hoc', 'Greedy Algorithms']
         frequency = []
 
         for types in important_types:
             problems = db.get_problem_types(types)
             frequency.append(problems)
-        
+
         data = {}
         data['group'] = []
         for label in labels:
             data[label] = []
         for username in usernames:
             data['group'].append(username)
-        
+
         def calculate_points(points: int):
             p = 0
             for i in range(min(100, len(points))):
                 p += (0.95**i)*points[i]
             return p
-        
+
         def to_point_val(problem):
             return problem.points
 
@@ -88,7 +95,6 @@ class Plot(commands.Cog):
                 percentage = 100*points/total_points
                 max_percentage = max(max_percentage, percentage)
                 data[labels[i]].append(percentage)
-
 
         if graph == 'radar':
             plot_radar(data, max_percentage)

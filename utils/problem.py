@@ -1,5 +1,3 @@
-import json
-
 class Problem:
 
     def __init__(self, args=None):
@@ -37,7 +35,7 @@ class Problem:
         yield self.partial
         yield self.is_organization_private
         yield self.is_public
-    
+
     def __str__(self):
         return str(tuple(self))
 

@@ -3,6 +3,7 @@ from utils.db import DbConn
 import math
 import asyncio
 
+
 class user:
     @staticmethod
     async def get_user(username):
@@ -23,20 +24,17 @@ class user:
         submission_page = [None]*max(pages_to_query, 1)
 
         for page in range(pages_to_query):
-            submission_page[page] = submission_api.get_submissions_page(username, page+1)
-        
+            submission_page[page] = submission_api.get_submissions_page(
+                username, page+1
+            )
+
         if pages_to_query:
             submission_page = await asyncio.gather(*submission_page)
             api_submissions = []
             for submission in submission_page:
                 api_submissions += submission
-        
+
             api_submissions = api_submissions[:submissions_to_query]
             db.cache_submissions(api_submissions)
-            return  api_submissions+cached_submissions
+            return api_submissions+cached_submissions
         return cached_submissions
-
-
-
-
-        

@@ -1,22 +1,23 @@
-import requests
-import time
-import asyncio
-from bs4 import BeautifulSoup
 from utils.submission import Submission
 from utils.problem import Problem
+from bs4 import BeautifulSoup
 import functools
 import aiohttp
+import asyncio
+import time
 
 
 class ApiError(Exception):
     pass
 
+
 def rate_limit(func):
     ratelimit = 87
     queue = []
+
     @functools.wraps(func)
     async def wrapper_rate_limit(*args, **kwargs):
-        # Is this enough? 
+        # Is this enough?
         # Any race condition?
         now = time.time()
         while len(queue) > 0 and now - queue[0] > 60:
@@ -31,7 +32,9 @@ def rate_limit(func):
         return await func(*args, **kwargs)
     return wrapper_rate_limit
 
+
 _session = None
+
 
 @rate_limit
 async def _query_api(url, resp_obj):
@@ -43,7 +46,8 @@ async def _query_api(url, resp_obj):
             resp = await resp.text()
         if resp_obj == 'json':
             resp = await resp.json()
-        # if 'error' in resp:  ApiError would interfere with some other stuff, might just change to error trapping
+        # if 'error' in resp:  ApiError would interfere with some other stuff,
+        # might just change to error trapping
         #     raise ApiError
         return resp
 
@@ -51,7 +55,8 @@ async def _query_api(url, resp_obj):
 class user_api:
     @staticmethod
     async def get_user(username):
-        resp = await _query_api(f'https://dmoj.ca/api/v2/user/{username}', 'json')
+        resp = await _query_api(f'https://dmoj.ca/api/v2/user/{username}',
+                                'json')
         if 'error' in resp:
             return None
         return resp['data']['object']
@@ -72,6 +77,7 @@ class user_api:
         rank = int(rank_str.split('#')[-1])
         return rank
 
+
 class submission_api:
     @staticmethod
     async def get_submission_total(username):
@@ -84,7 +90,8 @@ class submission_api:
     @staticmethod
     async def get_submissions_page(username, page):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
-                                f'submissions?user={username}&page={page}', 'json')
+                                f'submissions?user={username}&page={page}',
+                                'json')
         if 'error' in resp:
             return None
         return list(map(Submission.loads, resp['data']['objects']))
@@ -112,7 +119,7 @@ class submission_api:
                 points = 0
             lang = soup.find(class_='language').text
             problem = soup.find(class_='name')\
-                            .find('a')['href'].split('/')[-1]
+                          .find('a')['href'].split('/')[-1]
             name = soup.find(class_='name').find('a').text
             date = soup.find(class_='time-with-rel')['title']
             try:
@@ -145,6 +152,7 @@ class submission_api:
                            ))
         return matches[:num]
 
+
 class problem_api:
     @staticmethod
     async def get_problem(problem_code):
@@ -164,9 +172,11 @@ class problem_api:
 
     @staticmethod
     async def get_problem_option(id):
-        resp = await _query_api(f'https://dmoj.ca/problems/?show_types=1', 'text')
+        resp = await _query_api(f'https://dmoj.ca/problems/?show_types=1',
+                                'text')
         soup = BeautifulSoup(resp, features="html5lib")
         options = soup.find('select', id=id).find_all('option')
+
         def get_options(options):
             options_avaliable = []
             for option in options:
@@ -174,6 +184,7 @@ class problem_api:
                     options_avaliable.append(option.text.strip())
         options = get_options(options)
         return options
+
 
 async def close():
     await _session.close()
