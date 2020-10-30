@@ -241,7 +241,7 @@ class User(commands.Cog):
         # user.get_submissions(username)
         
         db = DbConn()
-        problems = db.get_unsolvedproblems(username, points[0], points[1])
+        problems = db.get_unsolved_problems(username, points[0], points[1])
 
         results = []
         if filters != []:

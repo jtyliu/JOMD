@@ -30,8 +30,10 @@ class Plot(commands.Cog):
             return 'bar'
         raise BadArgument('Graph type not known')
 
-    @plot.command(usage='[usernames]')
+    @plot.command(usage='[+radar,+bar] [usernames]')
     async def type(self, ctx, graph : typing.Optional[graph_type]='radar',*usernames):
+        """Graph problems solved by popular problem types"""
+
         usernames = list(usernames)
         datas = await asyncio.gather(*[user.get_user(username) for username in usernames])
         for i in range(len(datas)):

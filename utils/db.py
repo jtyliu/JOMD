@@ -102,18 +102,10 @@ class DbConn:
         res = self._fetchall(query, (username,))
         return list(map(Problem, res))
 
-    def get_solved_problems_type(self, username, types):
-        query = ('SELECT problem.* FROM '
-                 'problems problem LEFT JOIN '
-                 '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
-                 'submission ON submission.problem = problem.code WHERE '
-                 'ifnull(submission.points, 0) == problem.points AND '
-                 'problem.types like ?')
-        types = str_to_like(types)
-        res = self._fetchall(query, (username, types,))
-        return list(map(Problem, res))
-
     def get_attempted_submissions_types(self, username, types):
+        if isinstance(types, str):
+            types = [types]
+
         query = ('SELECT submission.* FROM '
                  'problems problem LEFT JOIN '
                  '(SELECT *, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
@@ -126,6 +118,9 @@ class DbConn:
         return list(map(Submission, res))
 
     def get_solved_problems_types(self, username, types):
+        if isinstance(types, str):
+            types = [types]
+
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '
                  '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
@@ -137,7 +132,7 @@ class DbConn:
         res = self._fetchall(query, args)
         return list(map(Problem, res))
 
-    def get_unsolvedproblems(self, username, low=0, high=50):
+    def get_unsolved_problems(self, username, low=0, high=50):
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '
                  '(SELECT problem, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
@@ -150,15 +145,10 @@ class DbConn:
         res = self._fetchall(query, args)
         return list(map(Problem, res))
 
-    def get_problem_type(self, types):
-        query = ('SELECT * FROM problems WHERE '
-                 'problems.types like ? ')
-        types = str_to_like(types)
-        args = (types,)
-        res = self._fetchall(query, args)
-        return list(map(Problem, res))
-
     def get_problem_types(self, types):
+        if isinstance(types, str):
+            types = [types]
+
         query = 'SELECT * FROM problems WHERE '
         query += ' OR '.join(['problems.types like ?'] * len(types))
         types = map(str_to_like, types)
