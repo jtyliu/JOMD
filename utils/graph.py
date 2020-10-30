@@ -1,7 +1,30 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from math import pi
+import numpy as np
 
+
+def plot_bar(data, maxval):
+    plt.clf()
+    fig = plt.figure()
+    df = pd.DataFrame(data)
+    categories = ['DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
+    N = len(categories)
+    usernames = data['group']
+    index = np.arange(N)
+    barwidth = 1/(len(usernames)+1)
+
+    colours = ['b', 'g', 'r', 'c', 'm', 'y']
+    for i in range(len(usernames)):
+        values = df.loc[i].drop('group').values.flatten().tolist()
+        br = [j + barwidth for j in index]
+        plt.bar(index, values, color=colours[i], width=barwidth, edgecolor='grey', label=usernames[i])
+        index = br
+    plt.xlabel('Problem Types', fontweight ='bold') 
+    plt.ylabel('Points', fontweight ='bold') 
+    plt.xticks([r for r in range(N)], categories) 
+    plt.legend(loc='lower right', bbox_to_anchor=(0.95, 0.95), labelspacing=0.1, fontsize='small')
+    plt.savefig('./graphs/plot.png')
 
 def plot_radar(data, maxval):
     # Code from https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
@@ -23,7 +46,7 @@ def plot_radar(data, maxval):
     # If you want the first axis to be on top:
     ax.set_theta_offset(pi / 2)
     ax.set_theta_direction(-1)
-
+    
     # Draw one axe per variable + add labels labels yet
     plt.xticks(angles[:-1], categories)
 
@@ -46,5 +69,5 @@ def plot_radar(data, maxval):
         ax.fill(angles, values, colours[i], alpha=0.1)
 
     # Add legend
-    plt.legend(loc='lower right', bbox_to_anchor=(0.1, 0.1))
+    plt.legend(loc='lower right', bbox_to_anchor=(0.95, 0.95), labelspacing=0.1, fontsize='small')
     plt.savefig('./graphs/plot.png')

@@ -170,7 +170,10 @@ class User(commands.Cog):
         
         username = data['username']
 
-        msg = await ctx.send(f'Caching {username}\'s submissions')
+        try:
+            msg = await ctx.send(f'Caching {username}\'s submissions')
+        except:
+            return await msg.edit(content='An error has occured, try caching again')
 
         await user.get_submissions(username)
 
@@ -195,8 +198,8 @@ class User(commands.Cog):
             raise BadArgument('Point value is not an integer')
 
     @commands.command(hidden=True)
-    async def gimmie(self, ctx, member: discord.Member):
-        return await ctx.send('%d :monkey:' % member.nick)
+    async def gimmie(self, ctx):
+        return await ctx.send(':monkey:')
 
     @commands.command(usage='username [points] [problem types]')
     async def gimme(self, ctx, username : str, points : typing.Optional[point_range]=[1,50], *filters):

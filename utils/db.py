@@ -113,6 +113,18 @@ class DbConn:
         res = self._fetchall(query, (username, types,))
         return list(map(Problem, res))
 
+    def get_attempted_submissions_types(self, username, types):
+        query = ('SELECT submission.* FROM '
+                 'problems problem LEFT JOIN '
+                 '(SELECT *, max(points) points FROM submissions WHERE user=? GROUP BY problem) '
+                 'submission ON submission.problem = problem.code WHERE '
+                 'ifnull(submission.points, 0) != 0 AND (')
+        query += ' OR '.join(['problem.types like ?'] * len(types))+')'
+        types = map(str_to_like, types)
+        args = (username, *types,)
+        res = self._fetchall(query, args)
+        return list(map(Submission, res))
+
     def get_solved_problems_types(self, username, types):
         query = ('SELECT problem.* FROM '
                  'problems problem LEFT JOIN '

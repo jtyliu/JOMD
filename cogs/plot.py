@@ -5,7 +5,8 @@ from utils.query import user
 from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
 from utils.db import DbConn
-from utils.graph import plot_radar
+from utils.graph import plot_radar, plot_bar
+from utils.problem import Problem
 import html
 import random
 import asyncio
@@ -20,8 +21,17 @@ class Plot(commands.Cog):
         "Plot various graphs"
         await ctx.send_help('plot')
     
+    def graph_type(argument) -> typing.Optional[str]:
+        if '+' not in argument:
+            raise BadArgument('No graph type provided')
+        if argument == '+radar':
+            return 'radar'
+        if argument == '+bar':
+            return 'bar'
+        raise BadArgument('Graph type not known')
+
     @plot.command(usage='[usernames]')
-    async def type(self, ctx, *usernames):
+    async def type(self, ctx, graph : typing.Optional[graph_type]='radar',*usernames):
         usernames = list(usernames)
         datas = await asyncio.gather(*[user.get_user(username) for username in usernames])
         for i in range(len(datas)):
@@ -40,7 +50,7 @@ class Plot(commands.Cog):
 
         for types in important_types:
             problems = db.get_problem_types(types)
-            frequency.append(len(problems))
+            frequency.append(problems)
         
         data = {}
         data['group'] = []
@@ -49,16 +59,40 @@ class Plot(commands.Cog):
         for username in usernames:
             data['group'].append(username)
         
+        def calculate_points(points: int):
+            p = 0
+            for i in range(min(100, len(points))):
+                p += (0.95**i)*points[i]
+            return p
+        
+        def to_point_val(problem):
+            return problem.points
+
         max_percentage = 0
         for i in range(len(important_types)):
             for username in usernames:
                 types = important_types[i]
-                problems = db.get_solved_problems_types(username, types)
-                percentage = 100*len(problems)/frequency[i]
+                problems = db.get_attempted_submissions_types(username, types)
+                total_problems = db.get_problem_types(types)
+                points = list(map(to_point_val, problems))
+                total_points = list(map(to_point_val, total_problems))
+
+                points.sort(reverse=True)
+                total_points.sort(reverse=True)
+
+                points = calculate_points(points)
+                total_points = calculate_points(total_points)
+
+                percentage = 100*points/total_points
                 max_percentage = max(max_percentage, percentage)
                 data[labels[i]].append(percentage)
 
-        plot_radar(data, max_percentage)
+
+        if graph == 'radar':
+            plot_radar(data, max_percentage)
+        elif graph == 'bar':
+            plot_bar(data, max_percentage)
+
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
