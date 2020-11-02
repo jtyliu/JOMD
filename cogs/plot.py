@@ -28,8 +28,17 @@ class Plot(commands.Cog):
             return 'bar'
         raise BadArgument('Graph type not known')
 
-    @plot.command(usage='[+radar,+bar] [usernames]')
-    async def type(self, ctx, graph: typing.Optional[graph_type]='radar',
+    def as_percentage(arguement) -> typing.Optional[bool]:
+        if arguement == '+percent':
+            return True
+        elif arguement == '+point':
+            return False
+        raise BadArgument('Argument not known')
+
+    @plot.command(usage='[+percent, +point] [+radar, +bar] [usernames]')
+    async def type(self, ctx,
+                   as_percent: typing.Optional[as_percentage]=False,
+                   graph: typing.Optional[graph_type]='radar',
                    *usernames):
         """Graph problems solved by popular problem types"""
 
@@ -74,7 +83,7 @@ class Plot(commands.Cog):
                 p += (0.95**i)*points[i]
             return p
 
-        def to_point_val(problem):
+        def to_points(problem):
             return problem.points
 
         max_percentage = 0
@@ -83,23 +92,25 @@ class Plot(commands.Cog):
                 types = important_types[i]
                 problems = db.get_attempted_submissions_types(username, types)
                 total_problems = db.get_problem_types(types)
-                points = list(map(to_point_val, problems))
-                total_points = list(map(to_point_val, total_problems))
+                points = list(map(to_points, problems))
+                total_points = list(map(to_points, total_problems))
 
                 points.sort(reverse=True)
                 total_points.sort(reverse=True)
 
                 points = calculate_points(points)
                 total_points = calculate_points(total_points)
-
-                percentage = 100*points/total_points
+                if as_percent:
+                    percentage = 100*points/total_points
+                else:
+                    percentage = points
                 max_percentage = max(max_percentage, percentage)
                 data[labels[i]].append(percentage)
 
         if graph == 'radar':
-            plot_radar(data, max_percentage)
+            plot_radar(data, as_percent, max_percentage)
         elif graph == 'bar':
-            plot_bar(data, max_percentage)
+            plot_bar(data, as_percent, max_percentage)
 
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')

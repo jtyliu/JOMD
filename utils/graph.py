@@ -4,7 +4,7 @@ from math import pi
 import numpy as np
 
 
-def plot_bar(data, maxval):
+def plot_bar(data, as_percent, maxval):
     # Code from https://www.geeksforgeeks.org/bar-plot-in-matplotlib/
     plt.clf()
     df = pd.DataFrame(data)
@@ -22,14 +22,17 @@ def plot_bar(data, maxval):
                 edgecolor='grey', label=usernames[i])
         index = br
     plt.xlabel('Problem Types', fontweight='bold')
-    plt.ylabel('Points', fontweight='bold')
+    if as_percent:
+        plt.ylabel('Points (%)', fontweight='bold')
+    else:
+        plt.ylabel('Points', fontweight='bold')
     plt.xticks([r for r in range(N)], categories)
     plt.legend(loc='lower right', bbox_to_anchor=(0.95, 0.95),
                labelspacing=0.1, fontsize='small')
     plt.savefig('./graphs/plot.png')
 
 
-def plot_radar(data, maxval):
+def plot_radar(data, as_percent, maxval):
     # Code from
     # https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
     plt.clf()
@@ -59,11 +62,26 @@ def plot_radar(data, maxval):
     ax.set_rlabel_position(0)
 
     scale = maxval*1.1
-    plt.yticks(
-        [scale/4, scale/2, 3*scale/4],
-        ["%.1f%%" % (scale/4), "%.1f%%" % (scale/2), "%.1f%%" % (3*scale/4)],
-        color="grey", size=7
-    )
+    if as_percent:
+        plt.yticks(
+            [scale/4, scale/2, 3*scale/4],
+            [
+                "%.1f%%" % (scale/4),
+                "%.1f%%" % (scale/2),
+                "%.1f%%" % (3*scale/4)
+            ],
+            color="grey", size=7
+        )
+    else:
+        plt.yticks(
+            [scale/4, scale/2, 3*scale/4],
+            [
+                "%.1f" % (scale/4),
+                "%.1f" % (scale/2),
+                "%.1f" % (3*scale/4)
+            ],
+            color="grey", size=7
+        )
     plt.ylim(0, maxval*1.1)
 
     # Plot each individual = each line of the data
