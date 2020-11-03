@@ -43,7 +43,8 @@ class DbConn:
             'CREATE TABLE IF NOT EXISTS handles ('
             'id             INTEGER PRIMARY KEY,'
             'handle         TEXT,'
-            'user_id        INTEGER'
+            'user_id        INTEGER,'
+            'guild_id       TEXT'
             ')'
         )
 
@@ -66,10 +67,10 @@ class DbConn:
     def _rowcount(self, query, arg):
         return self.conn.execute(query, arg).rowcount
 
-    def cache_handle(self, id, handle, user_id):
+    def cache_handle(self, id, handle, user_id, guild_id):
         query = ('INSERT OR REPLACE INTO handles VALUES'
-                 '(?, ?, ?)')
-        self._update_one(query, (id, handle, user_id,))
+                 '(?, ?, ? ?)')
+        self._update_one(query, (id, handle, user_id, guild_id))
 
     def cache_problem(self, problem):
         query = ('INSERT OR REPLACE INTO problems VALUES'
@@ -88,16 +89,16 @@ class DbConn:
         submissions = map(tuple, submissions)
         self._update_many(query, submissions)
 
-    def get_handle_id(self, id):
+    def get_handle_id(self, id, guild_id):
         query = ('SELECT * from handles WHERE '
-                 'id = ?')
-        res = self._fetchone(query, (id,))
+                 'id = ? AND guild_id = ')
+        res = self._fetchone(query, (id, guild_id,))
         return res
 
-    def get_handle_user_id(self, user_id):
+    def get_handle_user_id(self, user_id, guild_id):
         query = ('SELECT * from handles WHERE '
-                 'user_id = ?')
-        res = self._fetchone(query, (user_id,))
+                 'user_id = ? AND guild_id = ?')
+        res = self._fetchone(query, (user_id, guild_id,))
         return res
 
     def get_problem(self, code):

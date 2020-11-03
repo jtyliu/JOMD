@@ -17,12 +17,12 @@ class Handles(commands.Cog):
     async def link(self, ctx, username: str):
         """Links your discord account to your dmoj account"""
         db = DbConn()
-        if db.get_handle_id(ctx.author.id):
+        if db.get_handle_id(ctx.author.id, ctx.guild.id):
             await ctx.send(
                 '%s, your handle is already linked with %s.' %
                 (ctx.author.mention, db.get_handle_id(ctx.author.id)[1]))
             return
-        if db.get_handle_user_id(username):
+        if db.get_handle_user_id(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')
             return
 
@@ -38,17 +38,16 @@ class Handles(commands.Cog):
             if (submission.result == 'CE' and
                     submission.problem == problem.code):
                 user_data = await user_api.get_user(username)
-                db.cache_handle(ctx.author.id, username, user_data['id'])
-                await ctx.send(
+                username = user_data['username']
+                db.cache_handle(ctx.author.id, username,
+                                user_data['id'], ctx.guild.id)
+                return await ctx.send(
                     "%s, you now have linked your account to %s." %
-                    (ctx.author.name, user_data['username'])
+                    (ctx.author.name, username)
                 )
-                return
         else:
-            await ctx.send(
-                "I don't see anything :monkey: (Failed to link accounts)"
-            )
-            return
+            return await ctx.send('I don\'t see anything :monkey: '
+                                  '(Failed to link accounts)')
 
 
 def setup(bot):
