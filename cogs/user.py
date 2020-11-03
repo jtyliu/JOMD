@@ -73,8 +73,16 @@ class User(commands.Cog):
             title=f"{username}'s latest submissions",
             color=0xfcdb05
         )
-
+        db = DbConn()
         for submission in submissions:
+
+            problem = db.get_problem(submission.problem)
+            if problem.points is not None:
+                points = str(int(problem.points))
+                if problem.partial:
+                    points += 'p'
+            else:
+                points = '???'
 
             embed.add_field(
                 name="%s / %s" %
@@ -83,7 +91,8 @@ class User(commands.Cog):
                 inline=True
             )
             embed.add_field(
-                name="%s" % html.unescape(submission.problem_name),
+                name="%s (%s)" %
+                     (html.unescape(submission.problem_name), points),
                 value="%s | [Problem](https://dmoj.ca/problem/%s)" %
                       (submission.date, submission.problem),
                 inline=True
