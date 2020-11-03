@@ -39,6 +39,14 @@ class DbConn:
             ')'
         )
 
+        self.conn.execute(
+            'CREATE TABLE IF NOT EXISTS handles ('
+            'id             INTEGER PRIMARY KEY,'
+            'handle         TEXT,'
+            'user_id        INTEGER'
+            ')'
+        )
+
     def _update_many(self, query, args):
         rc = self.conn.executemany(query, args).rowcount
         self.conn.commit()
@@ -58,6 +66,11 @@ class DbConn:
     def _rowcount(self, query, arg):
         return self.conn.execute(query, arg).rowcount
 
+    def cache_handle(self, id, handle, user_id):
+        query = ('INSERT OR REPLACE INTO handles VALUES'
+                 '(?, ?, ?)')
+        self._update_one(query, (id, handle, user_id,))
+
     def cache_problem(self, problem):
         query = ('INSERT OR REPLACE INTO problems VALUES'
                  '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
@@ -74,6 +87,18 @@ class DbConn:
                  '(?, ?, ?, ?, ?, ?, ?, ?, ?)')
         submissions = map(tuple, submissions)
         self._update_many(query, submissions)
+
+    def get_handle_id(self, id):
+        query = ('SELECT * from handles WHERE '
+                 'id = ?')
+        res = self._fetchone(query, (id,))
+        return res
+
+    def get_handle_user_id(self, user_id):
+        query = ('SELECT * from handles WHERE '
+                 'user_id = ?')
+        res = self._fetchone(query, (user_id,))
+        return res
 
     def get_problem(self, code):
         query = ('SELECT * FROM problems WHERE '
@@ -148,6 +173,13 @@ class DbConn:
         args = (username, low, high,)
         res = self._fetchall(query, args)
         return list(map(Problem, res))
+
+    def get_random_problem(self, limit=7):
+        query = ('SELECT * FROM problems '
+                 'WHERE problems.points <= ? '
+                 'ORDER BY RANDOM() LIMIT 1')
+        res = self._fetchone(query, (limit,))
+        return Problem(res)
 
     def get_problem_types(self, types):
         if isinstance(types, str):
