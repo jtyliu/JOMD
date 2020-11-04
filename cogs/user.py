@@ -136,7 +136,7 @@ class User(commands.Cog):
             points = submission.points
             result = submission.result
 
-            if points is not None and points != 0:
+            if points is not None:
                 if result == 'AC':
                     problems_ACed[code] = 1
                 if code not in code_to_points:
