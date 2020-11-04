@@ -20,7 +20,7 @@ class Handles(commands.Cog):
         if db.get_handle_id(ctx.author.id, ctx.guild.id):
             await ctx.send(
                 '%s, your handle is already linked with %s.' %
-                (ctx.author.mention, db.get_handle_id(ctx.author.id)[1]))
+                (ctx.author.mention, db.get_handle_id(ctx.author.id)))
             return
         if db.get_handle_user_id(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')

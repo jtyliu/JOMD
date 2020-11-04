@@ -177,8 +177,14 @@ class User(commands.Cog):
 
         return await ctx.send(embed=embed)
 
+    def force(argument) -> typing.Optional[bool]:
+        if argument == '+f':
+            return True
+        raise BadArgument('No force argument')
+
     @commands.command(usage='username')
-    async def cache(self, ctx, username: str):
+    async def cache(self, ctx, complete: typing.Optional[force]=False,
+                    username: str=''):
         """Caches the submissions of a user, will speed up other commands"""
         data = await user.get_user(username)
         if data is None:
@@ -193,7 +199,10 @@ class User(commands.Cog):
                                    'try caching again. Log: '+e.message)
             return
 
-        await user.get_submissions(username)
+        if complete:
+            await user.get_all_submissions(username)
+        else:
+            await user.get_submissions(username)
 
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached.')

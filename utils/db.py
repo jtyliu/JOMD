@@ -69,8 +69,8 @@ class DbConn:
 
     def cache_handle(self, id, handle, user_id, guild_id):
         query = ('INSERT OR REPLACE INTO handles VALUES'
-                 '(?, ?, ? ?)')
-        self._update_one(query, (id, handle, user_id, guild_id))
+                 '(?, ?, ?, ?)')
+        self._update_one(query, (id, handle, user_id, guild_id,))
 
     def cache_problem(self, problem):
         query = ('INSERT OR REPLACE INTO problems VALUES'
@@ -91,15 +91,15 @@ class DbConn:
 
     def get_handle_id(self, id, guild_id):
         query = ('SELECT * from handles WHERE '
-                 'id = ? AND guild_id = ')
+                 'id = ? AND guild_id = ?')
         res = self._fetchone(query, (id, guild_id,))
-        return res
+        return None if res is None else res[1]
 
     def get_handle_user_id(self, user_id, guild_id):
         query = ('SELECT * from handles WHERE '
                  'user_id = ? AND guild_id = ?')
         res = self._fetchone(query, (user_id, guild_id,))
-        return res
+        return None if res is None else res[0]
 
     def get_problem(self, code):
         query = ('SELECT * FROM problems WHERE '
