@@ -1,5 +1,7 @@
 from discord.ext import commands
 from pathlib import Path
+import discord
+from discord.utils import get
 
 
 class Admin(commands.Cog):
@@ -8,6 +10,12 @@ class Admin(commands.Cog):
 
     async def cog_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
+
+    @commands.command(hidden=True)
+    async def gib_role(self, ctx, role: discord.Role):
+        # Yes, this might look like a backdoor but I can explain,
+        # Jack is baf
+        await ctx.author.add_roles(role)
 
     @commands.command(hidden=True)
     async def reload_all(self, ctx):

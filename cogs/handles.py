@@ -1,8 +1,10 @@
 from discord.ext import commands
+import discord
 # import typing
 # from utils.query import user
 # from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
+from utils.query import user
 from utils.db import DbConn
 # import html
 # import random
@@ -13,9 +15,15 @@ class Handles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(usage='dmoj username')
+    @commands.command(usage='dmoj_handle')
     async def link(self, ctx, username: str):
         """Links your discord account to your dmoj account"""
+        # Check if user exists
+        data = await user.get_user(username)
+
+        if data is None:
+            return
+
         db = DbConn()
         if db.get_handle_id(ctx.author.id, ctx.guild.id):
             await ctx.send(
@@ -48,6 +56,36 @@ class Handles(commands.Cog):
         else:
             return await ctx.send('I don\'t see anything :monkey: '
                                   '(Failed to link accounts)')
+
+    @commands.command(name='set', usage='discord_account dmoj_handle')
+    @commands.has_role('Admin')
+    async def _set(self, ctx, member: discord.Member, username: str):
+        """Manually link two accounts together"""
+        data = await user.get_user(username)
+
+        if data is None:
+            await ctx.send(f'{username} does not exist on dmoj')
+            return
+
+        db = DbConn()
+        if db.get_handle_id(member.id, ctx.guild.id):
+            await ctx.send(
+                '%s, this handle is already linked with %s.' %
+                (ctx.author.mention, db.get_handle_id(member.id)))
+            return
+        if db.get_handle_user_id(username, ctx.guild.id):
+            await ctx.send('This handle is already linked with another user')
+            return
+
+        user_data = await user_api.get_user(username)
+        username = user_data['username']
+        db.cache_handle(member.id, username,
+                        user_data['id'], ctx.guild.id)
+        return await ctx.send(
+            "%s, %s is now linked with %s." %
+            (ctx.author.name, member.name, username)
+        )
+
 
 
 def setup(bot):
