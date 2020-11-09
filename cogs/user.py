@@ -5,6 +5,7 @@ from utils.query import user
 from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
 from utils.db import DbConn
+from utils.jomd_common import parse_user, parse_predict, parse_gimme
 import html
 import random
 
@@ -13,10 +14,27 @@ class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(usage='username [latest submissions]')
-    async def user(self, ctx, username: str,
+    @commands.command(usage='[username] [latest submissions]')
+    async def user(self, ctx, username: typing.Optional[str]=None,
                    amount: typing.Optional[int]=None):
-        """Show user profile and latest submissions"""
+        """Show user profile and latest submissions
+
+        Use '' around to tell the parser this is a username
+        """
+        if amount is None:
+            username, amount = parse_user(username)
+
+        db = DbConn()
+        username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+
+        # If user is not found in db
+        if username is None:
+            username = amount
+            amount = None
+
+        if username is None:
+            return
+
         if amount is not None:
             amount = min(amount, 8)
             if amount < 1:
@@ -73,7 +91,6 @@ class User(commands.Cog):
             title=f"{username}'s latest submissions",
             color=0xfcdb05
         )
-        db = DbConn()
         for submission in submissions:
 
             problem = db.get_problem(submission.problem)
@@ -117,8 +134,21 @@ class User(commands.Cog):
     async def predict(self, ctx, username: str,
                       amounts: commands.Greedy[int]):
         """Predict total points after solving N pointer problem(s)"""
+
+        username, amounts = parse_predict(username, amounts)
+
+        db = DbConn()
+        username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+
+        if username is None and len(amounts) > 0:
+            username = amounts[0]
+            amounts.pop(0)
+
         if amounts == []:
             return await ctx.send(f'No points given!')
+
+        if username is None:
+            return
 
         amounts = amounts[:10]
         data = await user.get_user(username)
@@ -182,10 +212,16 @@ class User(commands.Cog):
             return True
         raise BadArgument('No force argument')
 
-    @commands.command(usage='username')
+    @commands.command(usage='[username]')
     async def cache(self, ctx, complete: typing.Optional[force]=False,
-                    username: str=''):
+                    username: typing.Optional[str]=None):
         """Caches the submissions of a user, will speed up other commands"""
+        db = DbConn()
+        username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+
+        if username is None:
+            return await ctx.send(f'No username given!')
+
         data = await user.get_user(username)
         if data is None:
             return await ctx.send(f'{username} does not exist on DMOJ')
@@ -207,7 +243,7 @@ class User(commands.Cog):
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached.')
 
-    def point_range(argument) -> typing.Optional[list]:
+    def point_range(self, argument) -> typing.Optional[list]:
         if '-' in argument:
             argument = argument.split('-')
             if len(argument) != 2:
@@ -229,7 +265,7 @@ class User(commands.Cog):
         return await ctx.send(':monkey:')
 
     @commands.command(usage='username [points] [problem types]')
-    async def gimme(self, ctx, username: str,
+    async def gimme(self, ctx, username: typing.Optional[str]=None,
                     points: typing.Optional[point_range]=[1, 50], *filters):
         """Recommend a problem
 
@@ -247,6 +283,15 @@ class User(commands.Cog):
         - regex
         - string"""
         filters = list(filters)
+
+        username, points, filters = parse_gimme(username, points,
+                                                filters, self.point_range)
+
+        db = DbConn()
+        username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+
+        if username is None:
+            return await ctx.send(f'No username provided')
 
         data = await user.get_user(username)
         if data is None:
@@ -281,7 +326,6 @@ class User(commands.Cog):
         # according to that
         # user.get_submissions(username)
 
-        db = DbConn()
         problems = db.get_unsolved_problems(username, points[0], points[1])
 
         results = []
