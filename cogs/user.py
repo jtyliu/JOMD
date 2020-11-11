@@ -5,7 +5,7 @@ from utils.query import user
 from discord.ext.commands.errors import BadArgument
 from utils.api import user_api, submission_api
 from utils.db import DbConn
-from utils.jomd_common import parse_user, parse_predict, parse_gimme
+from utils.jomd_common import str_not_int, point_range, parse_gimme
 import html
 import random
 
@@ -15,14 +15,12 @@ class User(commands.Cog):
         self.bot = bot
 
     @commands.command(usage='[username] [latest submissions]')
-    async def user(self, ctx, username: typing.Optional[str]=None,
+    async def user(self, ctx, username: typing.Optional[str_not_int]=None,
                    amount: typing.Optional[int]=None):
         """Show user profile and latest submissions
 
-        Use '' around to tell the parser this is a username
+        Use surround your username with '' if it can be interpreted as a number
         """
-        if amount is None:
-            username, amount = parse_user(username)
 
         db = DbConn()
         username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
@@ -47,7 +45,7 @@ class User(commands.Cog):
         username = data['username']
 
         def is_rated(user):
-            return 1 if 'rating' in user else 0
+            return 1 if 'rating' in user and user['rating'] else 0
 
         description = 'Calculated points: %.2f' % data['performance_points']
         embed = discord.Embed(
@@ -131,17 +129,17 @@ class User(commands.Cog):
         return None
 
     @commands.command(usage='username [points solved]')
-    async def predict(self, ctx, username: str,
-                      amounts: commands.Greedy[int]):
-        """Predict total points after solving N pointer problem(s)"""
+    async def predict(self, ctx, username: typing.Optional[str_not_int]=None,
+                      amounts: commands.Greedy[int]=[]):
+        """Predict total points after solving N pointer problem(s)
 
-        username, amounts = parse_predict(username, amounts)
-
+        Use surround your username with '' if it can be interpreted as a number
+        """
         db = DbConn()
         username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
 
         if username is None and len(amounts) > 0:
-            username = amounts[0]
+            username = str([0])
             amounts.pop(0)
 
         if amounts == []:
@@ -207,7 +205,7 @@ class User(commands.Cog):
 
         return await ctx.send(embed=embed)
 
-    def force(argument) -> typing.Optional[bool]:
+    def force(self, argument) -> typing.Optional[bool]:
         if argument == '+f':
             return True
         raise BadArgument('No force argument')
@@ -215,7 +213,12 @@ class User(commands.Cog):
     @commands.command(usage='[username]')
     async def cache(self, ctx, complete: typing.Optional[force]=False,
                     username: typing.Optional[str]=None):
-        """Caches the submissions of a user, will speed up other commands"""
+        """Caches the submissions of a user, will speed up other commands
+
+        Use surround your username with '' if it can be interpreted as a number
+        +f              cache every submission
+        """
+        username = username.replace('\'', '')
         db = DbConn()
         username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
 
@@ -243,31 +246,16 @@ class User(commands.Cog):
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached.')
 
-    def point_range(self, argument) -> typing.Optional[list]:
-        if '-' in argument:
-            argument = argument.split('-')
-            if len(argument) != 2:
-                raise BadArgument('Too many -, invalid range')
-            try:
-                point_high = int(argument[0])
-                point_low = int(argument[1])
-                return [point_high, point_low]
-            except ValueError as e:
-                raise BadArgument('Point values are not an integer')
-        try:
-            point_high = point_low = int(argument)
-            return [point_high, point_low]
-        except ValueError as e:
-            raise BadArgument('Point value is not an integer')
-
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
     @commands.command(usage='username [points] [problem types]')
-    async def gimme(self, ctx, username: typing.Optional[str]=None,
+    async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
                     points: typing.Optional[point_range]=[1, 50], *filters):
         """Recommend a problem
+
+        Use surround your username with '' if it can be interpreted as a number
 
         Shorthands:
         - adhoc
@@ -283,10 +271,6 @@ class User(commands.Cog):
         - regex
         - string"""
         filters = list(filters)
-
-        username, points, filters = parse_gimme(username, points,
-                                                filters, self.point_range)
-
         db = DbConn()
         username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
 
