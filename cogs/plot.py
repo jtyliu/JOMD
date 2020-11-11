@@ -19,7 +19,7 @@ class Plot(commands.Cog):
         """Plot various graphs"""
         await ctx.send_help('plot')
 
-    def graph_type(self, argument) -> typing.Optional[str]:
+    def graph_type(argument) -> typing.Optional[str]:
         if '+' not in argument:
             raise BadArgument('No graph type provided')
         if argument == '+radar':
@@ -28,12 +28,12 @@ class Plot(commands.Cog):
             return 'bar'
         raise BadArgument('Graph type not known')
 
-    def as_percentage(self, arguement) -> typing.Optional[bool]:
-        if arguement == '+percent':
+    def as_percentage(argument) -> typing.Optional[bool]:
+        if argument == '+percent':
             return True
-        if arguement == '+percentage':
+        if argument == '+percentage':
             return True
-        if arguement == '+point':
+        if argument == '+point':
             return False
         raise BadArgument('Argument not known')
 
