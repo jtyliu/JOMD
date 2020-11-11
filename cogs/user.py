@@ -93,7 +93,7 @@ class User(commands.Cog):
 
             problem = db.get_problem(submission.problem)
             if problem.points is not None:
-                points = str(int(problem.points))
+                points = str(int(problem.points))+'p'
                 if problem.partial:
                     points += 'p'
             else:
@@ -106,7 +106,7 @@ class User(commands.Cog):
                 inline=True
             )
             embed.add_field(
-                name="%s (%s)" %
+                name="%s %s" %
                      (html.unescape(submission.problem_name), points),
                 value="%s | [Problem](https://dmoj.ca/problem/%s)" %
                       (submission.date, submission.problem),
