@@ -106,7 +106,7 @@ class User(commands.Cog):
                 inline=True
             )
             embed.add_field(
-                name="%s %s" %
+                name="%s (%s)" %
                      (html.unescape(submission.problem_name), points),
                 value="%s | [Problem](https://dmoj.ca/problem/%s)" %
                       (submission.date, submission.problem),
