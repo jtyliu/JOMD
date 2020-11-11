@@ -46,6 +46,10 @@ class Plot(commands.Cog):
 
         usernames = list(usernames)
 
+        db = DbConn()
+        if usernames == []:
+            usernames = [db.get_handle_id(ctx.author.id, ctx.guild.id)]
+
         datas = await asyncio.gather(*[user.get_user(username)
                                      for username in usernames])
         for i in range(len(datas)):
@@ -57,7 +61,6 @@ class Plot(commands.Cog):
 
         usernames = [data['username'] for data in datas]
 
-        db = DbConn()
         important_types = [
             ['Data Structures'], ['Dynamic Programming'], ['Graph Theory'],
             ['String Algorithms'],
