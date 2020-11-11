@@ -68,11 +68,13 @@ class Handles(commands.Cog):
             return
 
         db = DbConn()
+
         if db.get_handle_id(member.id, ctx.guild.id):
             await ctx.send(
                 '%s, this handle is already linked with %s.' %
                 (ctx.author.mention, db.get_handle_id(member.id)))
             return
+
         if db.get_handle_user_id(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')
             return
@@ -85,7 +87,6 @@ class Handles(commands.Cog):
             "%s, %s is now linked with %s." %
             (ctx.author.name, member.name, username)
         )
-
 
 
 def setup(bot):
