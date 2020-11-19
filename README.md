@@ -28,15 +28,21 @@ cd JOMD
 
 Make sure you have python3.7 installed.
 
-```apt-get install python3.7```
+```
+apt-get install python3.7
+```
 
 Install relevant packages
 
-```pip3.7 install -r requirements.txt```
+```
+pip3.7 install -r requirements.txt
+```
 
 Run the bot with
 
-```python3.7 Main.py```
+```
+python3.7 Main.py
+```
 
 # Usage
 To use the bot, use the `+` prefix
