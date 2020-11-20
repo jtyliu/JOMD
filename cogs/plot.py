@@ -39,7 +39,7 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[+percent, +point] [+radar, +bar] [usernames]')
     async def type(self, ctx,
-                   as_percent: typing.Optional[as_percentage]=False,
+                   as_percent: typing.Optional[as_percentage]=True,
                    graph: typing.Optional[graph_type]='radar',
                    *usernames):
         """Graph problems solved by popular problem types"""
@@ -96,6 +96,12 @@ class Plot(commands.Cog):
             for username in usernames:
                 types = important_types[i]
                 problems = db.get_attempted_submissions_types(username, types)
+                if db.get_submissions(username) == []:
+                    await ctx.send('There are no submissions cached, fetching '
+                                   'submissions now.')
+                    await user.get_submissions(username)
+                    problems = db.get_attempted_submissions_types(username,
+                                                                  types)
                 total_problems = db.get_problem_types(types)
                 points = list(map(to_points, problems))
                 total_points = list(map(to_points, total_problems))
