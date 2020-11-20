@@ -38,6 +38,18 @@ Install relevant packages
 pip3.7 install -r requirements.txt
 ```
 
+Add your discord bot token with
+
+```
+export JOMD_BOT_TOKEN="INSERT BOT TOKEN HERE"
+```
+
+If you also want to add your DMOJ api token use
+
+```
+export JOMD_TOKEN="INSERT DMOJ API TOKEN HERE"
+```
+
 Run the bot with
 
 ```
