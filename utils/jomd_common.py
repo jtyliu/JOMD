@@ -17,21 +17,21 @@ def str_not_int(argument) -> typing.Optional[str]:
 
 
 def point_range(argument) -> typing.Optional[list]:
-        if '-' in argument:
-            argument = argument.split('-')
-            if len(argument) != 2:
-                raise BadArgument('Too many -, invalid range')
-            try:
-                point_high = int(argument[0])
-                point_low = int(argument[1])
-                return [point_high, point_low]
-            except ValueError as e:
-                raise BadArgument('Point values are not an integer')
+    if '-' in argument:
+        argument = argument.split('-')
+        if len(argument) != 2:
+            raise BadArgument('Too many -, invalid range')
         try:
-            point_high = point_low = int(argument)
+            point_high = int(argument[0])
+            point_low = int(argument[1])
             return [point_high, point_low]
         except ValueError as e:
-            raise BadArgument('Point value is not an integer')
+            raise BadArgument('Point values are not an integer')
+    try:
+        point_high = point_low = int(argument)
+        return [point_high, point_low]
+    except ValueError as e:
+        raise BadArgument('Point value is not an integer')
 
 
 def parse_gimme(argument) -> typing.Optional[str]:
@@ -47,7 +47,7 @@ def parse_gimme(argument) -> typing.Optional[str]:
         raise BadArgument("Argument is keyword")
 
     try:
-        point_range(argument)
-        raise BadArgument("Argument is point range")
+        print(point_range(argument))
     except BadArgument:
         return argument.replace('\'', '')
+    raise BadArgument("Argument is point range")
