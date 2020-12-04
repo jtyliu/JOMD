@@ -15,6 +15,14 @@ class Handles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command()
+    async def unlink(self, ctx):
+        """Unlink your discord account with your dmoj account"""
+        db = DbConn()
+        if not db.get_handle_id(ctx.author.id, ctx.guild.id):
+            await ctx.send('You are not linked with any user')
+            return
+
     @commands.command(usage='dmoj_handle')
     async def link(self, ctx, username: str):
         """Links your discord account to your dmoj account"""
