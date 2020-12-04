@@ -121,7 +121,7 @@ class Plot(commands.Cog):
         if graph == 'radar':
             plot_radar(data, as_percent, max_percentage)
         elif graph == 'bar':
-            plot_bar(data, as_percent, max_percentage)
+            plot_bar(data, as_percent)
 
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')

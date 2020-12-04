@@ -14,7 +14,7 @@ def main():
             code = problem['code']
             problem = problem_api.get_problem(code)
             problem = Problem.loads(problem['data']['object'])
-            print(problem)
+            # print(problem)
             if problem.is_public:
                 db.cache_problem(problem)
             time.sleep(0.7)
