@@ -1,34 +1,24 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from math import pi
-import numpy as np
+import seaborn as sns
 
 
-def plot_bar(data, as_percent, maxval):
-    # Code from https://www.geeksforgeeks.org/bar-plot-in-matplotlib/
+categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
+
+
+def plot_bar(data, as_percent):
     plt.clf()
     df = pd.DataFrame(data)
-    categories = ['DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
-    N = len(categories)
-    usernames = data['group']
-    index = np.arange(N)
-    barwidth = 1/(len(usernames)+1)
-
-    colours = ['b', 'g', 'r', 'c', 'm', 'y']
-    for i in range(len(usernames)):
-        values = df.loc[i].drop('group').values.flatten().tolist()
-        br = [j + barwidth for j in index]
-        plt.bar(index, values, color=colours[i], width=barwidth,
-                edgecolor='grey', label=usernames[i])
-        index = br
-    plt.xlabel('Problem Types', fontweight='bold')
-    if as_percent:
-        plt.ylabel('Points (%)', fontweight='bold')
-    else:
-        plt.ylabel('Points', fontweight='bold')
-    plt.xticks([r for r in range(N)], categories)
-    plt.legend(loc='lower right', bbox_to_anchor=(0.95, 0.95),
-               labelspacing=0.1, fontsize='small')
+    df.columns = categories
+    ylabel = 'Points (%)' if as_percent else 'Points'
+    df = pd.melt(df, id_vars='Users', var_name='Problem Type',
+                 value_name=ylabel)
+    sns.set_theme()
+    sns.set_style("whitegrid")
+    sns.barplot(x='Problem Type', y=ylabel, hue='Users', data=df,
+                palette='tab10')
+    plt.legend(loc='upper right', fontsize='8')
     plt.savefig('./graphs/plot.png')
 
 
