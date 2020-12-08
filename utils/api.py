@@ -155,6 +155,14 @@ class submission_api:
 
 class problem_api:
     @staticmethod
+    async def get_problem_total():
+        resp = await _query_api(f'https://dmoj.ca/api/v2/'
+                                f'problems', 'json')
+        if 'error' in resp:
+            return None
+        return resp['data']['total_objects']
+
+    @staticmethod
     async def get_problem(problem_code):
         resp = await _query_api(f'https://dmoj.ca/'
                                 f'api/v2/problem/{problem_code}', 'json')
@@ -166,9 +174,7 @@ class problem_api:
     async def get_problems(page=1):
         resp = await _query_api(f'https://dmoj.ca/api/v2/'
                                 f'problems?page={page}', 'json')
-        if 'error' in resp:
-            return None
-        return list(map(Problem.loads, resp['data']['object']))
+        return list(map(Problem.loads, resp['data']['objects']))
 
     @staticmethod
     async def get_problem_option(id):

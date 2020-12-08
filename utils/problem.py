@@ -42,14 +42,14 @@ class Problem:
     @staticmethod
     def loads(data):
         problem = Problem()
-        problem.code = data['code']
-        problem.name = data['name']
-        problem.types = data['types']
-        problem.group = data['group']
-        problem.time_limit = data['time_limit']
-        problem.memory_limit = data['memory_limit']
-        problem.points = data['points']
-        problem.partial = data['partial']
-        problem.is_organization_private = data['is_organization_private']
-        problem.is_public = data['is_public']
+        problem.code = data.get('code')
+        problem.name = data.get('name')
+        problem.types = data.get('types')
+        problem.group = data.get('group')
+        problem.time_limit = data.get('time_limit')
+        problem.memory_limit = data.get('memory_limit')
+        problem.points = data.get('points')
+        problem.partial = data.get('partial')
+        problem.is_organization_private = data.get('is_organization_private')
+        problem.is_public = data.get('is_public')
         return problem

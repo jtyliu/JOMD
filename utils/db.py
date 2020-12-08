@@ -105,6 +105,8 @@ class DbConn:
         query = ('SELECT * FROM problems WHERE '
                  'code = ?')
         res = self._fetchone(query, (code,))
+        if res is None:
+            return None
         return Problem(res)
 
     def count_submissions(self, username):
