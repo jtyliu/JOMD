@@ -400,4 +400,13 @@ class Judge(Base):
             self.languages.append(language)
 
 
+class Handle(Base):
+    __tablename__ = 'handle'
+
+    id = Column(Integer, primary_key=True)
+    handle = Column(String)
+    user_id = Column(Integer)
+    guild_id = Column(Integer)
+
+
 Base.metadata.create_all(engine)
