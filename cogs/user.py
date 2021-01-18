@@ -205,6 +205,13 @@ class User(commands.Cog):
 
         return await ctx.send(embed=embed)
 
+    @commands.command(usage='[usernames]')
+    async def vc(self, ctx, *username):
+        """Suggest a contest"""
+        if username == []:
+            return
+        return await ctx.send('Not implement yet!')
+
     def force(argument) -> typing.Optional[bool]:
         if argument == '+f':
             return True
