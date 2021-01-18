@@ -10,10 +10,10 @@ import time
 from datetime import datetime
 from utils.db import session
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
-                          Participation as Participation_DB,
-                          User as User_DB, Submission as Submission_DB,
-                          Organization as Organization_DB,
-                          Language as Language_DB, Judge as Judge_DB)
+                      Participation as Participation_DB,
+                      User as User_DB, Submission as Submission_DB,
+                      Organization as Organization_DB,
+                      Language as Language_DB, Judge as Judge_DB)
 
 
 def rate_limit(func):
