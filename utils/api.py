@@ -16,6 +16,7 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB)
 from utils.db import problem_user
+from utils.jomd_common import first_tuple
 
 
 def rate_limit(func):
@@ -88,8 +89,9 @@ class Problem:
             filter(Language_DB.key.in_(self._languages))
         language_q = session.query(Language_DB.key).\
             filter(Language_DB.key.in_(self._languages)).all()
+        language_q = list(map(first_tuple, language_q))
         for language_key in self._languages:
-            if language_key in language_q:
+            if language_key not in language_q:
                 api = API()
                 await api.get_languages()
                 for language in api.data.objects:
@@ -103,8 +105,9 @@ class Problem:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_q = list(map(first_tuple, organization_q))
         for organization_id in self._organizations:
-            if organization_id in organization_q:
+            if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -144,8 +147,9 @@ class Contest:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_q = list(map(first_tuple, organization_q))
         for organization_id in self._organizations:
-            if organization_id in organization_q:
+            if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -163,11 +167,11 @@ class Contest:
             filter(Problem_DB.code.in_(self._problem_codes))
         problem_q = session.query(Problem_DB.code).\
             filter(Problem_DB.code.in_(self._problem_codes)).all()
-
+        problem_q = list(map(first_tuple, problem_q))
         for problem_dict in self._problems:
             problem_code = problem_dict["code"]
             try:
-                if problem_code in problem_q:
+                if problem_code not in problem_q:
                     api = API()
                     await api.get_problem(problem_code)
                     session.add(Problem_DB(api.data.object))
@@ -236,9 +240,10 @@ class User:
             filter(Problem_DB.code.in_(self._solved_problems))
         problem_q = session.query(Problem_DB.code).\
             filter(Problem_DB.code.in_(self._solved_problems)).all()
+        problem_q = list(map(first_tuple, problem_q))
         for problem_code in self._solved_problems:
             try:
-                if problem_code in problem_q:
+                if problem_code not in problem_q:
                     api = API()
                     await api.get_problem(problem_code)
                     session.add(Problem_DB(api.data.object))
@@ -251,8 +256,9 @@ class User:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_q = list(map(first_tuple, organization_q))
         for organization_id in self._organizations:
-            if organization_id in organization_q:
+            if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -271,10 +277,11 @@ class User:
             filter(Contest_DB.key.in_(self._contest_keys))
         contest_q = session.query(Contest_DB.key).\
             filter(Contest_DB.key.in_(self._contest_keys)).all()
+        contest_q = list(map(first_tuple, contest_q))
         for contest_dict in self._contests:
             contest_key = contest_dict["key"]
             try:
-                if contest_key in contest_q:
+                if contest_key not in contest_q:
                     api = API()
                     await api.get_contest(contest_key)
                     session.add(Contest_DB(api.data.object))
