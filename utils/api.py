@@ -7,6 +7,7 @@ import functools
 import aiohttp
 import asyncio
 import time
+import html
 from datetime import datetime
 from utils.db import session
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
@@ -56,6 +57,7 @@ async def _query_api(url, resp_obj):
         # if 'error' in resp:  ApiError would interfere with some other stuff,
         # might just change to error trapping
         #     raise ApiError
+        print("Parsed data, returning...")
         return resp
 
 
@@ -276,6 +278,19 @@ class Submission:
         self.case_points = data.get("case_points")
         self.case_total = data.get("case_total")
         self.cases = data.get("cases")
+        self.score_num = data.get("score_num")
+        self.score_denom = data.get("score_denom")
+
+    @property
+    def memory_str(self):
+        if self.memory is None or self.memory == 0:
+            return "---"
+        if self.memory < 1024:
+            return "%.1f KB" % (self.memory)
+        elif self.memory < 1024**2:
+            return "%.1f MB" % (self.memory/1024)
+        else:
+            return "%.1f GB" % (self.memory/1024/1024)
 
     async def async_init(self):
         problem_q = session.query(Problem_DB).\
@@ -285,7 +300,7 @@ class Submission:
             await api.get_problem(self._problem)
             session.add(Problem_DB(api.data.object))
             session.commit()
-        self.problem = problem_q.first()
+        self.problem = [problem_q.first()]
 
         user_q = session.query(User_DB).\
             filter(User_DB.username == self._user)
@@ -294,7 +309,7 @@ class Submission:
             await api.get_user(self._user)
             session.add(User_DB(api.data.object))
             session.commit()
-        self.user = user_q.first()
+        self.user = [user_q.first()]
 
         language_q = session.query(Language_DB).\
             filter(Language_DB.key == self._language)
@@ -306,7 +321,7 @@ class Submission:
                     session.add(Language_DB(language))
                     session.commit()
                     break
-        self.language = language_q.first()
+        self.language = [language_q.first()]
 
 
 class Organization:
@@ -535,7 +550,7 @@ class API:
                 score = soup.find(class_='sub-result')\
                             .find(class_='score').text.split('/')
                 score_num, score_denom = map(int, score)
-                points = score_num/score_denom,
+                points = score_num/score_denom
             except ValueError:
                 score_num, score_denom = 0, 0
                 points = 0
@@ -557,7 +572,19 @@ class API:
                 time = None
             except KeyError:
                 time = None
-            memory = soup.find('div', class_='memory').text
+            size = ''
+            memory = soup.find('div', class_='memory').text.split(' ')
+            if len(memory) == 2:
+                memory, size = memory
+                memory = float(memory)
+                if size == 'MB':
+                    memory *= 1024
+                if size == 'GB':
+                    memory *= 1024*1024
+            else:
+                # --- case
+                memory = 0
+
             res = {
                 "id": submission_id,
                 "problem": problem,
@@ -570,8 +597,9 @@ class API:
                 "result": result,
                 "score_num": score_num,
                 "score_denom": score_denom,
-                "problem_name": name,
+                "problem_name": html.unescape(name),
             }
+            print(res)
             ret = Submission(res)
             await ret.async_init()
             return ret

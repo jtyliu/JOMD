@@ -5,7 +5,8 @@ from utils.db import (session, Problem as Problem_DB,
                       Participation as Participation_DB,
                       User as User_DB, Submission as Submission_DB,
                       Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB, Json)
+                      Language as Language_DB, Judge as Judge_DB,
+                      Handle as Handle_DB, Json)
 from typing import List
 from sqlalchemy.sql import functions
 
@@ -100,10 +101,10 @@ class Query:
     async def get_problem(self, code) -> Problem_DB:
         q = session.query(Problem_DB).\
             filter(Problem_DB.code == code)
-        if q.count():
-            # time_limit check if it has a detailed row
-            if q.first().time_limit is not None:
-                return q.first()
+        # if q.count():
+        #     # time_limit check if it has a detailed row
+        #     if q.first().time_limit is not None:
+        #         return q.first()
 
         a = API()
         await a.get_problem(code)
@@ -200,10 +201,10 @@ class Query:
     async def get_user(self, username) -> User_DB:
         q = session.query(User_DB).\
             filter(func.lower(User_DB.username) == func.lower(username))
-        if q.count():
-            # solved_problems checks if it has detailed rows
-            if len(q.first().solved_problems) != 0:
-                return q.first()
+        # if q.count():
+        #     # solved_problems checks if it has detailed rows
+        #     if len(q.first().solved_problems) != 0:
+        #         return q.first()
 
         a = API()
         await a.get_user(username)
@@ -321,12 +322,19 @@ class Query:
     async def get_submission(self, id):
         # Can't use this till i figure out whether or not to use api token
         pass
-    
+
     async def get_latest_submissions(self, user, num) -> List[Submission_DB]:
         a = API()
         ret = await a.get_latest_submission(user, num)
-        return list(map(Submission_DB, ret))
-    
+        return ret
+
     async def get_placement(self, username) -> int:
         a = API()
         return await a.get_placement(username)
+    
+    def get_handle(self, id, guild_id):
+        q = session.query(Handle_DB).\
+            filter(Handle_DB.id == id).\
+            filter(Handle_DB.guild_id == guild_id)
+        if q.count():
+            return q.first()

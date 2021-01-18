@@ -312,10 +312,10 @@ class Submission(Base):
 
     def __init__(self, submission):
         self.id = submission.id
-        self.problem.append(submission.problem)
-        self.user.append(submission.user)
+        self.problem += submission.problem
+        self.user += submission.user
         self.date = submission.date
-        self.language.append(submission.language)
+        self.language += submission.language
         self.time = submission.time
         self.memory = submission.memory
         self.points = submission.points
