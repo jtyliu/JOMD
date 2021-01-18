@@ -113,7 +113,12 @@ class User(commands.Cog):
                 name="%s (%s)" %
                      (submission.problem[0].name, points),
                 value="%s | [Problem](https://dmoj.ca/problem/%s)" %
-                      (submission.date, submission.problem[0].code),
+                      (submission.date.strftime("%b. %d, %Y, %I:%M %p").
+                       replace('AM', 'a.m.').
+                       replace('PM', 'p.m.'),
+                       submission.problem[0].code),
+                      # Jan. 13, 2021, 12:17 a.m.
+                      # %b. %d, %Y, %I:%M %p
                 inline=True
             )
             try:
