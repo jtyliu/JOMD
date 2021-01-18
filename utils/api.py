@@ -15,6 +15,7 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       User as User_DB, Submission as Submission_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB)
+from utils.db import problem_user
 
 
 def rate_limit(func):
@@ -83,10 +84,12 @@ class Problem:
         self.is_public = data.get("is_public")
 
     async def async_init(self):
+        language_qq = session.query(Language_DB).\
+            filter(Language_DB.key.in_(self._languages))
+        language_q = session.query(Language_DB.key).\
+            filter(Language_DB.key.in_(self._languages)).all()
         for language_key in self._languages:
-            language_q = session.query(Language_DB).\
-                filter(Language_DB.key == language_key)
-            if language_q.count() == 0:
+            if language_key in language_q:
                 api = API()
                 await api.get_languages()
                 for language in api.data.objects:
@@ -94,12 +97,14 @@ class Problem:
                         session.add(Language_DB(language))
                         session.commit()
                         break
-            self.languages.append(language_q.first())
+        self.languages = language_qq.all()
 
+        organization_qq = session.query(Organization_DB).\
+            filter(Organization_DB.id.in_(self._organizations))
+        organization_q = session.query(Organization_DB.id).\
+            filter(Organization_DB.id.in_(self._organizations)).all()
         for organization_id in self._organizations:
-            organization_q = session.query(Organization_DB).\
-                filter(Organization_DB.id == organization_id)
-            if organization_q.count() == 0:
+            if organization_id in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -107,7 +112,7 @@ class Problem:
                         session.add(Organization_DB(organization))
                         session.commit()
                         break
-            self.organizations.append(organization_q.first())
+        self.organizations = organization_qq.all()
 
 
 class Contest:
@@ -135,10 +140,12 @@ class Contest:
         self.problems = []
     
     async def async_init(self):
+        organization_qq = session.query(Organization_DB).\
+            filter(Organization_DB.id.in_(self._organizations))
+        organization_q = session.query(Organization_DB.id).\
+            filter(Organization_DB.id.in_(self._organizations)).all()
         for organization_id in self._organizations:
-            organization_q = session.query(Organization_DB).\
-                filter(Organization_DB.id == organization_id)
-            if organization_q.count() == 0:
+            if organization_id in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -146,22 +153,28 @@ class Contest:
                         session.add(Organization_DB(organization))
                         session.commit()
                         break
-            self.organizations.append(organization_q.first())
+        self.organizations = organization_qq.all()
 
         # perhaps I should check if it's the general or detailed version
+        def get_code(problem):
+            return problem["code"]
+        self._problem_codes = list(map(get_code, self._problems))
+        problem_qq = session.query(Problem_DB).\
+            filter(Problem_DB.code.in_(self._problem_codes))
+        problem_q = session.query(Problem_DB.code).\
+            filter(Problem_DB.code.in_(self._problem_codes)).all()
+
         for problem_dict in self._problems:
             problem_code = problem_dict["code"]
-            problem = session.query(Problem_DB).\
-                filter(Problem_DB.code == problem_code)
             try:
-                if problem.count() == 0:
+                if problem_code in problem_q:
                     api = API()
                     await api.get_problem(problem_code)
                     session.add(Problem_DB(api.data.object))
                     session.commit()
-                self.problems.append(problem.first())
             except ObjectNotFound:
                 pass
+        self.problems = problem_qq.all()
 
 
 class Participation:
@@ -219,23 +232,27 @@ class User:
         self.contests = []
 
     async def async_init(self):
+        problem_qq = session.query(Problem_DB).\
+            filter(Problem_DB.code.in_(self._solved_problems))
+        problem_q = session.query(Problem_DB.code).\
+            filter(Problem_DB.code.in_(self._solved_problems)).all()
         for problem_code in self._solved_problems:
-            problem_q = session.query(Problem_DB).\
-                filter(Problem_DB.code == problem_code)
             try:
-                if problem_q.count() == 0:
+                if problem_code in problem_q:
                     api = API()
                     await api.get_problem(problem_code)
                     session.add(Problem_DB(api.data.object))
                     session.commit()
-                self.solved_problems.append(problem_q.first())
             except ObjectNotFound:
                 pass
+        self.solved_problems = problem_qq.all()
 
+        organization_qq = session.query(Organization_DB).\
+            filter(Organization_DB.id.in_(self._organizations))
+        organization_q = session.query(Organization_DB.id).\
+            filter(Organization_DB.id.in_(self._organizations)).all()
         for organization_id in self._organizations:
-            organization_q = session.query(Organization_DB).\
-                filter(Organization_DB.id == organization_id)
-            if organization_q.count() == 0:
+            if organization_id in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
@@ -243,21 +260,28 @@ class User:
                         session.add(Organization_DB(organization))
                         session.commit()
                         break
-            self.organizations.append(organization_q.first())
+        self.organizations = organization_qq.all()
         
+        def get_key(contest):
+            return contest["key"]
+
+        self._contest_keys = list(map(get_key, self._contests))
+
+        contest_qq = session.query(Contest_DB).\
+            filter(Contest_DB.key.in_(self._contest_keys))
+        contest_q = session.query(Contest_DB.key).\
+            filter(Contest_DB.key.in_(self._contest_keys)).all()
         for contest_dict in self._contests:
             contest_key = contest_dict["key"]
-            contest_q = session.query(Contest_DB).\
-                filter(Contest_DB.key == contest_key)
             try:
-                if contest_q.count() == 0:
+                if contest_key in contest_q:
                     api = API()
                     await api.get_contest(contest_key)
                     session.add(Contest_DB(api.data.object))
                     session.commit()
-                self.contests.append(contest_q.first())
             except ObjectNotFound:
                 pass
+        self.contests = contest_qq.all()
 
 
 class Submission:
