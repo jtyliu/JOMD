@@ -2,6 +2,18 @@ from discord.ext.commands.errors import BadArgument
 import typing
 
 
+def list_to_str(arg):
+    if arg is None:
+        return None
+    return '&'.join(arg)
+
+
+def str_to_list(arg):
+    if arg is None:
+        return None
+    return arg.split('&')
+
+
 def is_int(val):
     try:
         int(val)
