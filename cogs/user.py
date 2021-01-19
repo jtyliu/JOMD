@@ -3,10 +3,21 @@ from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
+from utils.db import session
+from sqlalchemy import func
+from utils.db import (session, Problem as Problem_DB,
+                      Contest as Contest_DB,
+                      Participation as Participation_DB,
+                      User as User_DB, Submission as Submission_DB,
+                      Organization as Organization_DB,
+                      Language as Language_DB, Judge as Judge_DB,
+                      Handle as Handle_DB, Json)
 from utils.jomd_common import str_not_int, point_range, parse_gimme
 from utils.api import ObjectNotFound
+from utils.constants import TZ
 import html
 import random
+
 
 
 class User(commands.Cog):
@@ -109,11 +120,13 @@ class User(commands.Cog):
                                    true_short_name),
                 inline=True
             )
+
             embed.add_field(
                 name="%s (%s)" %
                      (submission.problem[0].name, points),
                 value="%s | [Problem](https://dmoj.ca/problem/%s)" %
-                      (submission.date.strftime("%b. %d, %Y, %I:%M %p").
+                      (submission.date.astimezone(TZ).
+                       strftime("%b. %d, %Y, %I:%M %p").
                        replace('AM', 'a.m.').
                        replace('PM', 'p.m.'),
                        submission.problem[0].code),
@@ -137,134 +150,143 @@ class User(commands.Cog):
         await ctx.send(embed=embed)
         return None
 
-    # @commands.command(usage='username [points solved]')
-    # async def predict(self, ctx, username: typing.Optional[str_not_int]=None,
-    #                   amounts: commands.Greedy[int]=[]):
-    #     """Predict total points after solving N pointer problem(s)
+    @commands.command(usage='username [points solved]')
+    async def predict(self, ctx, username: typing.Optional[str_not_int]=None,
+                      amounts: commands.Greedy[int]=[]):
+        """Predict total points after solving N pointer problem(s)
 
-    #     Use surround your username with '' if it can be interpreted as a number
-    #     """
-    #     db = DbConn()
-    #     username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+        Use surround your username with '' if it can be interpreted as a number
+        """
+        query = Query()
+        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
-    #     if username is None and len(amounts) > 0:
-    #         username = str([0])
-    #         amounts.pop(0)
+        if username is None and len(amounts) > 0:
+            username = str([0])
+            amounts.pop(0)
 
-    #     if amounts == []:
-    #         return await ctx.send(f'No points given!')
+        if amounts == []:
+            return await ctx.send(f'No points given!')
 
-    #     if username is None:
-    #         return
+        if username is None:
+            return
 
-    #     amounts = amounts[:10]
-    #     data = await user.get_user(username)
-    #     if data is None:
-    #         return await ctx.send(f'{username} does not exist on DMOJ')
+        amounts = amounts[:10]
+        user = await query.get_user(username)
+        if user is None:
+            return await ctx.send(f'{username} does not exist on DMOJ')
 
-    #     username = data['username']
+        username = user.username
+        q = session.query(Submission_DB).\
+            filter(Submission_DB.user.any(
+                func.lower(User_DB.username) == func.lower(username))
+            )
+        if q.count():
+            submissions = q.all()
+            msg = None
+        else:
+            msg = await ctx.send('No submissions cached, '
+                                 'fetching submissions now.')
+            submissions = await query.get_submissions(username)
 
-    #     submissions = await user.get_submissions(username)
+        problems_ACed = dict()
+        code_to_points = dict()
+        for submission in submissions:
+            code = submission.problem[0].code
+            points = submission.points
+            result = submission.result
 
-    #     problems_ACed = dict()
-    #     code_to_points = dict()
-    #     for submission in submissions:
-    #         code = submission.problem
-    #         points = submission.points
-    #         result = submission.result
+            if points is not None:
+                if result == 'AC':
+                    problems_ACed[code] = 1
+                if code not in code_to_points:
+                    code_to_points[code] = points
+                elif points > code_to_points[code]:
+                    code_to_points[code] = points
 
-    #         if points is not None:
-    #             if result == 'AC':
-    #                 problems_ACed[code] = 1
-    #             if code not in code_to_points:
-    #                 code_to_points[code] = points
-    #             elif points > code_to_points[code]:
-    #                 code_to_points[code] = points
+        fully_solved = len(problems_ACed)
+        points = list(code_to_points.values())
+        points.sort(reverse=True)
 
-    #     fully_solved = len(problems_ACed)
-    #     points = list(code_to_points.values())
-    #     points.sort(reverse=True)
+        def calculate_points(points, fully_solved):
+            b = 150*(1-0.997**fully_solved)
+            p = 0
+            for i in range(min(100, len(points))):
+                p += (0.95**i)*points[i]
+            return b+p
 
-    #     def calculate_points(points, fully_solved):
-    #         b = 150*(1-0.997**fully_solved)
-    #         p = 0
-    #         for i in range(min(100, len(points))):
-    #             p += (0.95**i)*points[i]
-    #         return b+p
+        embed = discord.Embed(
+            title=f'Point prediction for {username}',
+            description='Current points: %.2fp' %
+                        calculate_points(points, fully_solved),
+            color=0xfcdb05,
+        )
 
-    #     embed = discord.Embed(
-    #         title=f'Point prediction for {username}',
-    #         description='Current points: %.2fp' %
-    #                     calculate_points(points, fully_solved),
-    #         color=0xfcdb05,
-    #     )
+        embed.set_thumbnail(url=await query.get_pfp(username))
 
-    #     embed.set_thumbnail(url=await user_api.get_pfp(username))
+        for predict_val in amounts:
+            points.append(int(predict_val))
+            fully_solved += 1
+            points.sort(reverse=True)
+            updated_points = calculate_points(points, fully_solved)
+            embed.add_field(
+                name="Solve another %sp" % predict_val,
+                value="Total points: %.2fp" % updated_points,
+                inline=False,
+            )
 
-    #     for predict_val in amounts:
-    #         points.append(int(predict_val))
-    #         fully_solved += 1
-    #         points.sort(reverse=True)
-    #         updated_points = calculate_points(points, fully_solved)
-    #         embed.add_field(
-    #             name="Solve another %sp" % predict_val,
-    #             value="Total points: %.2fp" % updated_points,
-    #             inline=False,
-    #         )
+        if msg:
+            await msg.delete()
+        await ctx.send(embed=embed)
+        return
 
-    #     return await ctx.send(embed=embed)
+    @commands.command(usage='[usernames]')
+    async def vc(self, ctx, *username):
+        """Suggest a contest"""
+        if username == []:
+            return
+        return await ctx.send('Not implement yet!')
 
-    # @commands.command(usage='[usernames]')
-    # async def vc(self, ctx, *username):
-    #     """Suggest a contest"""
-    #     if username == []:
-    #         return
-    #     return await ctx.send('Not implement yet!')
+    def force(argument) -> typing.Optional[bool]:
+        if argument == '+f':
+            return True
+        raise BadArgument('No force argument')
 
-    # def force(argument) -> typing.Optional[bool]:
-    #     if argument == '+f':
-    #         return True
-    #     raise BadArgument('No force argument')
+    @commands.command(usage='[username]')
+    async def cache(self, ctx, complete: typing.Optional[force]=False,
+                    username: typing.Optional[str]=None):
+        """Caches the submissions of a user, will speed up other commands
 
-    # @commands.command(usage='[username]')
-    # async def cache(self, ctx, complete: typing.Optional[force]=False,
-    #                 username: typing.Optional[str]=None):
-    #     """Caches the submissions of a user, will speed up other commands
+        Use surround your username with '' if it can be interpreted as a number
+        +f              cache every submission
+        """
+        username = username.replace('\'', '')
+        query = Query()
+        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
-    #     Use surround your username with '' if it can be interpreted as a number
-    #     +f              cache every submission
-    #     """
-    #     username = username.replace('\'', '')
-    #     db = DbConn()
-    #     username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+        if username is None:
+            return await ctx.send(f'No username given!')
 
-    #     if username is None:
-    #         return await ctx.send(f'No username given!')
+        user = await query.get_user(username)
+        if user is None:
+            return await ctx.send(f'{username} does not exist on DMOJ')
 
-    #     data = await user.get_user(username)
-    #     if data is None:
-    #         return await ctx.send(f'{username} does not exist on DMOJ')
+        username = user.username
 
-    #     username = data['username']
+        try:
+            msg = await ctx.send(f'Caching {username}\'s submissions')
+        except Exception as e:
+            await msg.edit(content='An error has occured, ' +
+                                   'try caching again. Log: '+e.message)
+            return
 
-    #     try:
-    #         msg = await ctx.send(f'Caching {username}\'s submissions')
-    #     except Exception as e:
-    #         await msg.edit(content='An error has occured, ' +
-    #                                'try caching again. Log: '+e.message)
-    #         return
+        await query.get_submissions(username)
 
-    #     if complete:
-    #         await user.get_all_submissions(username)
-    #     else:
-    #         await user.get_submissions(username)
+        return await msg.edit(content=f'{username}\'s submissions ' +
+                                      'have been cached.')
 
-    #     return await msg.edit(content=f'{username}\'s submissions ' +
-    #                                   'have been cached.')
-
-    # @commands.command(hidden=True)
-    # async def gimmie(self, ctx):
-    #     return await ctx.send(':monkey:')
+    @commands.command(hidden=True)
+    async def gimmie(self, ctx):
+        return await ctx.send(':monkey:')
 
     # @commands.command(usage='username [points] [problem types]')
     # async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
@@ -287,17 +309,17 @@ class User(commands.Cog):
     #     - regex
     #     - string"""
     #     filters = list(filters)
-    #     db = DbConn()
-    #     username = username or db.get_handle_id(ctx.author.id, ctx.guild.id)
+    #     query = Query()
+    #     username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
     #     if username is None:
     #         return await ctx.send(f'No username provided')
 
-    #     data = await user.get_user(username)
-    #     if data is None:
+    #     user = await query.get_user(username)
+    #     if user is None:
     #         return await ctx.send(f'{username} does not exist on DMOJ')
 
-    #     username = data['username']
+    #     username = user.username
     #     shorthands = {
     #         'adhoc': ['Ad Hoc'],
     #         'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
@@ -325,7 +347,7 @@ class User(commands.Cog):
     #     # Maybe keep track of the last time it was updated and update
     #     # according to that
     #     # user.get_submissions(username)
-
+    #     problems = session.query(Problem_DB)
     #     problems = db.get_unsolved_problems(username, points[0], points[1])
 
     #     results = []

@@ -9,6 +9,8 @@ from utils.db import (session, Problem as Problem_DB,
                       Handle as Handle_DB, Json)
 from typing import List
 from sqlalchemy.sql import functions
+import asyncio
+from utils.jomd_common import first_tuple
 
 
 class Query:
@@ -249,35 +251,62 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
+        def get_id(participation):
+            return participation.id
+
+        participation_id = list(map(get_id, a.data.objects))
+        qq = session.query(Submission_DB.id).\
+            filter(Submission_DB.id.in_(participation_id)).all()
+        qq = list(map(first_tuple, qq))
+        for submission in a.data.objects:
+            if submission.id not in qq:
+                session.add(Submission_DB(submission))
+        total_pages = a.data.total_pages
         for participation in a.data.objects:
-            qq = session.query(Participation_DB).\
-                filter(Participation_DB.id == participation.id)
-            if qq.count() == 0:
+            if participation.id not in participation_id:
                 session.add(Participation_DB(participation))
 
-        while a.data.has_more:
+        apis = []
+        to_gather = []
+
+        for _ in range(2, total_pages+1):
             page += 1
-            await a.get_participations(
+            api = API()
+            to_await = await a.get_participations(
                 contest=contest, user=user, is_disqualified=is_disqualified,
                 virtual_participation_number=virtual_participation_number,
                 page=page
             )
-
-            for participation in a.data.objects:
-                qq = session.query(Participation_DB).\
-                    filter(Participation_DB.id == participation.id)
-                if qq.count() == 0:
+            apis.append(api)
+            to_gather.append(to_await)
+        await asyncio.gather(*to_gather)
+        for api in apis:
+            participation_id = list(map(get_id, api.data.objects))
+            qq = session.query(Submission_DB.id).\
+                filter(Submission_DB.id.in_(participation_id)).all()
+            qq = list(map(first_tuple, qq))
+            for submission in api.data.objects:
+                if submission.id not in qq:
+                    session.add(Submission_DB(submission))
+            total_pages = api.data.total_pages
+            for participation in api.data.objects:
+                if participation.id not in participation_id:
                     session.add(Participation_DB(participation))
         session.commit()
         return q.all()
 
     async def get_submissions(self, user=None, problem=None, language=None,
                               result=None) -> List[Submission_DB]:
+        # This function is the only one which might take a while to run and
+        # has data that is added reguarly. asyncio.gather can apply to all
+        # functions but this one is the only one which really needs it
         a = API()
         page = 1
+        import time
+        start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-
+        print("Done Api Call",time.time()-start)
         cond_user = self.parse(func.lower(User_DB.username), func.lower(user))
         if not cond_user:
             cond_user = Submission_DB.user.any(cond_user)
@@ -295,26 +324,41 @@ class Query:
             filter(cond_problem).\
             filter(cond_lang).\
             filter(self.parse(Submission_DB.result, result))
-        print(q)
+
         if a.data.total_objects == q.count():
             return q.all()
 
+        def get_id(submission):
+            return submission.id
+
+        submission_ids = list(map(get_id, a.data.objects))
+        qq = session.query(Submission_DB.id).\
+            filter(Submission_DB.id.in_(submission_ids)).all()
+        qq = list(map(first_tuple, qq))
         for submission in a.data.objects:
-            qq = session.query(Submission_DB).\
-                filter(Submission_DB.id == submission.id)
-            if qq.count() == 0:
+            if submission.id not in qq:
                 session.add(Submission_DB(submission))
+        total_pages = a.data.total_pages
 
-        while a.data.has_more:
+        apis = []
+        to_gather = []
+
+        for _ in range(2, total_pages+1):
             page += 1
-            await a.get_submissions(user=user, problem=problem,
-                                    language=language, result=result,
-                                    page=page)
-
-            for submission in a.data.objects:
-                qq = session.query(Submission_DB).\
-                    filter(Submission_DB.id == submission.id)
-                if qq.count() == 0:
+            api = API()
+            to_await = api.get_submissions(user=user, problem=problem,
+                                           language=language, result=result,
+                                           page=page)
+            apis.append(api)
+            to_gather.append(to_await)
+        await asyncio.gather(*to_gather)
+        for api in apis:
+            submission_ids = list(map(get_id, api.data.objects))
+            qq = session.query(Submission_DB.id).\
+                filter(Submission_DB.id.in_(submission_ids)).all()
+            qq = list(map(first_tuple, qq))
+            for submission in api.data.objects:
+                if submission.id not in qq:
                     session.add(Submission_DB(submission))
         session.commit()
         return q.all()

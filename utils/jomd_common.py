@@ -14,6 +14,10 @@ def str_to_list(arg):
     return arg.split('&')
 
 
+def first_tuple(arg):
+    return arg[0]
+
+
 def is_int(val):
     try:
         int(val)

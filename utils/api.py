@@ -46,7 +46,9 @@ _session = None
 
 @rate_limit
 async def _query_api(url, resp_obj):
+    import time
     if DEBUG_API:
+        start = time.time()
         print("Calling", url)
     global _session
     if _session is None:
@@ -59,7 +61,8 @@ async def _query_api(url, resp_obj):
         # if 'error' in resp:  ApiError would interfere with some other stuff,
         # might just change to error trapping
         #     raise ApiError
-        print("Parsed data, returning...")
+        if DEBUG_API:
+            print("Parsed data, returning... Time:", time.time()-start)
         return resp
 
 
@@ -83,6 +86,13 @@ class Problem:
         self.organizations = []
 
         self.is_public = data.get("is_public")
+
+    @staticmethod
+    async def async_map(_type, objects):
+        to_gather = []
+        for obj in objects:
+            to_gather.append(obj.async_init())
+        await asyncio.gather(*to_gather)
 
     async def async_init(self):
         language_qq = session.query(Language_DB).\
@@ -141,7 +151,14 @@ class Contest:
         self.rankings = data.get("rankings")
         self._problems = data.get("problems") or []
         self.problems = []
-    
+
+    @staticmethod
+    async def async_map(_type, objects):
+        to_gather = []
+        for obj in objects:
+            to_gather.append(obj.async_init())
+        await asyncio.gather(*to_gather)
+
     async def async_init(self):
         organization_qq = session.query(Organization_DB).\
             filter(Organization_DB.id.in_(self._organizations))
@@ -196,6 +213,13 @@ class Participation:
         self.is_disqualified = data["is_disqualified"]
         self.virtual_participation_number = data["virtual_participation_number"]
 
+    @staticmethod
+    async def async_map(_type, objects):
+        to_gather = []
+        for obj in objects:
+            to_gather.append(obj.async_init())
+        await asyncio.gather(*to_gather)
+
     async def async_init(self):
         user = session.query(User_DB).\
             filter(User_DB.username == self._user)
@@ -234,6 +258,13 @@ class User:
         self.organizations = []
         self._contests = data.get("contests") or []
         self.contests = []
+
+    @staticmethod
+    async def async_map(_type, objects):
+        to_gather = []
+        for obj in objects:
+            to_gather.append(obj.async_init())
+        await asyncio.gather(*to_gather)
 
     async def async_init(self):
         problem_qq = session.query(Problem_DB).\
@@ -323,7 +354,54 @@ class Submission:
         else:
             return "%.1f GB" % (self.memory/1024/1024)
 
-    async def async_init(self):
+    @staticmethod
+    async def async_map(_type, objects, is_latest=False):
+        # is_latest is to optimize parsing little submissions 
+        # and many submissions
+        if not is_latest:
+            problems = session.query(Problem_DB.code, Problem_DB).all()
+            problems = {k: v for k, v in problems}
+            users = session.query(User_DB.username, User_DB).all()
+            users = {k: v for k, v in users}
+            languages = session.query(Language_DB.key, Language_DB).all()
+            languages = {k: v for k, v in languages}
+        to_gather = []
+        for obj in objects:
+            if is_latest:
+                to_gather.append(obj.async_old())
+            else:
+                to_gather.append(obj.async_init(problems, users, languages))
+        await asyncio.gather(*to_gather)
+
+    async def async_init(self, problem_q, user_q, language_q):
+        if self._problem not in problem_q:
+            api = API()
+            await api.get_problem(self._problem)
+            session.add(Problem_DB(api.data.object))
+            session.commit()
+            problem_q[self._problem] = Problem_DB(api.data.object)
+        self.problem = [problem_q[self._problem]]
+
+        if self._user not in user_q:
+            api = API()
+            await api.get_user(self._user)
+            session.add(User_DB(api.data.object))
+            session.commit()
+            user_q[self._user] = User_DB(api.data.object)
+        self.user = [user_q[self._user]]
+
+        if self._language not in language_q:
+            api = API()
+            await api.get_languages()
+            for language in api.data.objects:
+                if language.key == self._language:
+                    session.add(Language_DB(language))
+                    session.commit()
+                    language_q[self._language] = Language_DB(language)
+                    break
+        self.language = [language_q[self._language]]
+
+    async def async_old(self):
         problem_q = session.query(Problem_DB).\
             filter(Problem_DB.code == self._problem)
         if problem_q.count() == 0:
@@ -354,7 +432,6 @@ class Submission:
                     break
         self.language = [language_q.first()]
 
-
 class Organization:
     def __init__(self, data):
         self.id = data["id"]
@@ -362,6 +439,10 @@ class Organization:
         self.short_name = data["short_name"]
         self.is_open = data["is_open"]
         self.member_count = data["member_count"]
+
+    @staticmethod
+    async def async_map(_type, objects):
+        pass
 
     async def async_init(self):
         pass
@@ -377,6 +458,10 @@ class Language:
         self.pygments_name = data["pygments_name"]
         self.code_template = data["code_template"]
 
+    @staticmethod
+    async def async_map(_type, objects):
+        pass
+
     async def async_init(self):
         pass
 
@@ -388,6 +473,10 @@ class Judge:
         self.ping = data["ping"]
         self.load = data["load"]
         self.languages = data["languages"]
+
+    @staticmethod
+    async def async_map(_type, objects):
+        pass
 
     async def async_init(self):
         pass
@@ -426,8 +515,7 @@ class API:
                 self.total_objects = data["total_objects"]
 
                 self.objects = list(map(_type, data["objects"]))
-                self._objects = self.async_map(_type, self.objects)
-                self._objects = await asyncio.gather(*self._objects)
+                await _type.async_map(_type, self.objects)
                 self.object = None
             return self
 
@@ -574,7 +662,7 @@ class API:
 
     async def get_latest_submission(self, user, num):
         # Don't look at me! I'm hideous!
-        async def soup_parse(soup):
+        def soup_parse(soup):
             submission_id = soup['id']
             result = soup.find(class_='sub-result')['class'][-1]
             try:
@@ -632,7 +720,6 @@ class API:
             }
             print(res)
             ret = Submission(res)
-            await ret.async_init()
             return ret
         resp = await _query_api(SITE_URL +
                                 f'submissions/user/{user}/', 'text')
@@ -640,7 +727,8 @@ class API:
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
-        return await asyncio.gather(*ret)
+        await Submission.async_map(Submission, ret, is_latest=True)
+        return ret
     
     async def get_placement(self, username):
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
