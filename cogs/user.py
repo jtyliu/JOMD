@@ -4,7 +4,7 @@ import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
 from utils.db import session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -185,7 +185,7 @@ class User(commands.Cog):
             msg = None
         else:
             msg = await ctx.send('No submissions cached, '
-                                 'fetching submissions now.')
+                                 'fetching submissions now. Please use +cache to get new submissions later on')
             submissions = await query.get_submissions(username)
 
         problems_ACed = dict()
@@ -288,107 +288,112 @@ class User(commands.Cog):
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
-    # @commands.command(usage='username [points] [problem types]')
-    # async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
-    #                 points: typing.Optional[point_range]=[1, 50], *filters):
-    #     """Recommend a problem
+    @commands.command(usage='username [points] [problem types]')
+    async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
+                    points: typing.Optional[point_range]=[1, 50], *filters):
+        """Recommend a problem
 
-    #     Use surround your username with '' if it can be interpreted as a number
+        Use surround your username with '' if it can be interpreted as a number
 
-    #     Shorthands:
-    #     - adhoc
-    #     - math
-    #     - bf
-    #     - ctf
-    #     - ds
-    #     - d&c
-    #     - dp
-    #     - geo
-    #     - gt
-    #     - greedy
-    #     - regex
-    #     - string"""
-    #     filters = list(filters)
-    #     query = Query()
-    #     username = username or query.get_handle(ctx.author.id, ctx.guild.id)
+        Shorthands:
+        - adhoc
+        - math
+        - bf
+        - ctf
+        - ds
+        - d&c
+        - dp
+        - geo
+        - gt
+        - greedy
+        - regex
+        - string"""
+        filters = list(filters)
+        query = Query()
+        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
-    #     if username is None:
-    #         return await ctx.send(f'No username provided')
+        if username is None:
+            return await ctx.send(f'No username provided')
 
-    #     user = await query.get_user(username)
-    #     if user is None:
-    #         return await ctx.send(f'{username} does not exist on DMOJ')
+        user = await query.get_user(username)
+        if user is None:
+            return await ctx.send(f'{username} does not exist on DMOJ')
 
-    #     username = user.username
-    #     shorthands = {
-    #         'adhoc': ['Ad Hoc'],
-    #         'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
-    #         'bf': ['Brute Force'],
-    #         'ctf': ['Capture the Flag'],
-    #         'ds': ['Data Structures'],
-    #         'd&c': ['Divide and Conquer'],
-    #         'dp': ['Dynamic Programming'],
-    #         'geo': ['Geometry'],
-    #         'gt': ['Graph Theory'],
-    #         'greedy': ['Greedy Algorithms'],
-    #         'regex': ['Regular Expressions'],
-    #         'string': ['String Algorithms'],
-    #     }
+        username = user.username
+        shorthands = {
+            'adhoc': ['Ad Hoc'],
+            'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
+            'bf': ['Brute Force'],
+            'ctf': ['Capture the Flag'],
+            'ds': ['Data Structures'],
+            'd&c': ['Divide and Conquer'],
+            'dp': ['Dynamic Programming'],
+            'geo': ['Geometry'],
+            'gt': ['Graph Theory'],
+            'greedy': ['Greedy Algorithms'],
+            'regex': ['Regular Expressions'],
+            'string': ['String Algorithms'],
+        }
 
-    #     filter_list = []
-    #     for filter in filters:
-    #         if filter in shorthands:
-    #             filter_list += shorthands[filter]
-    #         else:
-    #             filter_list.append(filter.title())
+        filter_list = []
+        for filter in filters:
+            if filter in shorthands:
+                filter_list += shorthands[filter]
+            else:
+                filter_list.append(filter.title())
 
-    #     filters = filter_list
-    #     # I will add this when the api has a fast way to query total objects
-    #     # Maybe keep track of the last time it was updated and update
-    #     # according to that
-    #     # user.get_submissions(username)
-    #     problems = session.query(Problem_DB)
-    #     problems = db.get_unsolved_problems(username, points[0], points[1])
+        filters = filter_list
+        filter_conds = []
+        for filter in filters:
+            filter_conds.append(Problem_DB.types.contains(filter))
+        # I will add this when the api has a fast way to query total objects
+        # Maybe keep track of the last time it was updated and update
+        # according to that
+        # user.get_submissions(username)
+        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
+            .filter(Submission_DB._user == username)\
+            .group_by(Submission_DB._code).subquery()
+        q = session.query(Problem_DB)\
+            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+            .filter(func.ifnull(sub_q.c.points, 0) < Problem_DB.points)\
+            .filter(or_(*filter_conds))\
+            .filter(Problem_DB.points.between(points[0], points[1]))\
+            .filter(Problem_DB.is_organization_private == 0)
+        results = q.all()
 
-    #     results = []
-    #     if filters != []:
-    #         for problem in problems:
-    #             if set(problem.types) & set(filters) != set():
-    #                 results.append(problem)
-    #     else:
-    #         results = problems
+        if len(results) == 0:
+            return await ctx.send('No problems found which satify filters')
 
-    #     if len(results) == 0:
-    #         return await ctx.send('No problems found which satify filters')
+        problem = random.choice(results)
+        points = str(problem.points)
+        if problem.partial:
+            points += 'p'
 
-    #     problem = random.choice(results)
-    #     points = str(problem.points)
-    #     if problem.partial:
-    #         points += 'p'
+        memory = problem.memory_limit
+        if memory >= 1024*1024:
+            memory = '%dG' % (memory//1024//1024)
+        elif memory >= 1024:
+            memory = '%dM' % (memory//1024)
+        else:
+            memory = '%dK' % (memory)
 
-    #     memory = problem.memory_limit
-    #     if memory >= 1024:
-    #         memory = '%dM' % (memory//1024)
-    #     else:
-    #         memory = '%dK' % (memory)
+        embed = discord.Embed(
+            title=problem.name,
+            url='https://dmoj.ca/problem/%s' % problem.code,
+            description='Points: %s\nProblem Types: %s' %
+                        (points, ', '.join(problem.types)),
+            color=0xfcdb05,
+        )
 
-    #     embed = discord.Embed(
-    #         title=problem.name,
-    #         url='https://dmoj.ca/problem/%s' % problem.code,
-    #         description='Points: %s\nProblem Types: %s' %
-    #                     (points, ', '.join(problem.types)),
-    #         color=0xfcdb05,
-    #     )
-
-    #     embed.set_thumbnail(url=await user_api.get_pfp(username))
-    #     embed.add_field(name='Group', value=problem.group, inline=True)
-    #     embed.add_field(
-    #         name='Time',
-    #         value='%ss' % problem.time_limit,
-    #         inline=True
-    #     )
-    #     embed.add_field(name='Memory', value=memory, inline=True)
-    #     return await ctx.send(embed=embed)
+        embed.set_thumbnail(url=await query.get_pfp(username))
+        embed.add_field(name='Group', value=problem.group, inline=True)
+        embed.add_field(
+            name='Time',
+            value='%ss' % problem.time_limit,
+            inline=True
+        )
+        embed.add_field(name='Memory', value=memory, inline=True)
+        return await ctx.send(embed=embed)
 
 
 def setup(bot):

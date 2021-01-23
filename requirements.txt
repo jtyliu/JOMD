@@ -30,3 +30,5 @@ python_dotenv == 0.13.0
 
 # JOMD/Test.py: 4
 requests == 2.25.0
+
+html5lib == 1.14.0

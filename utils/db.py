@@ -309,10 +309,15 @@ class Submission(Base):
     case_points = Column(Float)
     case_total = Column(Float)
     cases = Column(Json)
+    # This is for +gimme to retrieve unsolved problems
+    _code = Column(String)
+    _user = Column(String)
 
     def __init__(self, submission):
         self.id = submission.id
         self.problem += submission.problem
+        self._code = self.problem[0].code
+        self._user = submission._user
         self.user += submission.user
         self.date = submission.date
         self.language += submission.language
