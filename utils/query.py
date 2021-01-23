@@ -381,4 +381,18 @@ class Query:
             filter(Handle_DB.id == id).\
             filter(Handle_DB.guild_id == guild_id)
         if q.count():
+            return q.first().handle
+    
+    def get_handle_user(self, handle, guild_id):
+        q = session.query(Handle_DB).\
+            filter(Handle_DB.handle == handle).\
+            filter(Handle_DB.guild_id == guild_id)
+        if q.count():
+            return q.first().id
+    
+    def get_random_problem(self):
+        q = session.query(Problem_DB).filter(Problem_DB.points.between(1,10))\
+            .order_by(func.random()).limit(1)
+        if q.count():
             return q.first()
+    
