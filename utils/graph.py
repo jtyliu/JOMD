@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdt
 import pandas as pd
 from math import pi
 import seaborn as sns
@@ -6,9 +7,52 @@ import seaborn as sns
 
 categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
 
-
-def plot_bar(data, as_percent):
+def plot_rating(data):
+    # Credit to https://github.com/jacklee1792/dmoj-rating
     plt.clf()
+    plt.subplots()
+    df = pd.DataFrame(data)
+    df = df.T
+    max_ratings = df.iloc[1:].max()
+
+    for i in range(len(df.columns)):
+        username = data['users'][i]
+        ddf = df.iloc[:, i].dropna()
+        ddf.iloc[1:]\
+            .plot(label=f'{username} ({int(max_ratings[i])})',
+                  marker='s', markerfacecolor='white')
+
+    colors = ['#d2d2d3', '#a0ff8f', '#adb0ff', '#f399ff', '#ffd363',
+              '#ff3729', '#a11b00']
+    rng = [[0, 1000], [1001, 1200], [1201, 1500], [1501, 1800],
+           [1801, 2200], [2201, 3000], [3001, 9999]]
+
+    ma = df.iloc[1:].max().max()
+    mi = df.iloc[1:].min().min()
+    offset = 100
+
+    for i in range(7):
+        if mi - offset > rng[i][1]:
+            continue
+        elif ma + offset < rng[i][0]:
+            break
+        mi_range = max(mi - offset, rng[i][0])
+        ma_range = min(ma + offset, rng[i][1])
+        plt.axhspan(mi_range, ma_range, facecolor=colors[i])
+
+    plt.gca().set_ylim([mi-offset, ma+offset])
+    plt.gca().xaxis.set_major_formatter(mdt.DateFormatter('%m/%d/%Y'))
+    plt.gcf().autofmt_xdate()
+    plt.legend(loc="upper left", prop={"size": 8})
+    plt.xlabel('Date')
+    plt.ylabel('Rating')
+
+    plt.savefig('./graphs/plot.png')
+
+
+def plot_type_bar(data, as_percent):
+    plt.clf()
+    plt.subplots()
     df = pd.DataFrame(data)
     df.columns = categories
     ylabel = 'Points (%)' if as_percent else 'Points'
@@ -22,10 +66,11 @@ def plot_bar(data, as_percent):
     plt.savefig('./graphs/plot.png')
 
 
-def plot_radar(data, as_percent, maxval):
+def plot_type_radar(data, as_percent, maxval):
     # Code from
     # https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
     plt.clf()
+    plt.subplots()
     df = pd.DataFrame(data)
 
     # number of variable

@@ -23,9 +23,9 @@ class Query:
             try:
                 if isinstance(key.property.columns[0].type, Json):
                     if isinstance(val, str):
-                        cond = key.like(f'%"{val}%"')
+                        cond = key.contains(val)
                     elif isinstance(val, list):
-                        cond = or_(key.like(f'%"{v}%"') for v in val)
+                        cond = or_(key.contains(v) for v in val)
                     elif isinstance(val, functions.Function):
                         cond = key == val
                     return cond
@@ -389,10 +389,36 @@ class Query:
             filter(Handle_DB.guild_id == guild_id)
         if q.count():
             return q.first().id
-    
-    def get_random_problem(self):
-        q = session.query(Problem_DB).filter(Problem_DB.points.between(1,10))\
+
+    def get_random_problem(self, low=1, high=10):
+        q = session.query(Problem_DB)\
+            .filter(Problem_DB.points.between(low, high))\
             .order_by(func.random()).limit(1)
         if q.count():
             return q.first()
+
+    def get_unsolved_problems(self, username, types, low=1, high=50):
+        conds = [Problem_DB.types.contains(_type) for _type in types]
+        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
+            .filter(Submission_DB._user == username)\
+            .group_by(Submission_DB._code).subquery()
+        q = session.query(Problem_DB)\
+            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+            .filter(func.ifnull(sub_q.c.points, 0) < Problem_DB.points)\
+            .filter(or_(*conds))\
+            .filter(Problem_DB.points.between(low, high))\
+            .filter(Problem_DB.is_organization_private == 0)
+        return q.all()
+    
+    def get_attempted_problems(self, username, types):
+        conds = [Problem_DB.types.contains(_type) for _type in types]
+        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
+            .filter(Submission_DB._user == username)\
+            .group_by(Submission_DB._code).subquery()
+        q = session.query(Problem_DB)\
+            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+            .filter(func.ifnull(sub_q.c.points, 0) != 0)\
+            .filter(or_(*conds))
+        return q.all()
+
     

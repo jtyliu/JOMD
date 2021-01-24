@@ -343,23 +343,10 @@ class User(commands.Cog):
                 filter_list.append(filter.title())
 
         filters = filter_list
-        filter_conds = []
-        for filter in filters:
-            filter_conds.append(Problem_DB.types.contains(filter))
-        # I will add this when the api has a fast way to query total objects
-        # Maybe keep track of the last time it was updated and update
-        # according to that
-        # user.get_submissions(username)
-        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
-            .filter(Submission_DB._user == username)\
-            .group_by(Submission_DB._code).subquery()
-        q = session.query(Problem_DB)\
-            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
-            .filter(func.ifnull(sub_q.c.points, 0) < Problem_DB.points)\
-            .filter(or_(*filter_conds))\
-            .filter(Problem_DB.points.between(points[0], points[1]))\
-            .filter(Problem_DB.is_organization_private == 0)
-        results = q.all()
+
+        # Get all problems that are unsolved by user and fits the filter and point range
+        results = query.get_unsolved_problems(username, filters,
+                                              points[0], points[1])
 
         if len(results) == 0:
             return await ctx.send('No problems found which satify filters')

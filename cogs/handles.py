@@ -4,12 +4,40 @@ from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB
 # import html
 # import random
+import typing
 import asyncio
 
 
 class Handles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def whois(self, ctx, member: typing.Optional[discord.Member] = None,
+                    handle: typing.Optional[str] = None):
+        # TODO: Use embeds and pfps
+        query = Query()
+        if handle:
+            user = await query.get_user(handle)
+            handle = user.username
+            author_id = query.get_handle_user(handle, ctx.guild.id)
+            if author_id:
+                # member = await self.bot.fetch_user(author_id)
+                name = ctx.message.guild.get_member(author_id)
+                await ctx.send(f'`{handle}` is `{name.nick}`')
+            else:
+                await ctx.send(f'`{handle}` is not linked with any account here...')
+        elif member:
+            handle = query.get_handle(member.id, ctx.guild.id)
+            if handle:
+                await ctx.send(f'`{member.nick}` is `{handle}`')
+            else:
+                await ctx.send(f'`{member.nick}` is not linked with any account here')
+        else:
+            # wtf
+            pass
+
+
 
     @commands.command()
     async def unlink(self, ctx):
