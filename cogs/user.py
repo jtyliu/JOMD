@@ -4,7 +4,7 @@ import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
 from utils.db import session
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, not_
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -15,7 +15,7 @@ from utils.db import (session, Problem as Problem_DB,
 from utils.jomd_common import str_not_int, point_range, parse_gimme
 from utils.api import ObjectNotFound
 from utils.constants import TZ
-import html
+import asyncio
 import random
 
 
@@ -240,11 +240,36 @@ class User(commands.Cog):
         return
 
     @commands.command(usage='[usernames]')
-    async def vc(self, ctx, *username):
+    async def vc(self, ctx, *usernames):
         """Suggest a contest"""
-        if username == []:
+        usernames = list(usernames)
+
+        query = Query()
+        if usernames == []:
+            usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
+
+        users = await asyncio.gather(*[query.get_user(username)
+                                     for username in usernames])
+        usernames = [user.username for user in users]
+        for i in range(len(users)):
+            if users[i] is None:
+                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+
+        q = session.query(Contest_DB)
+        for user in users:
+            # TODO: Not only check for participation but check
+            # if the user has attempted any problems from the problem set
+            q = q.filter(not_(Contest_DB.rankings.contains(user.username)))
+
+        if q.count() == 0:
+            await ctx.send("Cannot find any contests which "
+                           "all users have not done")
             return
-        return await ctx.send('Not implement yet!')
+        contest = random.choice(q.all())
+
+        return await ctx.send(f"https://dmoj.ca/contest/{contest.key} "
+                              f"({contest.name}) {len(contest.problems)} "
+                              f"Problems")
 
     def force(argument) -> typing.Optional[bool]:
         if argument == '+f':

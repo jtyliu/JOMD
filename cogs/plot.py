@@ -42,7 +42,13 @@ class Plot(commands.Cog):
         raise BadArgument('Argument not known')
 
     @plot.command(usage='[usernames]')
+    async def points(self, ctx, *usernames):
+        """Plot point progression"""
+        pass
+
+    @plot.command(usage='[usernames]')
     async def rating(self, ctx, *usernames):
+        """Plot rating progression"""
         usernames = list(usernames)
 
         query = Query()
