@@ -7,6 +7,8 @@ import seaborn as sns
 
 categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
 
+# TODO: Fiddle around with matplotlib to make the graphs look better
+
 def plot_rating(data):
     # Credit to https://github.com/jacklee1792/dmoj-rating
     plt.clf()
