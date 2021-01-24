@@ -1,6 +1,7 @@
 import os
 from discord.ext import commands
 from pathlib import Path
+import discord
 
 
 def main():
@@ -12,8 +13,12 @@ def main():
         print('Missing bot token')
         return
 
+    intents = discord.Intents.default()  # All but the two privileged ones
+    intents.members = True  # Subscribe to the Members intent
+
     pref = '+'
-    bot = commands.Bot(command_prefix=commands.when_mentioned_or(pref))
+    bot = commands.Bot(command_prefix=commands.when_mentioned_or(pref),
+                       intents=intents)
 
     cogs = [file.stem for file in Path('cogs').glob('*.py')]
     for extension in cogs:
