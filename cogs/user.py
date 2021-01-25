@@ -4,7 +4,7 @@ import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
 from utils.db import session
-from sqlalchemy import func, or_, not_
+from sqlalchemy import func, or_, not_, orm
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -171,16 +171,19 @@ class User(commands.Cog):
             return
 
         amounts = amounts[:10]
+
         user = await query.get_user(username)
         if user is None:
             return await ctx.send(f'{username} does not exist on DMOJ')
 
         username = user.username
-        q = session.query(Submission_DB).\
-            filter(Submission_DB.user.any(
-                func.lower(User_DB.username) == func.lower(username))
-            )
+        q = session.query(Submission_DB).options(orm.joinedload('problem'))\
+            .join(User_DB, User_DB.username == Submission_DB._user,
+                  aliased=True)\
+            .filter(User_DB.username == user.username)
+
         if q.count():
+            start = time.time()
             submissions = q.all()
             msg = None
         else:
