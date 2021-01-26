@@ -20,8 +20,10 @@ def plot_rating(data):
     for i in range(len(df.columns)):
         username = data['users'][i]
         ddf = df.iloc[:, i].dropna()
+        # Make sure there is data, to plot
+        # Don't plot users with no contest score
         ddf.iloc[1:]\
-            .plot(label=f'{username} ({int(max_ratings[i])})',
+            .plot(label=f'{username} ({int(max_ratings[i] or 0)})',
                   marker='s', markerfacecolor='white')
 
     colors = ['#d2d2d3', '#a0ff8f', '#adb0ff', '#f399ff', '#ffd363',
