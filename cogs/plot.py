@@ -44,7 +44,7 @@ class Plot(commands.Cog):
     @plot.command(usage='[usernames]')
     async def points(self, ctx, *usernames):
         """Plot point progression"""
-        pass
+        return await ctx.send("Not implemented yet!")
 
     @plot.command(usage='[usernames]')
     async def rating(self, ctx, *usernames):
@@ -63,19 +63,18 @@ class Plot(commands.Cog):
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
         if len(users) > 6:
             return await ctx.send('Too many users given, max 6')
-        
+
         cond = [Contest_DB.rankings.contains(user.username) for user in users]
         q = session.query(Contest_DB).filter(or_(*cond))\
             .filter(Contest_DB.is_rated == 1)
         contests = q.all()
-        to_plot = {}
 
         def get_rating_change(rankings, users):
             ret = {}
             for ranking in rankings:
                 for user in users:
                     if (user.username == ranking['user'] and
-                        ranking['new_rating']):
+                       ranking['new_rating']):
                         ret[user.username] = ranking['new_rating']
             return ret
 
@@ -101,8 +100,6 @@ class Plot(commands.Cog):
         embed.set_image(url=f'attachment://plot.png',)
 
         return await ctx.send(embed=embed, file=file)
-
-    
 
     @plot.command(usage='[+percent, +point] [+radar, +bar] [usernames]')
     async def type(self, ctx,
