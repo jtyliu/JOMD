@@ -270,9 +270,16 @@ class User(commands.Cog):
             return
         contest = random.choice(q.all())
 
-        return await ctx.send(f"https://dmoj.ca/contest/{contest.key} "
-                              f"({contest.name}) {len(contest.problems)} "
-                              f"Problems")
+        # When problems are private, it says there are no problems
+        window = 'No'
+        if contest.time_limit:
+            window = f"{contest.time_limit/60/60} Hr"
+        embed = discord.Embed(
+            title=contest.name, url=f"https://dmoj.ca/contest/{contest.key}",
+            description=f"{window} window | {len(contest.problems)} Problems",
+            color=0xfcdb05
+        )
+        await ctx.send(embed=embed)
 
     def force(argument) -> typing.Optional[bool]:
         if argument == '+f':
