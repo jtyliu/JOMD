@@ -15,7 +15,6 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       User as User_DB, Submission as Submission_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB)
-from utils.db import problem_user
 from utils.jomd_common import first_tuple
 
 
@@ -223,7 +222,7 @@ class Participation:
     async def async_init(self):
         user = session.query(User_DB).\
             filter(User_DB.username == self._user)
-        
+
         if user.count() == 0:
             api = API()
             await api.get_user(self._user)
@@ -233,7 +232,7 @@ class Participation:
 
         contest = session.query(Contest_DB).\
             filter(Contest_DB.key == self._contest)
-        
+
         if contest.count() == 0:
             api = API()
             await api.get_contest(self._contest)
@@ -298,7 +297,7 @@ class User:
                         session.commit()
                         break
         self.organizations = organization_qq.all()
-        
+
         def get_key(contest):
             return contest["key"]
 
@@ -356,7 +355,7 @@ class Submission:
 
     @staticmethod
     async def async_map(_type, objects, is_latest=False):
-        # is_latest is to optimize parsing little submissions 
+        # is_latest is to optimize parsing little submissions
         # and many submissions
         if not is_latest:
             problems = session.query(Problem_DB.code, Problem_DB).all()
@@ -372,13 +371,13 @@ class Submission:
             else:
                 to_gather.append(obj.async_init(problems, users, languages))
         await asyncio.gather(*to_gather)
+        session.commit()
 
     async def async_init(self, problem_q, user_q, language_q):
         if self._problem not in problem_q:
             api = API()
             await api.get_problem(self._problem)
             session.add(Problem_DB(api.data.object))
-            session.commit()
             problem_q[self._problem] = Problem_DB(api.data.object)
         self.problem = [problem_q[self._problem]]
 
@@ -386,7 +385,6 @@ class Submission:
             api = API()
             await api.get_user(self._user)
             session.add(User_DB(api.data.object))
-            session.commit()
             user_q[self._user] = User_DB(api.data.object)
         self.user = [user_q[self._user]]
 
@@ -396,7 +394,6 @@ class Submission:
             for language in api.data.objects:
                 if language.key == self._language:
                     session.add(Language_DB(language))
-                    session.commit()
                     language_q[self._language] = Language_DB(language)
                     break
         self.language = [language_q[self._language]]
@@ -431,6 +428,7 @@ class Submission:
                     session.commit()
                     break
         self.language = [language_q.first()]
+
 
 class Organization:
     def __init__(self, data):
@@ -729,7 +727,7 @@ class API:
             ret.append(soup_parse(sub))
         await Submission.async_map(Submission, ret, is_latest=True)
         return ret
-    
+
     async def get_placement(self, username):
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
