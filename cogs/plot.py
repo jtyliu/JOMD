@@ -4,11 +4,14 @@ import typing
 from utils.query import Query
 from discord.ext.commands.errors import BadArgument
 from utils.db import (session, Contest as Contest_DB,
-                      Submission as Submission_DB)
-from utils.graph import plot_type_radar, plot_type_bar, plot_rating
-from sqlalchemy import or_
+                      Submission as Submission_DB,
+                      User as User_DB)
+from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
+                         plot_points)
+from sqlalchemy import or_, orm
 import asyncio
 import io
+import bisect
 
 
 class Plot(commands.Cog):
@@ -44,7 +47,78 @@ class Plot(commands.Cog):
     @plot.command(usage='[usernames]')
     async def points(self, ctx, *usernames):
         """Plot point progression"""
-        return await ctx.send("Not implemented yet!")
+        usernames = list(usernames)
+
+        query = Query()
+        if usernames == []:
+            usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
+
+        users = await asyncio.gather(*[query.get_user(username)
+                                     for username in usernames])
+        usernames = [user.username for user in users]
+        for i in range(len(users)):
+            if users[i] is None:
+                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+        if len(users) > 6:
+            return await ctx.send('Too many users given, max 6')
+
+        total_data = {}
+        for username in usernames:
+            q = session.query(Submission_DB)\
+                .options(orm.joinedload('problem'))\
+                .join(User_DB, User_DB.username == Submission_DB._user,
+                    aliased=True)\
+                .filter(User_DB.username == username)\
+                .order_by(Submission_DB.date)
+
+            def calculate_points(points, fully_solved):
+                b = 150*(1-0.997**fully_solved)
+                p = 0
+                for i in range(min(100, len(points))):
+                    p += (0.95**i)*points[i]
+                return b+p
+
+            submissions = q.all()
+            problems_ACed = dict()
+            code_to_points = dict()
+
+            points_arr = []
+            data_to_plot = {}
+            # O(N^2logN) :blobcreep:
+            for submission in submissions:
+                code = submission.problem[0].code
+                points = submission.points
+                result = submission.result
+
+                if points is not None:
+                    if result == 'AC':
+                        problems_ACed[code] = 1
+                    if code not in code_to_points:
+                        # log N search, N insert
+                        code_to_points[code] = points
+                        bisect.insort(points_arr, points)
+                    elif points > code_to_points[code]:
+                        # N remove, log N search, N insert
+                        points_arr.remove(code_to_points[code])
+                        code_to_points[code] = points
+                        bisect.insort(points_arr, points)
+                    cur_points = calculate_points(points_arr[::-1],
+                                                  len(problems_ACed))
+                    data_to_plot[submission.date] = cur_points
+            total_data[username] = data_to_plot
+
+        plot_points(total_data)
+
+        with open('./graphs/plot.png', 'rb') as file:
+            file = discord.File(io.BytesIO(file.read()), filename='plot.png')
+        embed = discord.Embed(
+                    title='Point Progression',
+                    description=' '.join(usernames),
+                    color=0xfcdb05,
+        )
+        embed.set_image(url=f'attachment://plot.png',)
+
+        return await ctx.send(embed=embed, file=file)
 
     @plot.command(usage='[usernames]')
     async def rating(self, ctx, *usernames):

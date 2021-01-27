@@ -9,6 +9,14 @@ categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
 
 # TODO: Fiddle around with matplotlib to make the graphs look better
 
+def plot_points(datas):
+    plt.clf()
+    plt.subplots()
+    for username, data in datas.items():
+        df = pd.Series(data)
+        df.plot(label=username)
+    plt.savefig('./graphs/plot.png')
+
 def plot_rating(data):
     # Credit to https://github.com/jacklee1792/dmoj-rating
     plt.clf()
