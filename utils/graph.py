@@ -14,7 +14,10 @@ def plot_points(datas):
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
-        df.plot(label=username)
+        df.plot(label="%s (%.2f)" % (username, df.max()))
+    plt.xlabel('Date')
+    plt.ylabel('Points')
+    plt.legend(loc='upper left', fontsize='8')
     plt.savefig('./graphs/plot.png')
 
 def plot_rating(data):
