@@ -10,12 +10,15 @@ class Meta(commands.Cog):
     async def check(self, ctx):
         """Check if the bot has been rate limited"""
         query = Query()
-        user = await query.get_user('JoshuaL')
-        if user is None:
-            await ctx.send('There is something wrong with the api, '
-                           'please contact an admin')
-        else:
-            await ctx.send('Api is all good, move along.')
+        try:
+            user = await query.get_user('JoshuaL')
+            if user is None:
+                await ctx.send('There is something wrong with the api, '
+                            'please contact an admin')
+            else:
+                await ctx.send('Api is all good, move along.')
+        except:
+            await ctx.send('Seems like I\'m getting cloud flared, rip')
 
 
 def setup(bot):
