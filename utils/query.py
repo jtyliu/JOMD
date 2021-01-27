@@ -306,24 +306,23 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-        print("Done Api Call",time.time()-start)
+        print("Done Api Call", time.time()-start)
+        start = time.time()
+        q = session.query(Submission_DB)
+
         cond_user = self.parse(func.lower(User_DB.username), func.lower(user))
         if not cond_user:
-            cond_user = Submission_DB.user.any(cond_user)
+            q = q.join(User_DB, cond_user, aliased=True)
 
         cond_problem = self.parse(Problem_DB.code, problem)
         if not cond_problem:
-            cond_problem = Submission_DB.problem.any(cond_problem)
+            q = q.join(Problem_DB, cond_problem, aliased=True)
 
         cond_lang = self.parse(Language_DB.key, language)
         if not cond_lang:
-            cond_lang = Submission_DB.language.any(cond_lang)
+            q = q.join(Language_DB, cond_lang, aliased=True)
 
-        q = session.query(Submission_DB).\
-            filter(cond_user).\
-            filter(cond_problem).\
-            filter(cond_lang).\
-            filter(self.parse(Submission_DB.result, result))
+        q = q.filter(self.parse(Submission_DB.result, result))
 
         if a.data.total_objects == q.count():
             return q.all()
@@ -375,14 +374,14 @@ class Query:
     async def get_placement(self, username) -> int:
         a = API()
         return await a.get_placement(username)
-    
+
     def get_handle(self, id, guild_id):
         q = session.query(Handle_DB).\
             filter(Handle_DB.id == id).\
             filter(Handle_DB.guild_id == guild_id)
         if q.count():
             return q.first().handle
-    
+
     def get_handle_user(self, handle, guild_id):
         q = session.query(Handle_DB).\
             filter(Handle_DB.handle == handle).\
@@ -409,7 +408,7 @@ class Query:
             .filter(Problem_DB.points.between(low, high))\
             .filter(Problem_DB.is_organization_private == 0)
         return q.all()
-    
+
     def get_attempted_problems(self, username, types):
         conds = [Problem_DB.types.contains(_type) for _type in types]
         sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
@@ -420,5 +419,3 @@ class Query:
             .filter(func.ifnull(sub_q.c.points, 0) != 0)\
             .filter(or_(*conds))
         return q.all()
-
-    
