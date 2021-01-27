@@ -227,7 +227,7 @@ class Plot(commands.Cog):
 
         max_percentage = 0
         for i, types in enumerate(important_types):
-            total_problems = await query.get_problems(_type=types)
+            total_problems = await query.get_problems(_type=types, cached=True)
             total_points = list(map(to_points, total_problems))
             total_points.sort(reverse=True)
             total_points = calculate_points(total_points)

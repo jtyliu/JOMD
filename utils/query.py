@@ -58,7 +58,16 @@ class Query:
         return languages
 
     async def get_problems(self, partial=None, group=None, _type=None,
-                           organization=None, search=None) -> List[Problem_DB]:
+                           organization=None, search=None, cached=False) -> List[Problem_DB]:
+
+        q = session.query(Problem_DB).\
+            filter(self.parse(Problem_DB.partial, partial)).\
+            filter(self.parse(Problem_DB.group, group)).\
+            filter(self.parse(Problem_DB.types, _type)).\
+            filter(self.parse(Problem_DB.organizations, organization))
+        if cached:
+            return q.all()
+
         a = API()
         if search is not None:
             # Can't bother to implement something with db
@@ -71,11 +80,6 @@ class Query:
         await a.get_problems(partial=partial, group=group, _type=_type,
                              organization=organization, search=search,
                              page=page)
-        q = session.query(Problem_DB).\
-            filter(self.parse(Problem_DB.partial, partial)).\
-            filter(self.parse(Problem_DB.group, group)).\
-            filter(self.parse(Problem_DB.types, _type)).\
-            filter(self.parse(Problem_DB.organizations, organization))
 
         if a.data.total_objects == q.count():
             return q.all()
