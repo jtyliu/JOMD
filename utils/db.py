@@ -316,7 +316,7 @@ class Submission(Base):
     def __init__(self, submission):
         self.id = submission.id
         self.problem += submission.problem
-        self._code = self.problem[0].code
+        self._code = submission._problem
         self._user = submission._user
         self.user += submission.user
         self.date = submission.date
