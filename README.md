@@ -1,20 +1,43 @@
 # JOMD
 JOMD is a Discord bot for [Dmoj](https://dmoj.ca/)
 
+## Previews
+Point history
+![plot_points](images/plot_points.png)
+
+Rating history
+![plot_points](images/plot_rating.png)
+
+Point prediction
+![plot_points](images/predict.png)
+
 # Features
-The current set of features are limited, although more are planned to be added.
+The features of JOMD are split up into seperate cogs each handling their related commands.
 
-### user
-Show user profile with recent submissions
+### User Cog
+```
+  cache      Caches the submissions of a user, will speed up other commands
+  gimme      Recommend a problem
+  predict    Predict total points after solving N pointer problem(s)
+  user       Show user profile and latest submissions
+  vc         Suggest a contest
+```
 
-### predict
-Predict culminated points after solving a problems with some amount of points
+### Plot Cog
+```
+  points Plot point progression
+  rating Plot rating progression
+  type   Graph problems solved by popular problem types
+```
 
-### gimme
-Problem suggestion with point range filter and problem type filter
+### Handles Cog
 
-### plot type
-Shows a radar chart of problems solved by users
+```
+  link       Links your discord account to your dmoj account
+  set        Manually link two accounts together
+  unlink     Unlink your discord account with your dmoj account
+  whois      Shows the discord account linked to the relevant dmoj account
+```
 
 # Setup
 
