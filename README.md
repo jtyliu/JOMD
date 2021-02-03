@@ -3,13 +3,16 @@ JOMD is a Discord bot for [Dmoj](https://dmoj.ca/)
 
 ## Previews
 Point history
-![plot_points](images/plot_points.png)
+
+<img src="images/plot_points.png" width=500>
 
 Rating history
-![plot_points](images/plot_rating.png)
+
+<img src="images/plot_rating.png" width=500>
 
 Point prediction
-![plot_points](images/predict.png)
+
+<img src="images/predict.png" width=500>
 
 # Features
 The features of JOMD are split up into seperate cogs each handling their related commands.
