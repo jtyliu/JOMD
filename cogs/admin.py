@@ -3,6 +3,9 @@ from pathlib import Path
 import discord
 # from utils.api import problem_api
 # from utils.db import DbConn
+from utils.db import (session, Contest as Contest_DB,
+                      Problem as Problem_DB)
+from utils.query import Query
 import math
 
 
@@ -30,6 +33,24 @@ class Admin(commands.Cog):
             await ctx.send(f'{e.__class__.__name__}: {e}')
         else:
             await ctx.send('All cogs have been reloaded')
+
+    @commands.command()
+    async def force(self, ctx, _type, key):
+        """Force a recache of a problem, or contest"""
+        if _type.lower() == "contest":
+            q = session.query(Contest_DB).filter(Contest_DB.key == key)
+            if q.count() == 0:
+                await ctx.send(f"There is no contests with the key {key} "
+                               f"cached. Will try fetching contest")
+            else:
+                q.delete()
+                session.commit()
+            query = Query()
+            await query.get_contest(key)
+            await ctx.send(f"Recached contest {key}")
+        if _type.lower() == "problem":
+            await ctx.send("Not Implemented Yet!")
+
 
     # @commands.command()
     # async def cache_problems(self, ctx):
