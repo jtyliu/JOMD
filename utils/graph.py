@@ -9,12 +9,25 @@ categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
 
 # TODO: Fiddle around with matplotlib to make the graphs look better
 
+def plot_solved(datas):
+    plt.clf()
+    plt.subplots()
+    for username, data in datas.items():
+        df = pd.Series(data)
+        df.plot(label="%s (%.2f)" % (username, df.max()))
+    sns.set_style("whitegrid")
+    plt.xlabel('Date')
+    plt.ylabel('Problem Solved Count')
+    plt.legend(loc='upper left', fontsize='8')
+    plt.savefig('./graphs/plot.png')
+
 def plot_points(datas):
     plt.clf()
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
         df.plot(label="%s (%.2f)" % (username, df.max()))
+    sns.set_style("whitegrid")
     plt.xlabel('Date')
     plt.ylabel('Points')
     plt.legend(loc='upper left', fontsize='8')
@@ -33,9 +46,12 @@ def plot_rating(data):
         ddf = df.iloc[:, i].dropna()
         # Make sure there is data, to plot
         # Don't plot users with no contest score
-        ddf.iloc[1:]\
-            .plot(label=f'{username} ({int(max_ratings[i] or 0)})',
-                  marker='s', markerfacecolor='white')
+        try:
+            ddf.iloc[1:]\
+                .plot(label=f'{username} ({max_ratings[i] or 0})',
+                    marker='s', markerfacecolor='white')
+        except TypeError:
+            pass
 
     colors = ['#d2d2d3', '#a0ff8f', '#adb0ff', '#f399ff', '#ffd363',
               '#ff3729', '#a11b00']
