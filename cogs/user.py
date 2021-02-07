@@ -12,7 +12,8 @@ from utils.db import (session, Problem as Problem_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB,
                       Handle as Handle_DB, Json)
-from utils.jomd_common import str_not_int, point_range, parse_gimme
+from utils.jomd_common import (str_not_int, point_range, parse_gimme,
+                               calculate_points)
 from utils.api import ObjectNotFound
 from utils.constants import TZ
 import asyncio
@@ -183,7 +184,6 @@ class User(commands.Cog):
             .filter(User_DB.username == user.username)
 
         if q.count():
-            start = time.time()
             submissions = q.all()
             msg = None
         else:
@@ -209,13 +209,6 @@ class User(commands.Cog):
         fully_solved = len(problems_ACed)
         points = list(code_to_points.values())
         points.sort(reverse=True)
-
-        def calculate_points(points, fully_solved):
-            b = 150*(1-0.997**fully_solved)
-            p = 0
-            for i in range(min(100, len(points))):
-                p += (0.95**i)*points[i]
-            return b+p
 
         embed = discord.Embed(
             title=f'Point prediction for {username}',
