@@ -95,11 +95,14 @@ class Handles(commands.Cog):
 
         submissions = await query.get_latest_submissions(username, 10)
 
+        # if the user links twice, it might break the db
+        # Should add decorator to prevent this
+        if query.get_handle(ctx.author.id, ctx.guild.id):
+            return
+
         for submission in submissions:
             if (submission.result == 'CE' and
                     submission.problem[0].code == problem.code):
-                user = await query.get_user(username)
-                username = user.username
 
                 handle = Handle_DB()
                 handle.id = ctx.author.id
@@ -138,9 +141,6 @@ class Handles(commands.Cog):
         if query.get_handle_user(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')
             return
-
-        user = await query.get_user(username)
-        username = user.username
 
         handle = Handle_DB()
         handle.id = member.id
