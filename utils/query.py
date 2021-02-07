@@ -107,10 +107,10 @@ class Query:
     async def get_problem(self, code) -> Problem_DB:
         q = session.query(Problem_DB).\
             filter(Problem_DB.code == code)
-        # if q.count():
-        #     # time_limit check if it has a detailed row
-        #     if q.first().time_limit is not None:
-        #         return q.first()
+        if q.count():
+            # has_rating check if it has a detailed row
+            if q.first().has_rating is not None:
+                return q.first()
 
         a = API()
         await a.get_problem(code)
@@ -165,7 +165,6 @@ class Query:
             # is_rated checks if it has detailed rows
             if q.first().is_rated is not None:
                 return q.first()
-
         a = API()
         await a.get_contest(key)
         if q.count():
