@@ -5,10 +5,12 @@ from utils.query import Query
 from discord.ext.commands.errors import BadArgument
 from utils.db import (session, Contest as Contest_DB,
                       Submission as Submission_DB,
-                      User as User_DB)
+                      User as User_DB,
+                      Problem as Problem_DB)
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
-                         plot_points)
-from sqlalchemy import or_, orm
+                         plot_points, plot_solved)
+from utils.jomd_common import first_tuple
+from sqlalchemy import or_, orm, func
 import asyncio
 import io
 import bisect
@@ -45,6 +47,64 @@ class Plot(commands.Cog):
         raise BadArgument('Argument not known')
 
     @plot.command(usage='[usernames]')
+    async def solved(self, ctx, *usernames):
+        """Plot problems solved over time"""
+        usernames = list(usernames)
+
+        query = Query()
+        if usernames == []:
+            usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
+
+        users = await asyncio.gather(*[query.get_user(username)
+                                     for username in usernames])
+        usernames = [user.username for user in users]
+        for i in range(len(users)):
+            if users[i] is None:
+                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+        if len(users) > 10:
+            return await ctx.send('Too many users given, max 10')
+
+        total_data = {}
+        not_cached = []
+        for username in usernames:
+            q = session.query(Submission_DB)\
+                .filter(Submission_DB._user == username)
+            if q.count() == 0:
+                not_cached.append(username)
+
+            q = session.query(func.min(Submission_DB.date))\
+                .join(Problem_DB, Problem_DB.code == Submission_DB._code)\
+                .filter(Submission_DB._user == username)\
+                .filter(Submission_DB.points == Problem_DB.points)\
+                .group_by(Submission_DB._code)
+            dates = list(map(first_tuple, q.all()))
+            dates.sort()
+            data_to_plot = {}
+            cnt = 0
+            for date in dates:
+                cnt += 1
+                data_to_plot[date] = cnt
+            total_data[username] = data_to_plot
+ 
+        plot_solved(total_data)
+
+        if len(not_cached):
+            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
+                           f"submissions. Please use +cache [username]`")
+
+        plot_points(total_data)
+
+        with open('./graphs/plot.png', 'rb') as file:
+            file = discord.File(io.BytesIO(file.read()), filename='plot.png')
+        embed = discord.Embed(
+            title='Problems Solved',
+            color=0xfcdb05,
+        )
+        embed.set_image(url=f'attachment://plot.png',)
+
+        return await ctx.send(embed=embed, file=file)
+
+    @plot.command(usage='[usernames]')
     async def points(self, ctx, *usernames):
         """Plot point progression"""
         usernames = list(usernames)
@@ -59,10 +119,11 @@ class Plot(commands.Cog):
         for i in range(len(users)):
             if users[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
-        if len(users) > 6:
-            return await ctx.send('Too many users given, max 6')
+        if len(users) > 10:
+            return await ctx.send('Too many users given, max 10')
 
         total_data = {}
+        not_cached = []
         for username in usernames:
             q = session.query(Submission_DB)\
                 .options(orm.joinedload('problem'))\
@@ -79,6 +140,8 @@ class Plot(commands.Cog):
                 return b+p
 
             submissions = q.all()
+            if len(submissions) == 0:
+                not_cached.append(username)
             problems_ACed = dict()
             code_to_points = dict()
 
@@ -107,13 +170,16 @@ class Plot(commands.Cog):
                     data_to_plot[submission.date] = cur_points
             total_data[username] = data_to_plot
 
+        if len(not_cached):
+            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
+                     f"submissions. Please use +cache [username]`")
+
         plot_points(total_data)
 
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
                     title='Point Progression',
-                    description=' '.join(usernames),
                     color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
@@ -135,8 +201,8 @@ class Plot(commands.Cog):
         for i in range(len(users)):
             if users[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
-        if len(users) > 6:
-            return await ctx.send('Too many users given, max 6')
+        if len(users) > 10:
+            return await ctx.send('Too many users given, max 10')
 
         cond = [Contest_DB.rankings.contains(user.username) for user in users]
         q = session.query(Contest_DB).filter(or_(*cond))\
@@ -168,7 +234,6 @@ class Plot(commands.Cog):
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
                     title='Contest Rating',
-                    description=' '.join(usernames),
                     color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
@@ -226,6 +291,14 @@ class Plot(commands.Cog):
             return problem.points
 
         max_percentage = 0
+        not_cached = []
+
+        for username in usernames:
+            q = session.query(Submission_DB)\
+                .filter(Submission_DB._user == username)
+            if q.count() == 0:
+                not_cached.append(username)
+
         for i, types in enumerate(important_types):
             total_problems = await query.get_problems(_type=types, cached=True)
             total_points = list(map(to_points, total_problems))
@@ -234,13 +307,7 @@ class Plot(commands.Cog):
 
             for username in usernames:
                 problems = query.get_attempted_problems(username, types)
-                q = session.query(Submission_DB)\
-                    .filter(Submission_DB._user == username)
-                if q.count() == 0:
-                    await ctx.send('There are no submissions cached, fetching '
-                                   'submissions now.')
-                    await query.get_submissions(username)
-                    problems = query.get_attempted_problems(username, types)
+
                 points = list(map(to_points, problems))
                 points.sort(reverse=True)
 
@@ -253,6 +320,10 @@ class Plot(commands.Cog):
                 data[labels[i]].append(percentage)
 
         print(data)
+        if len(not_cached):
+            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
+                     f"submissions. Please use +cache [username]`")
+
         if graph == 'radar':
             plot_type_radar(data, as_percent, max_percentage)
         elif graph == 'bar':
@@ -262,7 +333,6 @@ class Plot(commands.Cog):
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
                     title='Problem types solved',
-                    description=' '.join(usernames),
                     color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
