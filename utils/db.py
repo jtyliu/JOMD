@@ -383,7 +383,7 @@ class Language(Base):
         self.code_template = language.code_template
 
 
-# I don't thinkg I'll ever use this
+# I don't think I'll ever use this
 class Judge(Base):
     __tablename__ = 'judge'
 
@@ -407,11 +407,11 @@ class Judge(Base):
 
 class Handle(Base):
     __tablename__ = 'handle'
-
-    id = Column(Integer, primary_key=True)
-    handle = Column(String)
+    _id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, index=True)
+    handle = Column(String, index=True)
     user_id = Column(Integer)
-    guild_id = Column(Integer)
+    guild_id = Column(Integer, index=True)
 
 
 Base.metadata.create_all(engine)
