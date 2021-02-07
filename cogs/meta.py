@@ -18,8 +18,9 @@ class Meta(commands.Cog):
                             'please contact an admin')
             else:
                 await ctx.send('Api is all good, move along.')
-        except:
-            await ctx.send('Seems like I\'m getting cloud flared, rip')
+        except Exception as e:
+            await ctx.send('Seems like I\'m getting cloud flared, rip. '
+                           + str(e))
 
     @commands.command()
     async def stats(self, ctx):
