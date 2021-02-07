@@ -1,5 +1,5 @@
 # JOMD
-JOMD is a Discord bot for [Dmoj](https://dmoj.ca/)
+JOMD is a Discord bot for [Dmoj](https://dmoj.ca/) Inspired by [TLE](https://github.com/cheran-senthil/TLE)
 
 ## Previews
 Point history
