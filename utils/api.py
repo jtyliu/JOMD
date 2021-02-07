@@ -308,8 +308,7 @@ class User:
         contest_q = session.query(Contest_DB.key).\
             filter(Contest_DB.key.in_(self._contest_keys)).all()
         contest_q = list(map(first_tuple, contest_q))
-        for contest_dict in self._contests:
-            contest_key = contest_dict["key"]
+        for contest_key in self._contest_keys:
             try:
                 if contest_key not in contest_q:
                     api = API()
