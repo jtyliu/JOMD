@@ -254,7 +254,6 @@ class User(commands.Cog):
 
         q = session.query(Contest_DB)
         for user in users:
-            # TODO: Not only check for participation but check
             # if the user has attempted any problems from the problem set
             sub_q = session.query(Submission_DB,
                                   func.max(Submission_DB.points))\
