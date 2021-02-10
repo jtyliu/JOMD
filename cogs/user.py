@@ -4,7 +4,7 @@ import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
 from utils.db import session
-from sqlalchemy import func, or_, not_, orm
+from sqlalchemy import func, or_, not_, orm, distinct
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -18,6 +18,7 @@ from utils.api import ObjectNotFound
 from utils.constants import TZ
 import asyncio
 import random
+from operator import itemgetter
 
 
 
@@ -255,7 +256,16 @@ class User(commands.Cog):
         for user in users:
             # TODO: Not only check for participation but check
             # if the user has attempted any problems from the problem set
-            q = q.filter(not_(Contest_DB.rankings.contains(user.username)))
+            sub_q = session.query(Submission_DB,
+                                  func.max(Submission_DB.points))\
+                .filter(Submission_DB._user == user.username)\
+                .group_by(Submission_DB._code).subquery()
+            sub_q = session.query(Problem_DB.code)\
+                .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+                .filter(func.ifnull(sub_q.c.points, 0) != 0)
+            sub_q = list(map(itemgetter(0), sub_q.all()))
+            q = q.filter(not_(Contest_DB.rankings.contains(user.username)))\
+                .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))
 
         if q.count() == 0:
             await ctx.send("Cannot find any contests which "
