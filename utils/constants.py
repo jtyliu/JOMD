@@ -1,6 +1,8 @@
 import os
 import datetime
 import pytz
+
+# Has no use, URI located at db.py
 DB_DIR = 'utils/db/JOMD.db'
 SITE_URL = 'https://dmoj.ca/'
 DEBUG_DB = False
