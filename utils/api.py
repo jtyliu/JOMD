@@ -19,7 +19,7 @@ from utils.jomd_common import first_tuple
 
 
 def rate_limit(func):
-    ratelimit = 87
+    ratelimit = 80
     queue = []
 
     @functools.wraps(func)
@@ -340,6 +340,9 @@ class Submission:
         self.cases = data.get("cases")
         self.score_num = data.get("score_num")
         self.score_denom = data.get("score_denom")
+        self.problem = None
+        self.user = None
+        self.language = None
 
     @property
     def memory_str(self):
@@ -364,27 +367,40 @@ class Submission:
             languages = session.query(Language_DB.key, Language_DB).all()
             languages = {k: v for k, v in languages}
         to_gather = []
+        lock_table = {}
         for obj in objects:
             if is_latest:
                 to_gather.append(obj.async_old())
             else:
-                to_gather.append(obj.async_init(problems, users, languages))
+                # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will cause a db error
+                # this is because any submissions which are not in the db will be called by the api and stored into the db
+                # but in between that moment of calling the api and storing into the db, another process will call the api for the same problem
+                # because it is technically not in memory yet
+                # This fix to this is two global tables and a lock
+                to_gather.append(
+                    obj.async_init(problems, users, languages, lock_table)
+                )
         await asyncio.gather(*to_gather)
         session.commit()
 
-    async def async_init(self, problem_q, user_q, language_q):
-        if self._problem not in problem_q:
-            api = API()
-            await api.get_problem(self._problem)
-            session.add(Problem_DB(api.data.object))
-            problem_q[self._problem] = Problem_DB(api.data.object)
-        self.problem = [problem_q[self._problem]]
+    async def async_init(self, problem_q, user_q, language_q, lock_table):
+        if self._problem not in problem_q and self._problem not in lock_table:
+            lock_table[self._problem] = asyncio.Lock()
+            async with lock_table[self._problem]:
+                api = API()
+                await api.get_problem(self._problem)
+                problem = Problem_DB(api.data.object)
+                session.add(problem)
+                problem_q[self._problem] = problem
+        if self._problem in problem_q:
+            self.problem = [problem_q[self._problem]]
 
         if self._user not in user_q:
             api = API()
             await api.get_user(self._user)
-            session.add(User_DB(api.data.object))
-            user_q[self._user] = User_DB(api.data.object)
+            user = User_DB(api.data.object)
+            session.add()
+            user_q[self._user] = user
         self.user = [user_q[self._user]]
 
         if self._language not in language_q:
@@ -392,10 +408,16 @@ class Submission:
             await api.get_languages()
             for language in api.data.objects:
                 if language.key == self._language:
-                    session.add(Language_DB(language))
-                    language_q[self._language] = Language_DB(language)
+                    lang = Language_DB(language)
+                    session.add(lang)
+                    language_q[self._language] = lang
                     break
         self.language = [language_q[self._language]]
+
+        if self.problem is None:
+            async with lock_table[self._problem]:
+                self.problem = [problem_q[self._problem]]
+
 
     async def async_old(self):
         problem_q = session.query(Problem_DB).\
