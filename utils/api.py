@@ -19,13 +19,12 @@ from utils.jomd_common import first_tuple
 
 
 def rate_limit(func):
+    # Got ratelimited with 87, we'll stay on the safe side
     ratelimit = 80
     queue = []
 
     @functools.wraps(func)
     async def wrapper_rate_limit(*args, **kwargs):
-        # Is this enough?
-        # Any race condition?
         now = time.time()
         while len(queue) > 0 and now - queue[0] > 60:
             queue.pop(0)
@@ -417,7 +416,6 @@ class Submission:
         if self.problem is None:
             async with lock_table[self._problem]:
                 self.problem = [problem_q[self._problem]]
-
 
     async def async_old(self):
         problem_q = session.query(Problem_DB).\

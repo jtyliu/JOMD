@@ -16,12 +16,6 @@ class Admin(commands.Cog):
     async def cog_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
 
-    @commands.command(hidden=True)
-    async def gib_role(self, ctx, role: discord.Role):
-        # Yes, this might look like a backdoor but I can explain,
-        # Jack is baf
-        await ctx.author.add_roles(role)
-
     @commands.command()
     async def reload_all(self, ctx):
         """Reload a module"""
@@ -49,7 +43,16 @@ class Admin(commands.Cog):
             await query.get_contest(key)
             await ctx.send(f"Recached contest {key}")
         if _type.lower() == "problem":
-            await ctx.send("Not Implemented Yet!")
+            q = session.query(Problem_DB).filter(Problem_DB.code == key)
+            if q.count() == 0:
+                await ctx.send(f"There is no contests with the key {key} "
+                               f"cached. Will try fetching contest")
+            else:
+                q.delete()
+                session.commit()
+            query = Query()
+            await query.get_problem(key)
+            await ctx.send(f"Recached contest {key}")
 
 
     # @commands.command()

@@ -85,7 +85,6 @@ class Contest(commands.Cog):
                         else:
                             rank[str(i)] = 0
                     data.append(rank)
-        # TODO: Pad, format and print data
         max_len = {}
         max_len["rank"] = len("#")
         max_len["username"] = len("Handle")
@@ -136,16 +135,6 @@ class Contest(commands.Cog):
         output += "\n"
         await ctx.send("```yaml\n"+output+"```")
 
-
-
-
-
-
-            
-
-        
-        
-        
 
 def setup(bot):
     bot.add_cog(Contest(bot))
