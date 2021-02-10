@@ -414,11 +414,11 @@ class Query:
 
     def get_attempted_problems(self, username, types):
         conds = [Problem_DB.types.contains(_type) for _type in types]
-        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
-            .filter(Submission_DB._user == username)\
-            .group_by(Submission_DB._code).subquery()
-        q = session.query(Problem_DB)\
-            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
-            .filter(func.ifnull(sub_q.c.points, 0) != 0)\
-            .filter(or_(*conds))
+            sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
+                .filter(Submission_DB._user == username)\
+                .group_by(Submission_DB._code).subquery()
+            q = session.query(Problem_DB)\
+                .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+                .filter(func.ifnull(sub_q.c.points, 0) != 0)\
+                .filter(or_(*conds))
         return q.all()
