@@ -188,9 +188,9 @@ class User(commands.Cog):
             submissions = q.all()
             msg = None
         else:
-            msg = await ctx.send('No submissions cached, '
-                                 'fetching submissions now. Please use +cache to get new submissions later on')
-            submissions = await query.get_submissions(username)
+            await ctx.send('No submissions cached, '
+                           'Please use +cache to get new submissions')
+            return
 
         problems_ACed = dict()
         code_to_points = dict()
