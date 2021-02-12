@@ -296,9 +296,10 @@ class User(commands.Cog):
         Use surround your username with '' if it can be interpreted as a number
         +f              cache every submission
         """
-        username = username.replace('\'', '')
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
+
+        username = username.replace('\'', '')
 
         if username is None:
             return await ctx.send(f'No username given!')
