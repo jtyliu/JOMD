@@ -20,17 +20,18 @@ from utils.jomd_common import first_tuple
 
 def rate_limit(func):
     # Got ratelimited with 87, we'll stay on the safe side
-    ratelimit = 80
+    ratelimit = 3
+    time_span = 2
     queue = []
 
     @functools.wraps(func)
     async def wrapper_rate_limit(*args, **kwargs):
         now = time.time()
-        while len(queue) > 0 and now - queue[0] > 60:
+        while len(queue) > 0 and now - queue[0] > time_span:
             queue.pop(0)
 
         if len(queue) == ratelimit:
-            waittime = 60 - now + queue[0]
+            waittime = time_span - now + queue[0]
             queue.pop(0)
             await asyncio.sleep(waittime)
             now = time.time()
