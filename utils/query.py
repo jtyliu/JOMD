@@ -312,6 +312,7 @@ class Query:
         print("Done Api Call", time.time()-start)
         start = time.time()
         q = session.query(Submission_DB)
+        q = q.filter(Submission_DB._user == user)
 
         cond_user = self.parse(func.lower(User_DB.username), func.lower(user))
         if not cond_user:
@@ -345,6 +346,17 @@ class Query:
         apis = []
         to_gather = []
 
+        async def get_submission(api, user, problem, language, result, page):
+            try:
+                api.get_submissions(user=user, problem=problem,
+                                    language=language,
+                                    result=result, page=page)
+            except:
+                # Sometimes when caching a user with many pages one might not return correctly
+                # this will silently return nothing
+                # Perhaps I should implement some sort of error catching in the cogs
+                pass
+
         for _ in range(2, total_pages+1):
             page += 1
             api = API()
@@ -355,6 +367,8 @@ class Query:
             to_gather.append(to_await)
         await asyncio.gather(*to_gather)
         for api in apis:
+            if api.data.objects is None:
+                continue
             submission_ids = list(map(get_id, api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(submission_ids)).all()
