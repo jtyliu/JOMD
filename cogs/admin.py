@@ -55,24 +55,17 @@ class Admin(commands.Cog):
             await ctx.send(f"Recached contest {key}")
 
 
-    # @commands.command()
-    # async def cache_problems(self, ctx):
-    #     """Update db and cache all new problems"""
-    #     db = DbConn()
-    #     await ctx.send("Caching Problems...")
-    #     total = await problem_api.get_problem_total()
-    #     pages = math.ceil(total/1000)
-    #     total_cached = 0
-    #     for page in range(1, pages+1):
-    #         problems = await problem_api.get_problems(page)
-    #         for problem in problems:
-    #             if db.get_problem(problem.code):
-    #                 continue
-    #             problem = await problem_api.get_problem(problem.code)
-    #             if problem.is_public:
-    #                 db.cache_problem(problem)
-    #                 total_cached += 1
-    #     await ctx.send(f"{total_cached} problems added to db.")
+    @commands.command()
+    async def cache_problems(self, ctx):
+        """Update db and cache all new problems"""
+        query = Query()
+        msg = await ctx.send("Caching...")
+        count = 0
+        problems = await query.get_problems()
+        for problem in problems:
+            await query.get_problem(problem.code)
+            count += 1
+        return await msg.edit(f"Cache+d {count} problems")
 
 
 def setup(bot):

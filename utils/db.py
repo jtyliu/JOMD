@@ -16,7 +16,7 @@ from sqlalchemy.orm import relationship
 from utils.constants import DEBUG_DB
 import json
 
-URI = 'sqlite:///utils/db/JOMD1.db'
+URI = 'sqlite:///utils/db/JOMD.db'
 
 Base = declarative_base()
 engine = create_engine(URI, echo=DEBUG_DB)
@@ -413,5 +413,24 @@ class Handle(Base):
     user_id = Column(Integer)
     guild_id = Column(Integer, index=True)
 
+class Gitgud(Base):
+    __tablename__ = 'gitgud'
+    _id = Column(Integer, primary_key=True, autoincrement=True)
+    handle = Column(String)
+    guild_id = Column(Integer)
+    point = Column(Integer)
+    problem_id = Column(String)
+    time = Column(DateTime)
+
+
+
+class CurrentGitgud(Base):
+    __tablename__ = 'current_gitgud'
+    _id = Column(Integer, primary_key=True)
+    handle = Column(String)
+    guild_id = Column(Integer)
+    problem_id = Column(String)
+    point = Column(Integer)
+    time = Column(DateTime)
 
 Base.metadata.create_all(engine)

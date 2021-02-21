@@ -1,5 +1,4 @@
-**/JOMD.db
-**/JOMD1.db
+/utils/db/*
 __pycache__/
 .vscode/
 Test.py

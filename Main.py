@@ -6,8 +6,8 @@ import discord
 
 def main():
     # https://github.com/cheran-senthil/TLE/blob/bae59c2de6a2313be4a6ba4a5a5cbba81352e229/tle/__main__.py
-    BOT_TOKEN = os.environ["JOMD_BOT_TOKEN"]
-    API_TOKEN = os.environ["JOMD_TOKEN"]
+    BOT_TOKEN = "ODExNzUwNzU2ODY0MjI5NDA2.YC2vzg.KJjXb4x2362tVbVMXb97uBPLh1A"
+    # API_TOKEN = os.environ["JOMD_TOKEN"]
 
     if not BOT_TOKEN:
         print('Missing bot token')
