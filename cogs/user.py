@@ -283,7 +283,7 @@ class User(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    def force(self, argument) -> typing.Optional[bool]:
+    def force(argument) -> typing.Optional[bool]:
         if argument == '+f':
             return True
         raise BadArgument('No force argument')
