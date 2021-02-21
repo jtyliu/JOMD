@@ -7,10 +7,15 @@ from utils.db import (session, Problem as Problem_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB,
                       Handle as Handle_DB, Json)
+from utils.gitgud import Gitgud as Gitgud_utils
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
 from utils.jomd_common import first_tuple
+from utils.constants import SHORTHANDS
+import random
+import discord
+from datetime import datetime
 
 
 class Query:
@@ -109,7 +114,7 @@ class Query:
             filter(Problem_DB.code == code)
         if q.count():
             # has_rating check if it has a detailed row
-            if q.first().has_rating is not None:
+            if q.first().short_circuit is not None:
                 return q.first()
 
         a = API()
@@ -425,6 +430,54 @@ class Query:
             .filter(Problem_DB.points.between(low, high))\
             .filter(Problem_DB.is_organization_private == 0)
         return q.all()
+
+    async def solved(self, handle, problem_id):
+        user = await self.get_user(handle)
+        for problem in user.solved_problems:
+            if problem.code == problem_id:
+                return True
+        return False
+
+    async def get_unsolved_problem(self, username, guild_id, increment, types, low=1, high=50):
+        unsolved = self.get_unsolved_problems(username, types, low, high)
+        
+        if len(unsolved) == 0:
+            return None
+        problem = random.choice(unsolved)
+        gitgud_util = Gitgud_utils()
+        gitgud_util.bind(username, guild_id, problem.code, problem.points*increment, datetime.now())
+
+        points = str(problem.points)
+        if problem.partial:
+            points += 'p'
+
+        memory = problem.memory_limit
+        if memory >= 1024*1024:
+            memory = '%dG' % (memory//1024//1024)
+        elif memory >= 1024:
+            memory = '%dM' % (memory//1024)
+        else:
+            memory = '%dK' % (memory)
+
+        embed = discord.Embed(
+            title=problem.name,
+            url='https://dmoj.ca/problem/%s' % problem.code,
+            description='Points: %s\nProblem Types: ||%s||' %
+                        (points, ', '.join(problem.types)),
+            color=0xfcdb05,
+        )
+
+        embed.set_thumbnail(url=await self.get_pfp(username))
+        embed.add_field(name='Group', value=problem.group, inline=True)
+        embed.add_field(
+            name='Time',
+            value='%ss' % problem.time_limit,
+            inline=True
+        )
+        embed.add_field(name='Memory', value=memory, inline=True)
+        # print(embed)
+        return embed
+        
 
     def get_attempted_problems(self, username, types):
         conds = [Problem_DB.types.contains(_type) for _type in types]

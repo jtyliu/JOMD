@@ -15,7 +15,7 @@ from utils.db import (session, Problem as Problem_DB,
 from utils.jomd_common import (str_not_int, point_range, parse_gimme,
                                calculate_points)
 from utils.api import ObjectNotFound
-from utils.constants import TZ
+from utils.constants import TZ, SHORTHANDS
 import asyncio
 import random
 from operator import itemgetter
@@ -329,11 +329,12 @@ class User(commands.Cog):
     @commands.command(usage='username [points] [problem types]')
     async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
                     points: typing.Optional[point_range]=[1, 50], *filters):
-        """Recommend a problem
+        """
+        Recommend a problem
 
         Use surround your username with '' if it can be interpreted as a number
 
-        Shorthands:
+        SHORTHANDS:
         - adhoc
         - math
         - bf
@@ -345,7 +346,8 @@ class User(commands.Cog):
         - gt
         - greedy
         - regex
-        - string"""
+        - string
+        """
         filters = list(filters)
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
@@ -358,67 +360,21 @@ class User(commands.Cog):
             return await ctx.send(f'{username} does not exist on DMOJ')
 
         username = user.username
-        shorthands = {
-            'adhoc': ['Ad Hoc'],
-            'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
-            'bf': ['Brute Force'],
-            'ctf': ['Capture the Flag'],
-            'ds': ['Data Structures'],
-            'd&c': ['Divide and Conquer'],
-            'dp': ['Dynamic Programming'],
-            'geo': ['Geometry'],
-            'gt': ['Graph Theory'],
-            'greedy': ['Greedy Algorithms'],
-            'regex': ['Regular Expressions'],
-            'string': ['String Algorithms'],
-        }
-
         filter_list = []
         for filter in filters:
-            if filter in shorthands:
-                filter_list += shorthands[filter]
+            if filter in SHORTHANDS:
+                filter_list += SHORTHANDS[filter]
             else:
                 filter_list.append(filter.title())
 
         filters = filter_list
 
         # Get all problems that are unsolved by user and fits the filter and point range
-        results = query.get_unsolved_problems(username, filters,
-                                              points[0], points[1])
-
-        if len(results) == 0:
-            return await ctx.send('No problems found which satify filters')
-
-        problem = random.choice(results)
-        points = str(problem.points)
-        if problem.partial:
-            points += 'p'
-
-        memory = problem.memory_limit
-        if memory >= 1024*1024:
-            memory = '%dG' % (memory//1024//1024)
-        elif memory >= 1024:
-            memory = '%dM' % (memory//1024)
-        else:
-            memory = '%dK' % (memory)
-
-        embed = discord.Embed(
-            title=problem.name,
-            url='https://dmoj.ca/problem/%s' % problem.code,
-            description='Points: %s\nProblem Types: %s' %
-                        (points, ', '.join(problem.types)),
-            color=0xfcdb05,
-        )
-
-        embed.set_thumbnail(url=await query.get_pfp(username))
-        embed.add_field(name='Group', value=problem.group, inline=True)
-        embed.add_field(
-            name='Time',
-            value='%ss' % problem.time_limit,
-            inline=True
-        )
-        embed.add_field(name='Memory', value=memory, inline=True)
-        return await ctx.send(embed=embed)
+        result = await query.get_unsolved_problem(username, ctx.guild.id, 0, filters, points[0], points[1])
+        # print(result)
+        if result is None:
+            return await ctx.send("No problem that satisfies the filter")
+        return await ctx.send(embed=result)
 
 
 def setup(bot):
