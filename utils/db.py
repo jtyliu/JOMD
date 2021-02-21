@@ -414,4 +414,24 @@ class Handle(Base):
     guild_id = Column(Integer, index=True)
 
 
+class Gitgud(Base):
+    __tablename__ = 'gitgud'
+    _id = Column(Integer, primary_key=True, autoincrement=True)
+    handle = Column(String)
+    guild_id = Column(Integer)
+    point = Column(Integer)
+    problem_id = Column(String)
+    time = Column(DateTime)
+
+
+
+class CurrentGitgud(Base):
+    __tablename__ = 'current_gitgud'
+    _id = Column(Integer, primary_key=True)
+    handle = Column(String)
+    guild_id = Column(Integer)
+    problem_id = Column(String)
+    point = Column(Integer)
+    time = Column(DateTime)
+
 Base.metadata.create_all(engine)
