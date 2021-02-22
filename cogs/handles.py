@@ -24,15 +24,15 @@ class Handles(commands.Cog):
             if author_id:
                 # member = await self.bot.fetch_user(author_id)
                 name = ctx.message.guild.get_member(author_id)
-                await ctx.send(f'`{handle}` is `{name.nick}`')
+                await ctx.send(f'`{handle}` is `{name.nick or name.name}`')
             else:
                 await ctx.send(f'`{handle}` is not linked with any account here...')
         elif member:
             handle = query.get_handle(member.id, ctx.guild.id)
             if handle:
-                await ctx.send(f'`{member.nick}` is `{handle}`')
+                await ctx.send(f'`{member.nick or member.name}` is `{handle}`')
             else:
-                await ctx.send(f'`{member.nick}` is not linked with any account here')
+                await ctx.send(f'`{member.nick or member.name}` is not linked with any account here')
         else:
             # wtf
             pass
