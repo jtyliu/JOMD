@@ -9,7 +9,7 @@ from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB)
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
                          plot_points, plot_solved)
-from utils.jomd_common import first_tuple
+from operator import itemgetter
 from sqlalchemy import or_, orm, func
 import asyncio
 import io
@@ -77,7 +77,7 @@ class Plot(commands.Cog):
                 .filter(Submission_DB._user == username)\
                 .filter(Submission_DB.points == Problem_DB.points)\
                 .group_by(Submission_DB._code)
-            dates = list(map(first_tuple, q.all()))
+            dates = list(map(itemgetter(0), q.all()))
             dates.sort()
             data_to_plot = {}
             cnt = 0
