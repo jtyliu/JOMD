@@ -64,7 +64,8 @@ class Gitgud(commands.Cog):
             else:
                 problem = await query.get_problem(current.problem_id)
                 embed = discord.Embed(
-                    description=f"You currently have an uncompleted challenge, [{problem.name}](https://dmoj.ca/problem/{problem.code})"
+                    description=f"You currently have an uncompleted challenge, [{problem.name}](https://dmoj.ca/problem/{problem.code})",
+                    color=0xfcdb05,
                 )
                 return await ctx.send(embed=embed)
 
@@ -153,7 +154,7 @@ class Gitgud(commands.Cog):
             content += f"[{problem.name}](https://dmoj.ca/{problem.code}) [+{solved.point}] ({days_str})\n"
             count += 1
             if count % 10 == 0:
-                embed = discord.Embed()
+                embed = discord.Embed(color=0xfcdb05,)
                 embed.add_field(name=f"Gitgud Log for {username} (page {count//10}/{page_cnt})", value=content, inline=True)
                 embeds.append(embed)
                 content = ""
@@ -248,7 +249,8 @@ class Gitgud(commands.Cog):
             ret = 0
         embed = discord.Embed(
             title=username,
-            description=f"points: {ret}"
+            description=f"points: {ret}",
+            color=0xfcdb05,
         )
         return await ctx.send(embed=embed)
 
