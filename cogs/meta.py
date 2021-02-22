@@ -24,7 +24,7 @@ class Meta(commands.Cog):
 
     @commands.command()
     async def stats(self, ctx):
-        """Display cool dmoj stats that noone asked for"""
+        """Display cool dmoj stats that no one asked for"""
         problems = session.query(Problem_DB.points)\
             .order_by(Problem_DB.points.desc()).all()
 

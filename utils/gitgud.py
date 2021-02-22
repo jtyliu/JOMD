@@ -1,5 +1,5 @@
 from utils.api import API
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, desc
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -21,7 +21,8 @@ class Gitgud:
 
     def get_all(self, handle, guild_id):
         q = session.query(Gitgud_DB)\
-            .filter(Gitgud_DB.handle == handle and Gitgud_DB.guild_id == guild_id)
+            .filter(Gitgud_DB.handle == handle and Gitgud_DB.guild_id == guild_id)\
+            .order_by(desc(Gitgud_DB.time))
         return q.all()
 
     def insert(self, handle, guild_id, point, problem, time):
