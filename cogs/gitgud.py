@@ -3,8 +3,8 @@ from utils.gitgud import Gitgud as Gitgud_utils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
 from utils.api import ObjectNotFound
-from utils.jomd_common import (str_not_int, point_range, parse_gimme,
-                               calculate_points)
+from utils.jomd_common import (point_range, parse_gimme,
+                               calculate_points, gimme_common)
 import discord
 from DiscordUtils import Pagination
 from discord.ext import commands
@@ -75,11 +75,18 @@ class Gitgud(commands.Cog):
 
         filters = filter_list
 
-        result = await query.get_unsolved_problem(username, ctx.guild.id, 1, filters, points[0], points[1])
-        if result is None:
+        embed, problem = await gimme_common(username, points, filters)
+
+        if embed is None:
             return await ctx.send("No problems that satisfies the filter")
-        return await ctx.send(embed=result)
-    
+
+        gitgud_util.bind(username, ctx.guild.id, problem.code, problem.points,
+                         datetime.now())
+
+        embed.description = 'Points: %s\nProblem Types: ||%s||' % (problem.points, ', '.join(problem.types))
+
+        return await ctx.send(embed=embed)
+
     @commands.command()
     async def nogud(self, ctx):
         """

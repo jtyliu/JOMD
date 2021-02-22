@@ -10,7 +10,7 @@ from utils.db import (session, Problem as Problem_DB,
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
-from utils.jomd_common import first_tuple
+from operator import itemgetter
 
 class Gitgud:
 

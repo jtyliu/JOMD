@@ -1,6 +1,8 @@
 from discord.ext.commands.errors import BadArgument
 import typing
-
+from utils.query import Query
+import random
+import discord
 
 def list_to_str(arg):
     if arg is None:
@@ -12,10 +14,6 @@ def str_to_list(arg):
     if arg is None:
         return None
     return arg.split('&')
-
-
-def first_tuple(arg):
-    return arg[0]
 
 
 def is_int(val):
@@ -75,3 +73,45 @@ def calculate_points(points, fully_solved):
     for i in range(min(100, len(points))):
         p += (0.95**i)*points[i]
     return b+p
+
+
+async def gimme_common(username, points, types):
+    query = Query()
+    unsolved = query.get_unsolved_problems(username, types, points[0],
+                                           points[1])
+
+    if len(unsolved) == 0:
+        return None, None
+
+    problem = random.choice(unsolved)
+
+    points = str(problem.points)
+    if problem.partial:
+        points += 'p'
+
+    memory = problem.memory_limit
+    if memory >= 1024*1024:
+        memory = '%dG' % (memory//1024//1024)
+    elif memory >= 1024:
+        memory = '%dM' % (memory//1024)
+    else:
+        memory = '%dK' % (memory)
+
+    embed = discord.Embed(
+        title=problem.name,
+        url='https://dmoj.ca/problem/%s' % problem.code,
+        description='Points: %s\nProblem Types: %s' %
+                    (points, ', '.join(problem.types)),
+        color=0xfcdb05,
+    )
+
+    embed.set_thumbnail(url=await query.get_pfp(username))
+    embed.add_field(name='Group', value=problem.group, inline=True)
+    embed.add_field(
+        name='Time',
+        value='%ss' % problem.time_limit,
+        inline=True
+    )
+    embed.add_field(name='Memory', value=memory, inline=True)
+
+    return embed, problem

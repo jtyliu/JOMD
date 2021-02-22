@@ -11,7 +11,7 @@ from utils.gitgud import Gitgud as Gitgud_utils
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
-from utils.jomd_common import first_tuple
+from operator import itemgetter
 from utils.constants import SHORTHANDS
 import random
 import discord
@@ -265,7 +265,7 @@ class Query:
         participation_id = list(map(get_id, a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(participation_id)).all()
-        qq = list(map(first_tuple, qq))
+        qq = list(map(itemgetter(0), qq))
         for submission in a.data.objects:
             if submission.id not in qq:
                 session.add(Submission_DB(submission))
@@ -292,7 +292,7 @@ class Query:
             participation_id = list(map(get_id, api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(participation_id)).all()
-            qq = list(map(first_tuple, qq))
+            qq = list(map(itemgetter(0), qq))
             for submission in api.data.objects:
                 if submission.id not in qq:
                     session.add(Submission_DB(submission))
@@ -342,7 +342,7 @@ class Query:
         submission_ids = list(map(get_id, a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(submission_ids)).all()
-        qq = list(map(first_tuple, qq))
+        qq = list(map(itemgetter(0), qq))
         for submission in a.data.objects:
             if submission.id not in qq:
                 session.add(Submission_DB(submission))
@@ -377,7 +377,7 @@ class Query:
             submission_ids = list(map(get_id, api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(submission_ids)).all()
-            qq = list(map(first_tuple, qq))
+            qq = list(map(itemgetter(0), qq))
             for submission in api.data.objects:
                 if submission.id not in qq:
                     session.add(Submission_DB(submission))
@@ -437,47 +437,6 @@ class Query:
             if problem.code == problem_id:
                 return True
         return False
-
-    async def get_unsolved_problem(self, username, guild_id, increment, types, low=1, high=50):
-        unsolved = self.get_unsolved_problems(username, types, low, high)
-        
-        if len(unsolved) == 0:
-            return None
-        problem = random.choice(unsolved)
-        gitgud_util = Gitgud_utils()
-        gitgud_util.bind(username, guild_id, problem.code, problem.points*increment, datetime.now())
-
-        points = str(problem.points)
-        if problem.partial:
-            points += 'p'
-
-        memory = problem.memory_limit
-        if memory >= 1024*1024:
-            memory = '%dG' % (memory//1024//1024)
-        elif memory >= 1024:
-            memory = '%dM' % (memory//1024)
-        else:
-            memory = '%dK' % (memory)
-
-        embed = discord.Embed(
-            title=problem.name,
-            url='https://dmoj.ca/problem/%s' % problem.code,
-            description='Points: %s\nProblem Types: ||%s||' %
-                        (points, ', '.join(problem.types)),
-            color=0xfcdb05,
-        )
-
-        embed.set_thumbnail(url=await self.get_pfp(username))
-        embed.add_field(name='Group', value=problem.group, inline=True)
-        embed.add_field(
-            name='Time',
-            value='%ss' % problem.time_limit,
-            inline=True
-        )
-        embed.add_field(name='Memory', value=memory, inline=True)
-        # print(embed)
-        return embed
-        
 
     def get_attempted_problems(self, username, types):
         conds = [Problem_DB.types.contains(_type) for _type in types]

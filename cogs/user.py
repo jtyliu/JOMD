@@ -13,7 +13,7 @@ from utils.db import (session, Problem as Problem_DB,
                       Language as Language_DB, Judge as Judge_DB,
                       Handle as Handle_DB, Json)
 from utils.jomd_common import (str_not_int, point_range, parse_gimme,
-                               calculate_points)
+                               calculate_points, gimme_common)
 from utils.api import ObjectNotFound
 from utils.constants import TZ, SHORTHANDS
 import asyncio
@@ -370,7 +370,7 @@ class User(commands.Cog):
         filters = filter_list
 
         # Get all problems that are unsolved by user and fits the filter and point range
-        result = await query.get_unsolved_problem(username, ctx.guild.id, 0, filters, points[0], points[1])
+        result, problem = await gimme_common(username, points, filters)
         # print(result)
         if result is None:
             return await ctx.send("No problem that satisfies the filter")

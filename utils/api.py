@@ -15,7 +15,7 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       User as User_DB, Submission as Submission_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB)
-from utils.jomd_common import first_tuple
+from operator import itemgetter
 
 
 def rate_limit(func):
@@ -98,7 +98,7 @@ class Problem:
             filter(Language_DB.key.in_(self._languages))
         language_q = session.query(Language_DB.key).\
             filter(Language_DB.key.in_(self._languages)).all()
-        language_q = list(map(first_tuple, language_q))
+        language_q = list(map(itemgetter(0), language_q))
         for language_key in self._languages:
             if language_key not in language_q:
                 api = API()
@@ -114,7 +114,7 @@ class Problem:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(first_tuple, organization_q))
+        organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
@@ -163,7 +163,7 @@ class Contest:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(first_tuple, organization_q))
+        organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
@@ -183,7 +183,7 @@ class Contest:
             filter(Problem_DB.code.in_(self._problem_codes))
         problem_q = session.query(Problem_DB.code).\
             filter(Problem_DB.code.in_(self._problem_codes)).all()
-        problem_q = list(map(first_tuple, problem_q))
+        problem_q = list(map(itemgetter(0), problem_q))
         for problem_dict in self._problems:
             problem_code = problem_dict["code"]
             try:
@@ -262,6 +262,9 @@ class User:
     async def async_map(_type, objects):
         to_gather = []
         for obj in objects:
+            # I think there's an issue similar to LN 376
+            # If multiple users are fetched after a contest, it crashes the db
+            # The solution should be the same, an async lock table
             to_gather.append(obj.async_init())
         await asyncio.gather(*to_gather)
 
@@ -270,7 +273,7 @@ class User:
             filter(Problem_DB.code.in_(self._solved_problems))
         problem_q = session.query(Problem_DB.code).\
             filter(Problem_DB.code.in_(self._solved_problems)).all()
-        problem_q = list(map(first_tuple, problem_q))
+        problem_q = list(map(itemgetter(0), problem_q))
         for problem_code in self._solved_problems:
             try:
                 if problem_code not in problem_q:
@@ -286,7 +289,7 @@ class User:
             filter(Organization_DB.id.in_(self._organizations))
         organization_q = session.query(Organization_DB.id).\
             filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(first_tuple, organization_q))
+        organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
@@ -307,7 +310,7 @@ class User:
             filter(Contest_DB.key.in_(self._contest_keys))
         contest_q = session.query(Contest_DB.key).\
             filter(Contest_DB.key.in_(self._contest_keys)).all()
-        contest_q = list(map(first_tuple, contest_q))
+        contest_q = list(map(itemgetter(0), contest_q))
         for contest_key in self._contest_keys:
             try:
                 if contest_key not in contest_q:
