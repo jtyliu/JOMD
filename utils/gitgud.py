@@ -1,27 +1,26 @@
-from utils.api import API
-from sqlalchemy import or_, func, desc
+from sqlalchemy import func, desc
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
                       User as User_DB, Submission as Submission_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB,
-                      Handle as Handle_DB, Gitgud as Gitgud_DB, CurrentGitgud as CurrentGitgud_DB, Json)
-from typing import List
-from sqlalchemy.sql import functions
-import asyncio
-from operator import itemgetter
+                      Handle as Handle_DB, Gitgud as Gitgud_DB,
+                      CurrentGitgud as CurrentGitgud_DB, Json)
+
 
 class Gitgud:
 
     def get_point(self, handle, guild_id):
         q = session.query(func.sum(Gitgud_DB.point))\
-            .filter(Gitgud_DB.handle == handle and Gitgud_DB.guild_id == guild_id)
+            .filter(Gitgud_DB.handle == handle)\
+            .filter(Gitgud_DB.guild_id == guild_id)
         return q.first()[0]
 
     def get_all(self, handle, guild_id):
         q = session.query(Gitgud_DB)\
-            .filter(Gitgud_DB.handle == handle and Gitgud_DB.guild_id == guild_id)\
+            .filter(Gitgud_DB.handle == handle)\
+            .filter(Gitgud_DB.guild_id == guild_id)\
             .order_by(desc(Gitgud_DB.time))
         return q.all()
 
@@ -37,8 +36,8 @@ class Gitgud:
 
     def get_current(self, handle, guild_id):
         result = session.query(CurrentGitgud_DB)\
-            .filter(CurrentGitgud_DB.handle == handle \
-                and CurrentGitgud_DB.guild_id == guild_id)
+            .filter(CurrentGitgud_DB.handle == handle)\
+            .filter(CurrentGitgud_DB.guild_id == guild_id)
         return result.first()
 
     # set the user's current gitgud

@@ -431,13 +431,6 @@ class Query:
             .filter(Problem_DB.is_organization_private == 0)
         return q.all()
 
-    async def solved(self, handle, problem_id):
-        user = await self.get_user(handle)
-        for problem in user.solved_problems:
-            if problem.code == problem_id:
-                return True
-        return False
-
     def get_attempted_problems(self, username, types):
         conds = [Problem_DB.types.contains(_type) for _type in types]
         sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\

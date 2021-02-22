@@ -2,22 +2,29 @@ import typing
 from utils.gitgud import Gitgud as Gitgud_utils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
-from utils.api import ObjectNotFound
-from utils.jomd_common import (point_range, parse_gimme,
-                               calculate_points, gimme_common)
+from utils.jomd_common import (point_range, gimme_common)
+from utils.db import (session, Problem as Problem_DB,
+                      Contest as Contest_DB,
+                      Participation as Participation_DB,
+                      User as User_DB, Submission as Submission_DB,
+                      Organization as Organization_DB,
+                      Language as Language_DB, Judge as Judge_DB,
+                      Handle as Handle_DB, Gitgud as Gitgud_DB,
+                      CurrentGitgud as CurrentGitgud_DB, Json)
 import discord
 from DiscordUtils import Pagination
 from discord.ext import commands
 from datetime import datetime
-from sqlalchemy import orm
-import random
+from sqlalchemy import func
+
 
 class Gitgud(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(usage='[points] [problem types]')
-    async def gitgud(self, ctx, points: typing.Optional[point_range], *filters):
+    async def gitgud(self, ctx, points: typing.Optional[point_range],
+                     *filters):
         """
           Recommend a problem and gain point upon completion
 
@@ -35,6 +42,7 @@ class Gitgud(commands.Cog):
         - regex
         - string
         """
+
         filters = list(filters)
         query = Query()
         gitgud_util = Gitgud_utils()
@@ -43,7 +51,8 @@ class Gitgud(commands.Cog):
         # user = await query.get_user(username)
 
         if username is None:
-            return await ctx.send(f"You are not linked to a DMOJ Account. Please link your account before continuing")
+            return await ctx.send("You are not linked to a DMOJ Account. "
+                                  "Please link your account before continuing")
 
         user = await query.get_user(username)
 
@@ -58,13 +67,23 @@ class Gitgud(commands.Cog):
         # return if the user haven't finished the previous problem
         current = gitgud_util.get_current(username, ctx.guild.id)
 
+        def has_solved(username, problem_code):
+            q = session.query(User_DB)\
+                .filter(User_DB.username == username)\
+                .join(User_DB.solved_problems)\
+                .filter(Problem_DB.code == problem_code)
+            if q.count():
+                return True
+            return False
+
         if current is not None and current.problem_id is not None:
-            if current.point == 0 and await query.solved(username, current.problem_id):
-                gitgud_util.clear(username, ctx.guild.id)
-            else:
+            if not has_solved(username, current.problem_id):
+                # User has a current problem unsolved
                 problem = await query.get_problem(current.problem_id)
                 embed = discord.Embed(
-                    description=f"You currently have an uncompleted challenge, [{problem.name}](https://dmoj.ca/problem/{problem.code})",
+                    description=f"You currently have an uncompleted "
+                                f"challenge, [{problem.name}]"
+                                f"(https://dmoj.ca/problem/{problem.code})",
                     color=0xfcdb05,
                 )
                 return await ctx.send(embed=embed)
@@ -84,7 +103,8 @@ class Gitgud(commands.Cog):
         gitgud_util.bind(username, ctx.guild.id, problem.code, problem.points,
                          datetime.now())
 
-        embed.description = 'Points: %s\nProblem Types: ||%s||' % (problem.points, ', '.join(problem.types))
+        embed.description = "Points: %s\nProblem Types ||%s||" % \
+                            (problem.points, ', '.join(problem.types))
 
         return await ctx.send(embed=embed)
 
@@ -95,19 +115,18 @@ class Gitgud(commands.Cog):
         """
         query = Query()
         gitgud_util = Gitgud_utils()
-        
+
         username = query.get_handle(ctx.author.id, ctx.guild.id)
 
         if username is None:
             return await ctx.send("You do not have a linked DMOJ account")
-        
+
         current = gitgud_util.get_current(username, ctx.guild.id)
         if current is None or current.problem_id is None:
             return await ctx.send("Nothing to cancel")
 
         gitgud_util.clear(username, ctx.guild.id)
         return await ctx.send("Challenge skipped")
-
 
     @commands.command(usage="[username]")
     async def gitlog(self, ctx, username=None):
@@ -122,21 +141,23 @@ class Gitgud(commands.Cog):
         except TypeError:
             username = None
         if username is None:
-            return await ctx.send("You have not entered a valid DMOJ handle or linked with a DMOJ Account")
+            return await ctx.send("You have not entered a valid DMOJ handle "
+                                  "or linked with a DMOJ Account")
 
         gitgud_util = Gitgud_utils()
         history = gitgud_util.get_all(username, ctx.guild.id)
 
-
         if len(history) == 0:
-            embed = discord.Embed(description="User have not completed any challenge")
+            embed = discord.Embed(description="User have not completed any"
+                                              "challenge")
             return await ctx.send(embed=embed)
         # paginate
         count = 0
-        page_cnt = min(10, len(history)//10 + bool(len(history)%10))
+        page_cnt = min(10, len(history) // 10 + bool(len(history) % 10))
         embeds = []
         content = ""
-        paginator = Pagination.CustomEmbedPaginator(ctx, timeout=60, remove_reactions=True)
+        paginator = Pagination.CustomEmbedPaginator(ctx, timeout=60,
+                                                    remove_reactions=True)
         paginator.add_reaction('⏮️', "first")
         paginator.add_reaction('⏪', "back")
         paginator.add_reaction('⏩', "next")
@@ -145,27 +166,37 @@ class Gitgud(commands.Cog):
             # print(solved.problem_id)
             problem = await query.get_problem(solved.problem_id)
             days = (datetime.now() - solved.time).days
-            if days==0:
+            if days == 0:
                 days_str = "today"
-            elif days==1:
+            elif days == 1:
                 days_str = "yesterday"
             else:
                 days_str = f"{days} days ago"
-            content += f"[{problem.name}](https://dmoj.ca/{problem.code}) [+{solved.point}] ({days_str})\n"
+            content += f"[{problem.name}](https://dmoj.ca/{problem.code}) " \
+                       f"[+{solved.point}] ({days_str})\n"
             count += 1
             if count % 10 == 0:
                 embed = discord.Embed(color=0xfcdb05,)
-                embed.add_field(name=f"Gitgud Log for {username} (page {count//10}/{page_cnt})", value=content, inline=True)
+                embed.add_field(
+                    name=f"Gitgud Log for {username} "
+                         f"(page {count//10}/{page_cnt})",
+                    value=content,
+                    inline=True
+                )
                 embeds.append(embed)
                 content = ""
             if count == 100:
                 break
         if count % 10 != 0:
             embed = discord.Embed()
-            embed.add_field(name=f"Gitlog for {username} (page {count//10 + 1}/{page_cnt})", value=content, inline=True)
+            embed.add_field(
+                name=f"Gitlog for {username} "
+                     f"(page {count//10 + 1}/{page_cnt})",
+                value=content,
+                inline=True
+            )
             embeds.append(embed)
         return await paginator.run(embeds)
-
 
     @commands.command(brief="Mark challenge as complete")
     async def gotgud(self, ctx):
@@ -185,7 +216,7 @@ class Gitgud(commands.Cog):
         for key in RATING_TO_POINT:
             if abs(key - user.rating) <= abs(closest - user.rating):
                 closest = key
-        
+
         # convert rating to point and get difference
         rating_point = RATING_TO_POINT[closest]
         if current is None or current.problem_id is None:
@@ -200,11 +231,14 @@ class Gitgud(commands.Cog):
                     closest = key
             # convert rating to point and get difference
             rating_point = RATING_TO_POINT[closest]
-            print(POINT_VALUES.index(current.point) - POINT_VALUES.index(rating_point))
-            point = 10 + 2 * (POINT_VALUES.index(current.point) - POINT_VALUES.index(rating_point))
+            point_diff = (POINT_VALUES.index(current.point) -
+                          POINT_VALUES.index(rating_point))
+            print(point_diff)
+            point = 10 + 2 * (point_diff)
             point = max(point, 0)
 
-            gitgud_util.insert(username, ctx.guild.id, point, current.problem_id, datetime.now())
+            gitgud_util.insert(username, ctx.guild.id, point,
+                               current.problem_id, datetime.now())
             gitgud_util.clear(username, ctx.guild.id)
 
             completion_time = datetime.now() - current.time
@@ -232,10 +266,8 @@ class Gitgud(commands.Cog):
         else:
             return await ctx.send("You have not completed the challenge")
 
-
-
     @commands.command(usage='[member]')
-    async def howgud(self, ctx, username = None):
+    async def howgud(self, ctx, username=None):
         """
         Returns total amount of gitgud points
         """
@@ -254,6 +286,6 @@ class Gitgud(commands.Cog):
         )
         return await ctx.send(embed=embed)
 
+
 def setup(bot):
     bot.add_cog(Gitgud(bot))
-    
