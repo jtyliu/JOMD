@@ -37,8 +37,6 @@ class Handles(commands.Cog):
             # wtf
             pass
 
-
-
     @commands.command()
     async def unlink(self, ctx):
         """Unlink your discord account with your dmoj account"""
@@ -53,7 +51,6 @@ class Handles(commands.Cog):
         session.commit()
         await ctx.send(f'Unlinked you with handle {handle.handle}')
 
-
     @commands.command(usage='dmoj_handle')
     async def link(self, ctx, username: str):
         """Links your discord account to your dmoj account"""
@@ -64,7 +61,7 @@ class Handles(commands.Cog):
         if user is None:
             await ctx.send(f"{username} does not exist on DMOJ")
             return
-        
+
         username = user.username
 
         if query.get_handle(ctx.author.id, ctx.guild.id):
