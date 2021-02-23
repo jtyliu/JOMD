@@ -40,6 +40,15 @@ class Gitgud:
             .filter(CurrentGitgud_DB.guild_id == guild_id)
         return result.first()
 
+    def has_solved(self, username, problem_code):
+        q = session.query(User_DB)\
+            .filter(User_DB.username == username)\
+            .join(User_DB.solved_problems)\
+            .filter(Problem_DB.code == problem_code)
+        if q.count():
+            return True
+        return False
+
     # set the user's current gitgud
     def bind(self, handle, guild_id, problem_id, point, time):
         result = self.get_current(handle, guild_id)

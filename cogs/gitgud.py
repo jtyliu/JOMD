@@ -67,17 +67,8 @@ class Gitgud(commands.Cog):
         # return if the user haven't finished the previous problem
         current = gitgud_util.get_current(username, ctx.guild.id)
 
-        def has_solved(username, problem_code):
-            q = session.query(User_DB)\
-                .filter(User_DB.username == username)\
-                .join(User_DB.solved_problems)\
-                .filter(Problem_DB.code == problem_code)
-            if q.count():
-                return True
-            return False
-
         if current is not None and current.problem_id is not None:
-            if not has_solved(username, current.problem_id):
+            if not gitgud_util.has_solved(username, current.problem_id):
                 # User has a current problem unsolved
                 problem = await query.get_problem(current.problem_id)
                 embed = discord.Embed(
@@ -223,7 +214,7 @@ class Gitgud(commands.Cog):
             return await ctx.send("No pending challenges")
 
         # check if user is scamming the bot :monkey:
-        if await query.solved(username, current.problem_id):
+        if gitgud_util.has_solved(username, current.problem_id):
             # get closest rating
             closest = -1000
             for key in RATING_TO_POINT:
