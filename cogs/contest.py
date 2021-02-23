@@ -56,35 +56,45 @@ class Contest(commands.Cog):
         #                              for username in users])
         # usernames = [user.username for user in users]
         # Filter for those who participated in contest
-        usernames = list(set(usernames) & set(rankings.keys()))
+        user_rankings = list(map(itemgetter("user"), contest.rankings))
+        usernames = list(set(usernames) & set(user_rankings))
         
         # The length is 0 is contest is still ongoing
         problems = len(contest.problems)
-        print(usernames)
+
         data = []
-        for ranking in contest.rankings:
+
+        for rank_num, ranking in enumerate(contest.rankings):
+            # TODO: ok ish, but placements match the rankings
             for username in usernames:
                 if ranking["user"] == username:
-                    evan_ranking = rankings[username]
-                    rank = {
-                        "rank": int(evan_ranking["rank"]),
-                        "username": username+":",
-                        "old_rating": evan_ranking["old_rating"],
-                        "new_rating": evan_ranking["new_rating"],
-                    }
-                    if evan_ranking["rating_change"] > 0:
-                        rank["rating_change"] = "+"+str(evan_ranking["rating_change"])
+                    # If contest is not rated, this crashes
+                    if contest.is_rated:
+                        evan_ranking = rankings[username]
+                        rank_dict = {
+                            "rank": int(evan_ranking["rank"]),
+                            "username": username+":",
+                            "old_rating": evan_ranking["old_rating"],
+                            "new_rating": evan_ranking["new_rating"],
+                        }
+                        if evan_ranking["rating_change"] > 0:
+                            rank_dict["rating_change"] = "+"+str(evan_ranking["rating_change"])
+                        else:
+                            rank_dict["rating_change"] = evan_ranking["rating_change"]
                     else:
-                        rank["rating_change"] = evan_ranking["rating_change"]
+                        rank_dict = {
+                            "rank": rank_num+1,
+                            "username": username+":",
+                        }
                     # This is a quick fix :>
                     problems = len(ranking["solutions"])
                     for i in range(1, problems+1):
                         solution = ranking["solutions"][i-1]
                         if solution:
-                            rank[str(i)] = int(solution["points"])
+                            rank_dict[str(i)] = int(solution["points"])
                         else:
-                            rank[str(i)] = 0
-                    data.append(rank)
+                            rank_dict[str(i)] = 0
+                    data.append(rank_dict)
         max_len = {}
         max_len["rank"] = len("#")
         max_len["username"] = len("Handle")
@@ -98,38 +108,55 @@ class Contest(commands.Cog):
         for i in range(1, problems+1):
             format_output += "{:"+str(max_len[str(i)])+"} "
 
-        format_output += " "
-        format_output += "{:>"+str(max_len["rating_change"])+"}  "
-        format_output += "{:"+str(max_len["old_rating"])+"} "
-        format_output += "{:"+str(max_len["new_rating"])+"} "
-        output = format_output.format(
+        to_format = [
             "#",
             "Handle",
             *[str(i) for i in range(1, problems+1)],
-            "∆",
-            "Old",
-            "New"
-        )
-        output += "\n"
-        hyphens = format_output.format(
+        ]
+
+        hyphen_format = [
             "—"*max_len["rank"],
             "—"*max_len["username"],
             *["—"*max_len[str(i)] for i in range(1, problems+1)],
-            "—"*max_len["rating_change"],
-            "—"*max_len["old_rating"],
-            "—"*max_len["new_rating"],
-        )
+        ]
+        if contest.is_rated:
+            format_output += " "
+            format_output += "{:>"+str(max_len["rating_change"])+"}  "
+            format_output += "{:"+str(max_len["old_rating"])+"} "
+            format_output += "{:"+str(max_len["new_rating"])+"} "
+            to_format += [
+                "∆",
+                "Old",
+                "New",
+            ]
+
+            hyphen_format += [
+                "—"*max_len["rating_change"],
+                "—"*max_len["old_rating"],
+                "—"*max_len["new_rating"],
+            ]
+        output = format_output.format(*to_format)
+
+        output += "\n"
+        hyphens = format_output.format(*hyphen_format)
         output += hyphens
         output += "\n"
         for rank in data:
-            output += format_output.format(
-                rank["rank"],
-                rank["username"],
-                *[rank[str(i)] for i in range(1, problems+1)],
-                rank["rating_change"],
-                rank["old_rating"],
-                rank["new_rating"],
-            )
+            if contest.is_rated:
+                output += format_output.format(
+                    rank["rank"],
+                    rank["username"],
+                    *[rank[str(i)] for i in range(1, problems+1)],
+                    rank["rating_change"],
+                    rank["old_rating"],
+                    rank["new_rating"],
+                )
+            else:
+                output += format_output.format(
+                    rank["rank"],
+                    rank["username"],
+                    *[rank[str(i)] for i in range(1, problems+1)],
+                )
             output += "\n"
         output += hyphens
         output += "\n"
