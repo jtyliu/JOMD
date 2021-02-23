@@ -1,7 +1,7 @@
 # JOMD
 JOMD is a Discord bot for [Dmoj](https://dmoj.ca/) Inspired by [TLE](https://github.com/cheran-senthil/TLE)
 
-**Add the bot [here](https://discord.com/api/oauth2/authorize?client_id=725004198466551880&permissions=0&scope=bot)!**
+**Add the bot [here](https://discord.com/api/oauth2/authorize?client_id=725004198466551880&permissions=8256&scope=bot)!**
 
 ## Previews
 Point history
