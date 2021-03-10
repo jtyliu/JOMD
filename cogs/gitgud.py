@@ -163,7 +163,7 @@ class Gitgud(commands.Cog):
                 days_str = "yesterday"
             else:
                 days_str = f"{days} days ago"
-            content += f"[{problem.name}](https://dmoj.ca/{problem.code}) " \
+            content += f"[{problem.name}](https://dmoj.ca/problem/{problem.code}) " \
                        f"[+{solved.point}] ({days_str})\n"
             count += 1
             if count % 10 == 0:
