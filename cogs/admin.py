@@ -64,7 +64,7 @@ class Admin(commands.Cog):
         for problem in problems:
             await query.get_problem(problem.code)
             count += 1
-        return await msg.edit(f"Cached {count} problems")
+        return await msg.edit(content=f"Cached {count} problems")
 
 
 def setup(bot):
