@@ -20,8 +20,8 @@ from operator import itemgetter
 
 def rate_limit(func):
     # Got ratelimited with 87, we'll stay on the safe side
-    ratelimit = 3
-    time_span = 2
+    ratelimit = 5
+    time_span = 4
     queue = []
 
     @functools.wraps(func)

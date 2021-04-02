@@ -4,10 +4,12 @@ import discord
 # from utils.api import problem_api
 # from utils.db import DbConn
 from utils.db import (session, Contest as Contest_DB,
-                      Problem as Problem_DB)
+                      Problem as Problem_DB, Submission as Submission_DB)
 from utils.query import Query
 from utils.api import API
 import math
+from operator import itemgetter
+import time
 
 
 class Admin(commands.Cog):
@@ -69,7 +71,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def update_problems(self, ctx):
-        """Update all problems in db (Warning! Really slow!)"""
+        """Update all problems in db"""
         msg = await ctx.send("Updating...")
         session.query(Problem_DB).delete()
         session.commit()
@@ -77,6 +79,26 @@ class Admin(commands.Cog):
         await query.get_problems()
         return await msg.edit(content=f"Updated all problems")
 
+    @commands.command()
+    async def update_submissions(self, ctx):
+        """Updates the submissions of every user in db (Warning! Slow!)"""
+        q = session.query(Submission_DB._user).distinct(Submission_DB._user)
+        usernames = list(map(itemgetter(0), q.all()))
+        await ctx.send(f"Recaching submissions for {len(usernames)}"
+                       f" users. This will take a long time (perhaps hours).")
+        # session.query(Submission_DB).delete()
+        # session.commit()
+
+        query = Query()
+        count = 0
+        msg = await ctx.send(f"{count}/{len(usernames)} users cached...")
+        for username in usernames:
+            await msg.edit(content=f"{count}/{len(usernames)} users cached..."
+                                   f" ({username})")
+            await query.get_submissions(username)
+            time.sleep(30) # PLS DON'T GET CLOUDFLARED
+            count += 1
+        await msg.edit(content=f"{len(usernames)} users cache. Done!")
 
 
 def setup(bot):
