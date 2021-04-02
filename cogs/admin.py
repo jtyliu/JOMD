@@ -6,6 +6,7 @@ import discord
 from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB)
 from utils.query import Query
+from utils.api import API
 import math
 
 
@@ -56,7 +57,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def cache_problems(self, ctx):
-        """Update db and cache all new problems"""
+        """Cache all new problems"""
         query = Query()
         msg = await ctx.send("Caching...")
         count = 0
@@ -65,6 +66,17 @@ class Admin(commands.Cog):
             await query.get_problem(problem.code)
             count += 1
         return await msg.edit(content=f"Cached {count} problems")
+
+    @commands.command()
+    async def update_problems(self, ctx):
+        """Update all problems in db (Warning! Really slow!)"""
+        msg = await ctx.send("Updating...")
+        session.query(Problem_DB).delete()
+        session.commit()
+        query = Query()
+        await query.get_problems()
+        return await msg.edit(content=f"Updated all problems")
+
 
 
 def setup(bot):

@@ -289,12 +289,10 @@ class User(commands.Cog):
         raise BadArgument('No force argument')
 
     @commands.command(usage='[username]')
-    async def cache(self, ctx, complete: typing.Optional[force]=False,
-                    username: typing.Optional[str]=None):
+    async def cache(self, ctx, username: typing.Optional[str]=None):
         """Caches the submissions of a user, will speed up other commands
 
         Use surround your username with '' if it can be interpreted as a number
-        +f              cache every submission
         """
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
@@ -314,7 +312,7 @@ class User(commands.Cog):
             msg = await ctx.send(f'Caching {username}\'s submissions')
         except Exception as e:
             await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: '+e.message)
+                                   'try caching again. Log: '+e)
             return
 
         await query.get_submissions(username)
