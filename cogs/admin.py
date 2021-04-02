@@ -86,8 +86,8 @@ class Admin(commands.Cog):
         usernames = list(map(itemgetter(0), q.all()))
         await ctx.send(f"Recaching submissions for {len(usernames)}"
                        f" users. This will take a long time (perhaps hours).")
-        # session.query(Submission_DB).delete()
-        # session.commit()
+        session.query(Submission_DB).delete()
+        session.commit()
 
         query = Query()
         count = 0
