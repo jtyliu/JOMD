@@ -104,10 +104,10 @@ class Problem:
                 api = API()
                 await api.get_languages()
                 for language in api.data.objects:
-                    if language.key == language_key:
+                    if language.key not in language_q:
                         session.add(Language_DB(language))
                         session.commit()
-                        break
+                break
         self.languages = language_qq.all()
 
         organization_qq = session.query(Organization_DB).\
@@ -120,10 +120,10 @@ class Problem:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id == organization_id:
+                    if organization.id not in organization_q:
                         session.add(Organization_DB(organization))
                         session.commit()
-                        break
+                break
         self.organizations = organization_qq.all()
 
 
@@ -169,10 +169,10 @@ class Contest:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id == organization_id:
+                    if organization.id not in organization_q:
                         session.add(Organization_DB(organization))
                         session.commit()
-                        break
+                break
         self.organizations = organization_qq.all()
 
         # perhaps I should check if it's the general or detailed version
@@ -295,10 +295,10 @@ class User:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id == organization_id:
+                    if organization.id not in organization_q:
                         session.add(Organization_DB(organization))
                         session.commit()
-                        break
+                break
         self.organizations = organization_qq.all()
 
         def get_key(contest):
