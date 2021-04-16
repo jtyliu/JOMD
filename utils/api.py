@@ -17,21 +17,22 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       Language as Language_DB, Judge as Judge_DB)
 from operator import itemgetter
 
+queue = []
+
 
 def rate_limit(func):
     # Got ratelimited with 87, we'll stay on the safe side
-    ratelimit = 5
-    time_span = 4
-    queue = []
+    tries = 4
+    per_second = 5
 
     @functools.wraps(func)
     async def wrapper_rate_limit(*args, **kwargs):
         now = time.time()
-        while len(queue) > 0 and now - queue[0] > time_span:
+        while len(queue) > 0 and now - queue[0] > per_second:
             queue.pop(0)
 
-        if len(queue) == ratelimit:
-            waittime = time_span - now + queue[0]
+        if len(queue) == tries:
+            waittime = per_second - now + queue[0]
             queue.pop(0)
             await asyncio.sleep(waittime)
             now = time.time()
