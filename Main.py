@@ -2,6 +2,8 @@ import os
 from discord.ext import commands
 from pathlib import Path
 import discord
+from utils.query import Query
+import asyncio
 
 
 def main():
@@ -29,6 +31,11 @@ def main():
         if ctx.guild is None:
             raise commands.NoPrivateMessage('Private messages not permitted.')
         return True
+    
+    # Get preliminary data
+    q = Query()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(q.get_problems())
 
     # Restrict bot usage to inside guild channels only.
     bot.add_check(no_dm_check)
