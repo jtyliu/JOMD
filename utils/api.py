@@ -402,24 +402,29 @@ class Submission:
         if self._problem in problem_q:
             self.problem = [problem_q[self._problem]]
 
-        if self._user not in user_q:
-            api = API()
-            await api.get_user(self._user)
-            user = User_DB(api.data.object)
-            session.add()
-            user_q[self._user] = user
-        self.user = [user_q[self._user]]
+        if self._user not in user_q and self._user not in lock_table:
+            lock_table[self._user] = asyncio.Lock()
+            async with lock_table[self._user]:
+                api = API()
+                await api.get_user(self._user)
+                user = User_DB(api.data.object)
+                session.add(user)
+                user_q[self._user] = user
+        if self._user in user_q:
+            self.user = [user_q[self._user]]
 
-        if self._language not in language_q:
-            api = API()
-            await api.get_languages()
-            for language in api.data.objects:
-                if language.key == self._language:
-                    lang = Language_DB(language)
-                    session.add(lang)
-                    language_q[self._language] = lang
-                    break
-        self.language = [language_q[self._language]]
+        if self._language not in language_q and 'language' not in lock_table:
+            lock_table['language'] = asyncio.Lock()
+            async with lock_table['language']:
+                api = API()
+                await api.get_languages()
+                for language in api.data.objects:
+                    if language.key not in language_q:
+                        lang = Language_DB(language)
+                        session.add(lang)
+                        language_q[self.language.key] = lang
+        if self._language in language_q:
+            self.language = [language_q[self._language]]
 
         if self.problem is None:
             async with lock_table[self._problem]:
