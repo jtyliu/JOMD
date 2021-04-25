@@ -1,5 +1,6 @@
 from discord.ext import commands
 from utils.query import Query
+from utils.api import API
 from utils.db import session, Problem as Problem_DB
 
 
@@ -10,12 +11,13 @@ class Meta(commands.Cog):
     @commands.command()
     async def check(self, ctx):
         """Check if the bot has been rate limited"""
-        query = Query()
+        api = API()
         try:
-            user = await query.get_judges()
+            await api.get_judges()
+            user = api.data.objects
             if user is None:
                 await ctx.send('There is something wrong with the api, '
-                            'please contact an admin')
+                               'please contact an admin')
             else:
                 await ctx.send('Api is all good, move along.')
         except Exception as e:
