@@ -109,10 +109,10 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_problem(self, code) -> Problem_DB:
+    async def get_problem(self, code, cached=True) -> Problem_DB:
         q = session.query(Problem_DB).\
             filter(Problem_DB.code == code)
-        if q.count():
+        if q.count() and cached:
             # has_rating check if it has a detailed row
             if q.first().short_circuit is not None:
                 return q.first()
@@ -419,6 +419,11 @@ class Query:
             return q.first()
 
     def get_unsolved_problems(self, username, types, low=1, high=50):
+        # Does not find problems if you first
+        # +update_problems
+        # +gimme
+        # This is cause calling the /problems api does not return is_organization_private
+        # The original goal of is_organization_private filter is to prevent leaking problems
         conds = [Problem_DB.types.contains(_type) for _type in types]
         sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
             .filter(Submission_DB._user == username)\
@@ -428,7 +433,8 @@ class Query:
             .filter(func.ifnull(sub_q.c.points, 0) < Problem_DB.points)\
             .filter(or_(*conds))\
             .filter(Problem_DB.points.between(low, high))\
-            .filter(Problem_DB.is_organization_private == 0)
+            .filter(Problem_DB.is_organization_private == 0)\
+            .filter(Problem_DB.is_public == 1)
         return q.all()
 
     def get_attempted_problems(self, username, types):

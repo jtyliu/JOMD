@@ -363,30 +363,24 @@ class Submission:
             return "%.1f GB" % (self.memory/1024/1024)
 
     @staticmethod
-    async def async_map(_type, objects, is_latest=False):
-        # is_latest is to optimize parsing little submissions
-        # and many submissions
-        if not is_latest:
-            problems = session.query(Problem_DB.code, Problem_DB).all()
-            problems = {k: v for k, v in problems}
-            users = session.query(User_DB.username, User_DB).all()
-            users = {k: v for k, v in users}
-            languages = session.query(Language_DB.key, Language_DB).all()
-            languages = {k: v for k, v in languages}
+    async def async_map(_type, objects):
+        problems = session.query(Problem_DB.code, Problem_DB).all()
+        problems = {k: v for k, v in problems}
+        users = session.query(User_DB.username, User_DB).all()
+        users = {k: v for k, v in users}
+        languages = session.query(Language_DB.key, Language_DB).all()
+        languages = {k: v for k, v in languages}
         to_gather = []
         lock_table = {}
         for obj in objects:
-            if is_latest:
-                to_gather.append(obj.async_old())
-            else:
-                # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will cause a db error
-                # this is because any submissions which are not in the db will be called by the api and stored into the db
-                # but in between that moment of calling the api and storing into the db, another process will call the api for the same problem
-                # because it is technically not in memory yet
-                # This fix to this is two global tables and a lock
-                to_gather.append(
-                    obj.async_init(problems, users, languages, lock_table)
-                )
+            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will cause a db error
+            # this is because any submissions which are not in the db will be called by the api and stored into the db
+            # but in between that moment of calling the api and storing into the db, another process will call the api for the same problem
+            # because it is technically not in memory yet
+            # This fix to this is two global tables and a lock
+            to_gather.append(
+                obj.async_init(problems, users, languages, lock_table)
+            )
         await asyncio.gather(*to_gather)
         session.commit()
 
@@ -429,37 +423,6 @@ class Submission:
         if self.problem is None:
             async with lock_table[self._problem]:
                 self.problem = [problem_q[self._problem]]
-
-    async def async_old(self):
-        problem_q = session.query(Problem_DB).\
-            filter(Problem_DB.code == self._problem)
-        if problem_q.count() == 0:
-            api = API()
-            await api.get_problem(self._problem)
-            session.add(Problem_DB(api.data.object))
-            session.commit()
-        self.problem = [problem_q.first()]
-
-        user_q = session.query(User_DB).\
-            filter(User_DB.username == self._user)
-        if user_q.count() == 0:
-            api = API()
-            await api.get_user(self._user)
-            session.add(User_DB(api.data.object))
-            session.commit()
-        self.user = [user_q.first()]
-
-        language_q = session.query(Language_DB).\
-            filter(Language_DB.key == self._language)
-        if language_q.count() == 0:
-            api = API()
-            await api.get_languages()
-            for language in api.data.objects:
-                if language.key == self._language:
-                    session.add(Language_DB(language))
-                    session.commit()
-                    break
-        self.language = [language_q.first()]
 
 
 class Organization:
@@ -757,7 +720,7 @@ class API:
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
-        await Submission.async_map(Submission, ret, is_latest=True)
+        await Submission.async_map(Submission, ret)
         return ret
 
     async def get_placement(self, username):
