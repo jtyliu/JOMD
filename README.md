@@ -84,6 +84,8 @@ Run the bot with
 python3.7 Main.py
 ```
 
+**Warning**: Many of the commands require multiple pieces of information to be fetched, so many initial commands will take several seconds to run but will speed up as more information is fetched and stored.
+
 # Usage
 To use the bot, use the `+` prefix
 
