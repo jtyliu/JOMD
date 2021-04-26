@@ -9,6 +9,7 @@ categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
 
 # TODO: Fiddle around with matplotlib to make the graphs look better
 
+
 def plot_solved(datas):
     plt.clf()
     plt.subplots()
@@ -21,6 +22,7 @@ def plot_solved(datas):
     plt.legend(loc='upper left', fontsize='8')
     plt.savefig('./graphs/plot.png')
 
+
 def plot_points(datas):
     plt.clf()
     plt.subplots()
@@ -32,6 +34,7 @@ def plot_points(datas):
     plt.ylabel('Points')
     plt.legend(loc='upper left', fontsize='8')
     plt.savefig('./graphs/plot.png')
+
 
 def plot_rating(data):
     # Credit to https://github.com/jacklee1792/dmoj-rating
@@ -49,7 +52,7 @@ def plot_rating(data):
         try:
             ddf.iloc[1:]\
                 .plot(label=f'{username} ({max_ratings[i] or 0})',
-                    marker='s', markerfacecolor='white')
+                      marker='s', markerfacecolor='white')
         except TypeError:
             pass
 

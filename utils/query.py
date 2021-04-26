@@ -7,15 +7,10 @@ from utils.db import (session, Problem as Problem_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB,
                       Handle as Handle_DB, Json)
-from utils.gitgud import Gitgud as Gitgud_utils
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
 from operator import itemgetter
-from utils.constants import SHORTHANDS
-import random
-import discord
-from datetime import datetime
 
 
 class Query:

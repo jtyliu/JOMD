@@ -4,6 +4,7 @@ from utils.query import Query
 import random
 import discord
 
+
 def list_to_str(arg):
     if arg is None:
         return None
@@ -39,12 +40,12 @@ def point_range(argument) -> typing.Optional[list]:
             point_high = int(argument[0])
             point_low = int(argument[1])
             return [point_high, point_low]
-        except ValueError as e:
+        except ValueError:
             raise BadArgument('Point values are not an integer')
     try:
         point_high = point_low = int(argument)
         return [point_high, point_low]
-    except ValueError as e:
+    except ValueError:
         raise BadArgument('Point value is not an integer')
 
 

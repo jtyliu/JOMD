@@ -424,7 +424,6 @@ class Gitgud(Base):
     time = Column(DateTime)
 
 
-
 class CurrentGitgud(Base):
     __tablename__ = 'current_gitgud'
     _id = Column(Integer, primary_key=True)
@@ -433,5 +432,6 @@ class CurrentGitgud(Base):
     problem_id = Column(String)
     point = Column(Integer)
     time = Column(DateTime)
+
 
 Base.metadata.create_all(engine)

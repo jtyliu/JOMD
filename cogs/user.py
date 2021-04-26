@@ -4,14 +4,9 @@ import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
 from utils.db import session
-from sqlalchemy import func, or_, not_, orm, distinct
-from utils.db import (session, Problem as Problem_DB,
-                      Contest as Contest_DB,
-                      Participation as Participation_DB,
-                      User as User_DB, Submission as Submission_DB,
-                      Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB,
-                      Handle as Handle_DB, Json)
+from sqlalchemy import func, not_, orm
+from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
+                      User as User_DB, Submission as Submission_DB)
 from utils.jomd_common import (str_not_int, point_range, parse_gimme,
                                calculate_points, gimme_common)
 from utils.api import ObjectNotFound
@@ -21,14 +16,13 @@ import random
 from operator import itemgetter
 
 
-
 class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(usage='[username] [latest submissions]')
-    async def user(self, ctx, username: typing.Optional[str_not_int]=None,
-                   amount: typing.Optional[int]=None):
+    async def user(self, ctx, username: typing.Optional[str_not_int] = None,
+                   amount: typing.Optional[int] = None):
         """Show user profile and latest submissions
 
         Use surround your username with '' if it can be interpreted as a number
@@ -153,8 +147,8 @@ class User(commands.Cog):
         return None
 
     @commands.command(usage='username [points solved]')
-    async def predict(self, ctx, username: typing.Optional[str_not_int]=None,
-                      amounts: commands.Greedy[int]=[]):
+    async def predict(self, ctx, username: typing.Optional[str_not_int] = None,
+                      amounts: commands.Greedy[int] = []):
         """Predict total points after solving N pointer problem(s)
 
         Use surround your username with '' if it can be interpreted as a number
@@ -289,7 +283,7 @@ class User(commands.Cog):
         raise BadArgument('No force argument')
 
     @commands.command(usage='[username]')
-    async def cache(self, ctx, username: typing.Optional[str]=None):
+    async def cache(self, ctx, username: typing.Optional[str] = None):
         """Caches the submissions of a user, will speed up other commands
 
         Use surround your username with '' if it can be interpreted as a number
@@ -325,8 +319,8 @@ class User(commands.Cog):
         return await ctx.send(':monkey:')
 
     @commands.command(usage='username [points] [problem types]')
-    async def gimme(self, ctx, username: typing.Optional[parse_gimme]=None,
-                    points: typing.Optional[point_range]=[1, 50], *filters):
+    async def gimme(self, ctx, username: typing.Optional[parse_gimme] = None,
+                    points: typing.Optional[point_range] = [1, 50], *filters):
         """
         Recommend a problem
 
@@ -367,7 +361,8 @@ class User(commands.Cog):
 
         filters = filter_list
 
-        # Get all problems that are unsolved by user and fits the filter and point range
+        # Get all problems that are unsolved by user and fits the filter and
+        # point range
         result, problem = await gimme_common(username, points, filters)
         # print(result)
         if result is None:

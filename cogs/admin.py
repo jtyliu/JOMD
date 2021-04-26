@@ -1,13 +1,10 @@
 from discord.ext import commands
 from pathlib import Path
-import discord
 # from utils.api import problem_api
 # from utils.db import DbConn
 from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB, Submission as Submission_DB)
 from utils.query import Query
-from utils.api import API
-import math
 from operator import itemgetter
 import time
 
@@ -77,7 +74,8 @@ class Admin(commands.Cog):
         session.commit()
         query = Query()
         problems = await query.get_problems()
-        # In order some modules such as +gimme to work it needs more details of problems
+        # In order some modules such as +gimme to work it needs more details
+        # of problems
         for problem in problems:
             await query.get_problem(problem.code)
         return await msg.edit(content=f"Updated all problems")
@@ -99,7 +97,7 @@ class Admin(commands.Cog):
             await msg.edit(content=f"{count}/{len(usernames)} users cached..."
                                    f" ({username})")
             await query.get_submissions(username)
-            time.sleep(30) # PLS DON'T GET CLOUDFLARED
+            time.sleep(30)  # PLS DON'T GET CLOUDFLARED
             count += 1
         await msg.edit(content=f"{len(usernames)} users cache. Done!")
 

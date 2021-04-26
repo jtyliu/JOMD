@@ -85,7 +85,7 @@ class Plot(commands.Cog):
                 cnt += 1
                 data_to_plot[date] = cnt
             total_data[username] = data_to_plot
- 
+
         plot_solved(total_data)
 
         if len(not_cached):
@@ -126,7 +126,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .options(orm.joinedload('problem'))\
                 .join(User_DB, User_DB.username == Submission_DB._user,
-                    aliased=True)\
+                      aliased=True)\
                 .filter(User_DB.username == username)\
                 .order_by(Submission_DB.date)
 
@@ -170,7 +170,7 @@ class Plot(commands.Cog):
 
         if len(not_cached):
             await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
-                     f"submissions. Please use +cache [username]`")
+                           f"submissions. Please use +cache [username]`")
 
         plot_points(total_data)
 
@@ -320,7 +320,7 @@ class Plot(commands.Cog):
         print(data)
         if len(not_cached):
             await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
-                     f"submissions. Please use +cache [username]`")
+                           f"submissions. Please use +cache [username]`")
 
         if graph == 'radar':
             plot_type_radar(data, as_percent, max_percentage)
