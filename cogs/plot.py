@@ -92,8 +92,6 @@ class Plot(commands.Cog):
             await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
                            f"submissions. Please use +cache [username]`")
 
-        plot_points(total_data)
-
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
