@@ -71,12 +71,15 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def update_problems(self, ctx):
-        """Update all problems in db"""
+        """Update all problems in db (Warning! Slow!)"""
         msg = await ctx.send("Updating...")
         session.query(Problem_DB).delete()
         session.commit()
         query = Query()
-        await query.get_problems()
+        problems = await query.get_problems()
+        # In order some modules such as +gimme to work it needs more details of problems
+        for problem in problems:
+            await query.get_problem(problem.code)
         return await msg.edit(content=f"Updated all problems")
 
     @commands.command()
