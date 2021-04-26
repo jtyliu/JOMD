@@ -74,7 +74,7 @@ def plot_rating(data):
         ma_range = min(ma + offset, rng[i][1])
         plt.axhspan(mi_range, ma_range, facecolor=colors[i])
 
-    plt.gca().set_ylim([mi-offset, ma+offset])
+    plt.gca().set_ylim([mi - offset, ma + offset])
     plt.gca().xaxis.set_major_formatter(mdt.DateFormatter('%m/%d/%Y'))
     plt.gcf().autofmt_xdate()
     plt.legend(loc="upper left", prop={"size": 8})
@@ -130,28 +130,28 @@ def plot_type_radar(data, as_percent, maxval):
     # Draw ylabels
     ax.set_rlabel_position(0)
 
-    scale = maxval*1.1
+    scale = maxval * 1.1
     if as_percent:
         plt.yticks(
-            [scale/4, scale/2, 3*scale/4],
+            [scale / 4, scale / 2, 3 * scale / 4],
             [
-                "%.1f%%" % (scale/4),
-                "%.1f%%" % (scale/2),
-                "%.1f%%" % (3*scale/4)
+                "%.1f%%" % (scale / 4),
+                "%.1f%%" % (scale / 2),
+                "%.1f%%" % (3 * scale / 4)
             ],
             color="grey", size=7
         )
     else:
         plt.yticks(
-            [scale/4, scale/2, 3*scale/4],
+            [scale / 4, scale / 2, 3 * scale / 4],
             [
-                "%.1f" % (scale/4),
-                "%.1f" % (scale/2),
-                "%.1f" % (3*scale/4)
+                "%.1f" % (scale / 4),
+                "%.1f" % (scale / 2),
+                "%.1f" % (3 * scale / 4)
             ],
             color="grey", size=7
         )
-    plt.ylim(0, maxval*1.1)
+    plt.ylim(0, maxval * 1.1)
 
     # Plot each individual = each line of the data
     # I don't do a loop, because plotting more than

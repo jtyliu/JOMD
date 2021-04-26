@@ -91,10 +91,10 @@ async def gimme_common(username, points, types):
         points += 'p'
 
     memory = problem.memory_limit
-    if memory >= 1024*1024:
-        memory = '%dG' % (memory//1024//1024)
+    if memory >= 1024 * 1024:
+        memory = '%dG' % (memory // 1024 // 1024)
     elif memory >= 1024:
-        memory = '%dM' % (memory//1024)
+        memory = '%dM' % (memory // 1024)
     else:
         memory = '%dK' % (memory)
 

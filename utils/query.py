@@ -272,7 +272,7 @@ class Query:
         apis = []
         to_gather = []
 
-        for _ in range(2, total_pages+1):
+        for _ in range(2, total_pages + 1):
             page += 1
             api = API()
             to_await = await a.get_participations(
@@ -309,7 +309,7 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-        print("Done Api Call", time.time()-start)
+        print("Done Api Call", time.time() - start)
         start = time.time()
         q = session.query(Submission_DB)
         q = q.filter(Submission_DB._user == user)
@@ -357,7 +357,7 @@ class Query:
                 # Perhaps I should implement some sort of error catching in the cogs
                 pass
 
-        for _ in range(2, total_pages+1):
+        for _ in range(2, total_pages + 1):
             page += 1
             api = API()
             to_await = api.get_submissions(user=user, problem=problem,

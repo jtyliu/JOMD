@@ -131,11 +131,11 @@ class Plot(commands.Cog):
                 .order_by(Submission_DB.date)
 
             def calculate_points(points, fully_solved):
-                b = 150*(1-0.997**fully_solved)
+                b = 150 * (1 - 0.997**fully_solved)
                 p = 0
                 for i in range(min(100, len(points))):
-                    p += (0.95**i)*points[i]
-                return b+p
+                    p += (0.95**i) * points[i]
+                return b + p
 
             submissions = q.all()
             if len(submissions) == 0:
@@ -177,8 +177,8 @@ class Plot(commands.Cog):
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
-                    title='Point Progression',
-                    color=0xfcdb05,
+            title='Point Progression',
+            color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
 
@@ -231,8 +231,8 @@ class Plot(commands.Cog):
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
-                    title='Contest Rating',
-                    color=0xfcdb05,
+            title='Contest Rating',
+            color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
 
@@ -282,7 +282,7 @@ class Plot(commands.Cog):
         def calculate_points(points: int):
             p = 0
             for i in range(min(100, len(points))):
-                p += (0.95**i)*points[i]
+                p += (0.95**i) * points[i]
             return p
 
         def to_points(problem):
@@ -311,7 +311,7 @@ class Plot(commands.Cog):
 
                 points = calculate_points(points)
                 if as_percent:
-                    percentage = 100*points/total_points
+                    percentage = 100 * points / total_points
                 else:
                     percentage = points
                 max_percentage = max(max_percentage, percentage)
@@ -330,8 +330,8 @@ class Plot(commands.Cog):
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
         embed = discord.Embed(
-                    title='Problem types solved',
-                    color=0xfcdb05,
+            title='Problem types solved',
+            color=0xfcdb05,
         )
         embed.set_image(url=f'attachment://plot.png',)
 

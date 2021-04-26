@@ -288,7 +288,7 @@ class User(Base):
         self.solved_problems += user.solved_problems
         self.organizations += user.organizations
         self.contests += user.contests
-        
+
 
 class Submission(Base):
     __tablename__ = 'submission'

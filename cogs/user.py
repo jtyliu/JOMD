@@ -98,7 +98,7 @@ class User(commands.Cog):
         for submission in submissions:
             problem = submission.problem[0]
             if problem.points is not None:
-                points = str(int(problem.points))+'p'
+                points = str(int(problem.points)) + 'p'
                 if problem.partial:
                     points += 'p'
             else:
@@ -135,7 +135,7 @@ class User(commands.Cog):
                     name="%.2fs" % submission.time,
                     value="%s" % submission.memory_str,
                     inline=True,
-                    )
+                )
             except TypeError:
                 embed.add_field(
                     name="---",
@@ -306,7 +306,7 @@ class User(commands.Cog):
             msg = await ctx.send(f'Caching {username}\'s submissions')
         except Exception as e:
             await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: '+e)
+                                   'try caching again. Log: ' + e)
             return
 
         await query.get_submissions(username)

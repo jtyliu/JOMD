@@ -62,7 +62,7 @@ async def _query_api(url, resp_obj):
         # might just change to error trapping
         #     raise ApiError
         if DEBUG_API:
-            print("Parsed data, returning... Time:", time.time()-start)
+            print("Parsed data, returning... Time:", time.time() - start)
         return resp
 
 
@@ -204,7 +204,7 @@ class Participation:
 
     def __init__(self, data):
         self.id = data["user"] + "&" + data["contest"] + "&" \
-                  + str(data["virtual_participation_number"])
+                               + str(data["virtual_participation_number"])
         self._user = data["user"]
         self.user = None
         self._contest = data["contest"]
@@ -358,9 +358,9 @@ class Submission:
         if self.memory < 1024:
             return "%.1f KB" % (self.memory)
         elif self.memory < 1024**2:
-            return "%.1f MB" % (self.memory/1024)
+            return "%.1f MB" % (self.memory / 1024)
         else:
-            return "%.1f GB" % (self.memory/1024/1024)
+            return "%.1f GB" % (self.memory / 1024 / 1024)
 
     @staticmethod
     async def async_map(_type, objects):
@@ -662,7 +662,7 @@ class API:
                 score = soup.find(class_='sub-result')\
                             .find(class_='score').text.split('/')
                 score_num, score_denom = map(int, score)
-                points = score_num/score_denom
+                points = score_num / score_denom
             except ValueError:
                 score_num, score_denom = 0, 0
                 points = 0
@@ -692,7 +692,7 @@ class API:
                 if size == 'MB':
                     memory *= 1024
                 if size == 'GB':
-                    memory *= 1024*1024
+                    memory *= 1024 * 1024
             else:
                 # --- case
                 memory = 0
