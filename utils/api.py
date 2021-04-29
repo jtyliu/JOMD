@@ -22,8 +22,8 @@ queue = []
 
 def rate_limit(func):
     # Got ratelimited with 87, we'll stay on the safe side
-    tries = 4
-    per_second = 5
+    tries = 2
+    per_second = 3
 
     @functools.wraps(func)
     async def wrapper_rate_limit(*args, **kwargs):
