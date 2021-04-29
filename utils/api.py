@@ -79,10 +79,10 @@ class Problem:
         self.memory_limit = data.get("memory_limit")
         self.language_resource_limits = data.get("language_resource_limits")
         self.short_circuit = data.get("short_circuit")
-        self._languages = data.get("languages") or []
+        self._languages = data.get("languages", [])
         self.languages = []
         self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
 
         self.is_public = data.get("is_public")
@@ -145,12 +145,12 @@ class Contest:
         self.rating_ceiling = data.get("rating_ceiling")
         self.hidden_scoreboard = data.get("hidden_scoreboard")
         self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
         self.is_private = data.get("is_private")
         self.format = data.get("format")
         self.rankings = data.get("rankings")
-        self._problems = data.get("problems") or []
+        self._problems = data.get("problems", [])
         self.problems = []
 
     @staticmethod
@@ -254,11 +254,11 @@ class User:
         self.rank = data["problem_count"]
         self.rating = data["rating"]
         self.volatility = data["volatility"]
-        self._solved_problems = data.get("solved_problems") or []
+        self._solved_problems = data.get("solved_problems", [])
         self.solved_problems = []
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
-        self._contests = data.get("contests") or []
+        self._contests = data.get("contests", [])
         self.contests = []
 
     @staticmethod
