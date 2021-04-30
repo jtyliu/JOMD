@@ -22,7 +22,7 @@ queue = []
 
 def rate_limit(func):
     # Got ratelimited with 87, we'll stay on the safe side
-    tries = 2
+    tries = 1
     per_second = 3
 
     @functools.wraps(func)
