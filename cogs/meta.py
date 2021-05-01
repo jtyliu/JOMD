@@ -44,7 +44,7 @@ class Meta(commands.Cog):
         total_problems = len(problems)
         total_points = calculate_points(problems, total_problems)
         await ctx.send("The theoretical maximum number of points "
-                       "you can achieve is %.2f" % total_points)
+                       "you can achieve is %.2f \n There are %d public problems on DMOJ" % (total_points,total_problems))
         return
 
 def setup(bot):
