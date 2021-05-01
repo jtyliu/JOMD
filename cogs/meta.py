@@ -43,8 +43,8 @@ class Meta(commands.Cog):
         problems = list(map(tuple_first, problems))
         total_problems = len(problems)
         total_points = calculate_points(problems, total_problems)
-        await ctx.send("The theoretical maximum number of points "
-                       "you can achieve is %.2f \n There are %d public problems on DMOJ" % (total_points,total_problems))
+        await ctx.send("The theoretical maximum number of points you can achieve is %.2f\n"
+                       "There are %d public problems on DMOJ" % (total_points, total_problems))
         return
 
 
