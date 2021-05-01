@@ -17,10 +17,11 @@ from operator import itemgetter
 # Post new contests
 # Rating change predictions for all users in a server
 
+
 class Contest(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.command(usage="[contest key]")
     async def ranklist(self, ctx, key):
         """List rating predictions of a contest"""
@@ -43,7 +44,7 @@ class Contest(commands.Cog):
             return handle.handle
 
         usernames = list(map(to_handle, handles))
-        
+
         # The only way to calculate rating changes is by getting the volitility of all the users
         # that means 100+ seperate api calls
         # How does evan do it?
@@ -58,7 +59,7 @@ class Contest(commands.Cog):
         # Filter for those who participated in contest
         user_rankings = list(map(itemgetter("user"), contest.rankings))
         usernames = list(set(usernames) & set(user_rankings))
-        
+
         # The length is 0 is contest is still ongoing
         problems = len(contest.problems)
 
@@ -73,23 +74,23 @@ class Contest(commands.Cog):
                         evan_ranking = rankings[username]
                         rank_dict = {
                             "rank": int(evan_ranking["rank"]),
-                            "username": username+":",
+                            "username": username + ":",
                             "old_rating": evan_ranking["old_rating"],
                             "new_rating": evan_ranking["new_rating"],
                         }
                         if evan_ranking["rating_change"] > 0:
-                            rank_dict["rating_change"] = "+"+str(evan_ranking["rating_change"])
+                            rank_dict["rating_change"] = "+" + str(evan_ranking["rating_change"])
                         else:
                             rank_dict["rating_change"] = evan_ranking["rating_change"]
                     else:
                         rank_dict = {
-                            "rank": rank_num+1,
-                            "username": username+":",
+                            "rank": rank_num + 1,
+                            "username": username + ":",
                         }
                     # This is a quick fix :>
                     problems = len(ranking["solutions"])
-                    for i in range(1, problems+1):
-                        solution = ranking["solutions"][i-1]
+                    for i in range(1, problems + 1):
+                        solution = ranking["solutions"][i - 1]
                         if solution:
                             rank_dict[str(i)] = int(solution["points"])
                         else:
@@ -103,27 +104,27 @@ class Contest(commands.Cog):
             for k, v in rank.items():
                 max_len[k] = max(len(str(v)), max_len.get(k, 0))
 
-        format_output = "{:>"+str(max_len["rank"])+"} "
-        format_output += "{:"+str(max_len["username"]+1)+"}  "
-        for i in range(1, problems+1):
-            format_output += "{:"+str(max_len[str(i)])+"} "
+        format_output = "{:>" + str(max_len["rank"]) + "} "
+        format_output += "{:" + str(max_len["username"] + 1) + "}  "
+        for i in range(1, problems + 1):
+            format_output += "{:" + str(max_len[str(i)]) + "} "
 
         to_format = [
             "#",
             "Handle",
-            *[str(i) for i in range(1, problems+1)],
+            *[str(i) for i in range(1, problems + 1)],
         ]
 
         hyphen_format = [
-            "—"*max_len["rank"],
-            "—"*max_len["username"],
-            *["—"*max_len[str(i)] for i in range(1, problems+1)],
+            "—" * max_len["rank"],
+            "—" * max_len["username"],
+            *["—" * max_len[str(i)] for i in range(1, problems + 1)],
         ]
         if contest.is_rated:
             format_output += " "
-            format_output += "{:>"+str(max_len["rating_change"])+"}  "
-            format_output += "{:"+str(max_len["old_rating"])+"} "
-            format_output += "{:"+str(max_len["new_rating"])+"} "
+            format_output += "{:>" + str(max_len["rating_change"]) + "}  "
+            format_output += "{:" + str(max_len["old_rating"]) + "} "
+            format_output += "{:" + str(max_len["new_rating"]) + "} "
             to_format += [
                 "∆",
                 "Old",
@@ -131,9 +132,9 @@ class Contest(commands.Cog):
             ]
 
             hyphen_format += [
-                "—"*max_len["rating_change"],
-                "—"*max_len["old_rating"],
-                "—"*max_len["new_rating"],
+                "—" * max_len["rating_change"],
+                "—" * max_len["old_rating"],
+                "—" * max_len["new_rating"],
             ]
         output = format_output.format(*to_format)
 
@@ -146,7 +147,7 @@ class Contest(commands.Cog):
                 output += format_output.format(
                     rank["rank"],
                     rank["username"],
-                    *[rank[str(i)] for i in range(1, problems+1)],
+                    *[rank[str(i)] for i in range(1, problems + 1)],
                     rank["rating_change"],
                     rank["old_rating"],
                     rank["new_rating"],
@@ -155,12 +156,12 @@ class Contest(commands.Cog):
                 output += format_output.format(
                     rank["rank"],
                     rank["username"],
-                    *[rank[str(i)] for i in range(1, problems+1)],
+                    *[rank[str(i)] for i in range(1, problems + 1)],
                 )
             output += "\n"
         output += hyphens
         output += "\n"
-        await ctx.send("```yaml\n"+output+"```")
+        await ctx.send("```yaml\n" + output + "```")
 
 
 def setup(bot):

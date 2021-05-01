@@ -445,9 +445,11 @@ class Submission:
         to_gather = []
         lock_table = {}
         for obj in objects:
-            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will cause a db error
+            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will
+            # cause a db error
             # this is because any submissions which are not in the db will be called by the api and stored into the db
-            # but in between that moment of calling the api and storing into the db, another process will call the api for the same problem
+            # but in between that moment of calling the api and storing into the db, another process will call the api
+            # for the same problem
             # because it is technically not in memory yet
             # This fix to this is two global tables and a lock
             to_gather.append(

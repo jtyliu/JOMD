@@ -12,18 +12,18 @@ DEBUG_API = True
 TZ = pytz.timezone('America/New_York')
 
 SHORTHANDS = {
-	'adhoc': ['Ad Hoc'],
-	'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
-	'bf': ['Brute Force'],
-	'ctf': ['Capture the Flag'],
-	'ds': ['Data Structures'],
-	'd&c': ['Divide and Conquer'],
-	'dp': ['Dynamic Programming'],
-	'geo': ['Geometry'],
-	'gt': ['Graph Theory'],
+    'adhoc': ['Ad Hoc'],
+    'math': ['Advanced Math', 'Intermediate Math', 'Simple Math'],
+    'bf': ['Brute Force'],
+    'ctf': ['Capture the Flag'],
+    'ds': ['Data Structures'],
+    'd&c': ['Divide and Conquer'],
+    'dp': ['Dynamic Programming'],
+    'geo': ['Geometry'],
+    'gt': ['Graph Theory'],
     'greedy': ['Greedy Algorithms'],
-	'regex': ['Regular Expressions'],
-	'string': ['String Algorithms'],
+    'regex': ['Regular Expressions'],
+    'string': ['String Algorithms'],
 }
 
 POINT_VALUES = [1, 3, 5, 7, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50]

@@ -69,11 +69,11 @@ def parse_gimme(argument) -> typing.Optional[str]:
 
 
 def calculate_points(points, fully_solved):
-    b = 150*(1-0.997**fully_solved)
+    b = 150 * (1 - 0.997**fully_solved)
     p = 0
     for i in range(min(100, len(points))):
-        p += (0.95**i)*points[i]
-    return b+p
+        p += (0.95**i) * points[i]
+    return b + p
 
 
 async def gimme_common(username, points, types):

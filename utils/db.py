@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Column, String, Integer, Date, String, TypeDecorator,
+from sqlalchemy import (Column, String, Integer, Date, TypeDecorator,
                         Float, Boolean, DateTime, JSON, Table, ForeignKey,
                         Text)
 from sqlalchemy.orm import relationship
