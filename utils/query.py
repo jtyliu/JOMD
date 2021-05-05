@@ -351,7 +351,7 @@ class Query:
                 api.get_submissions(user=user, problem=problem,
                                     language=language,
                                     result=result, page=page)
-            except:
+            except Exception:
                 # Sometimes when caching a user with many pages one might not return correctly
                 # this will silently return nothing
                 # Perhaps I should implement some sort of error catching in the cogs

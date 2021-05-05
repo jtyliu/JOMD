@@ -8,6 +8,7 @@ import aiohttp
 import asyncio
 import time
 import html
+import math
 from datetime import datetime
 from utils.db import session
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
@@ -16,54 +17,125 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       Organization as Organization_DB,
                       Language as Language_DB, Judge as Judge_DB)
 from operator import itemgetter
-
-queue = []
-
-
-def rate_limit(func):
-    # Got ratelimited with 87, we'll stay on the safe side
-    tries = 4
-    per_second = 5
-
-    @functools.wraps(func)
-    async def wrapper_rate_limit(*args, **kwargs):
-        now = time.time()
-        while len(queue) > 0 and now - queue[0] > per_second:
-            queue.pop(0)
-
-        if len(queue) == tries:
-            waittime = per_second - now + queue[0]
-            queue.pop(0)
-            await asyncio.sleep(waittime)
-            now = time.time()
-        queue.append(now)
-        return await func(*args, **kwargs)
-    return wrapper_rate_limit
+from contextlib import asynccontextmanager
 
 
+# Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
+class RateLimiter:
+    def __init__(self,
+                 rate_limit: int,
+                 concurrency_limit: int) -> None:
+        if not rate_limit or rate_limit < 1:
+            raise ValueError('rate limit must be non zero positive number')
+        if not concurrency_limit or concurrency_limit < 1:
+            raise ValueError('concurrent limit must be non zero positive number')
+
+        self.rate_limit = rate_limit
+        self.tokens_queue = asyncio.Queue(rate_limit)
+        self.tokens_consumer_task = asyncio.create_task(self.consume_tokens())
+        self.semaphore = asyncio.Semaphore(concurrency_limit)
+
+    async def add_token(self) -> None:
+        await self.tokens_queue.put(1)
+        return None
+
+    async def consume_tokens(self):
+        try:
+            consumption_rate = 1 / self.rate_limit
+            last_consumption_time = 0
+
+            while True:
+                if self.tokens_queue.empty():
+                    await asyncio.sleep(consumption_rate)
+                    continue
+
+                current_consumption_time = time.monotonic()
+                total_tokens = self.tokens_queue.qsize()
+                tokens_to_consume = self.get_tokens_amount_to_consume(
+                    consumption_rate,
+                    current_consumption_time,
+                    last_consumption_time,
+                    total_tokens
+                )
+
+                for i in range(0, tokens_to_consume):
+                    self.tokens_queue.get_nowait()
+
+                last_consumption_time = time.monotonic()
+
+                await asyncio.sleep(consumption_rate)
+        except asyncio.CancelledError:
+            # you can ignore the error here and deal with closing this task later but this is not advised
+            raise
+        except Exception:
+            # do something with the error and re-raise
+            raise
+
+    @staticmethod
+    def get_tokens_amount_to_consume(consumption_rate, current_consumption_time, last_consumption_time, total_tokens):
+        time_from_last_consumption = current_consumption_time - last_consumption_time
+        calculated_tokens_to_consume = math.floor(time_from_last_consumption / consumption_rate)
+        tokens_to_consume = min(total_tokens, calculated_tokens_to_consume)
+        return tokens_to_consume
+
+    @asynccontextmanager
+    async def throttle(self):
+        await self.semaphore.acquire()
+        await self.add_token()
+        try:
+            yield
+        finally:
+            self.semaphore.release()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            # log error here and safely close the class
+            pass
+
+        await self.close()
+
+    async def close(self) -> None:
+        if self.tokens_consumer_task and not self.tokens_consumer_task.cancelled():
+            try:
+                self.tokens_consumer_task.cancel()
+                await self.tokens_consumer_task
+            except asyncio.CancelledError:
+                # we ignore this exception but it is good to log and signal the task was cancelled
+                pass
+            except Exception:
+                # log here and deal with the exception
+                raise
+
+
+rate_limiter = None
 _session = None
 
 
-@rate_limit
 async def _query_api(url, resp_obj):
-    import time
-    if DEBUG_API:
-        start = time.time()
-        print("Calling", url)
-    global _session
-    if _session is None:
-        _session = aiohttp.ClientSession()
-    async with _session.get(url) as resp:
-        if resp_obj == 'text':
-            resp = await resp.text()
-        if resp_obj == 'json':
-            resp = await resp.json()
-        # if 'error' in resp:  ApiError would interfere with some other stuff,
-        # might just change to error trapping
-        #     raise ApiError
+    global _session, rate_limiter
+    if rate_limiter is None:
+        rate_limiter = RateLimiter(rate_limit=3, concurrency_limit=3)
+
+    async with rate_limiter.throttle():
         if DEBUG_API:
-            print("Parsed data, returning... Time:", time.time() - start)
-        return resp
+            start = time.time()
+            print("Calling", url)
+        if _session is None:
+            _session = aiohttp.ClientSession()
+        async with _session.get(url) as resp:
+            if resp_obj == 'text':
+                resp = await resp.text()
+            if resp_obj == 'json':
+                resp = await resp.json()
+            # if 'error' in resp:  ApiError would interfere with some other stuff,
+            # might just change to error trapping
+            #     raise ApiError
+            if DEBUG_API:
+                print("Parsed data, returning... Time:", time.time() - start)
+    return resp
 
 
 class Problem:
@@ -79,10 +151,10 @@ class Problem:
         self.memory_limit = data.get("memory_limit")
         self.language_resource_limits = data.get("language_resource_limits")
         self.short_circuit = data.get("short_circuit")
-        self._languages = data.get("languages") or []
+        self._languages = data.get("languages", [])
         self.languages = []
         self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
 
         self.is_public = data.get("is_public")
@@ -145,12 +217,12 @@ class Contest:
         self.rating_ceiling = data.get("rating_ceiling")
         self.hidden_scoreboard = data.get("hidden_scoreboard")
         self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
         self.is_private = data.get("is_private")
         self.format = data.get("format")
         self.rankings = data.get("rankings")
-        self._problems = data.get("problems") or []
+        self._problems = data.get("problems", [])
         self.problems = []
 
     @staticmethod
@@ -254,11 +326,11 @@ class User:
         self.rank = data["problem_count"]
         self.rating = data["rating"]
         self.volatility = data["volatility"]
-        self._solved_problems = data.get("solved_problems") or []
+        self._solved_problems = data.get("solved_problems", [])
         self.solved_problems = []
-        self._organizations = data.get("organizations") or []
+        self._organizations = data.get("organizations", [])
         self.organizations = []
-        self._contests = data.get("contests") or []
+        self._contests = data.get("contests", [])
         self.contests = []
 
     @staticmethod
@@ -373,9 +445,11 @@ class Submission:
         to_gather = []
         lock_table = {}
         for obj in objects:
-            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will cause a db error
+            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will
+            # cause a db error
             # this is because any submissions which are not in the db will be called by the api and stored into the db
-            # but in between that moment of calling the api and storing into the db, another process will call the api for the same problem
+            # but in between that moment of calling the api and storing into the db, another process will call the api
+            # for the same problem
             # because it is technically not in memory yet
             # This fix to this is two global tables and a lock
             to_gather.append(
