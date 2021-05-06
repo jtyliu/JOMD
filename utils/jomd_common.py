@@ -86,6 +86,10 @@ async def gimme_common(username, points, types):
 
     problem = random.choice(unsolved)
 
+    # Sometimes the problem might not contain the memory info
+    # so we need to call the api
+    problem = await query.get_problem(problem.code)
+
     points = str(problem.points)
     if problem.partial:
         points += 'p'
