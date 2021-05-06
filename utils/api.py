@@ -490,7 +490,7 @@ class Submission:
                     if language.key not in language_q:
                         lang = Language_DB(language)
                         session.add(lang)
-                        language_q[self.language.key] = lang
+                        language_q[self._language.key] = lang
         if self._language in language_q:
             self.language = [language_q[self._language]]
 
