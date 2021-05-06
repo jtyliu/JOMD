@@ -117,7 +117,7 @@ _session = None
 async def _query_api(url, resp_obj):
     global _session, rate_limiter
     if rate_limiter is None:
-        rate_limiter = RateLimiter(rate_limit=3, concurrency_limit=3)
+        rate_limiter = RateLimiter(rate_limit=1, concurrency_limit=3)
 
     async with rate_limiter.throttle():
         if DEBUG_API:
