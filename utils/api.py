@@ -498,6 +498,14 @@ class Submission:
             async with lock_table[self._problem]:
                 self.problem = [problem_q[self._problem]]
 
+        if self.user is None:
+            async with lock_table[self._user]:
+                self.user = [user_q[self._user]]
+
+        if self.language is None:
+            async with lock_table['language']:
+                self.language = [language_q[self._language]]
+
 
 class Organization:
     def __init__(self, data):
