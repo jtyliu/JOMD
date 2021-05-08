@@ -59,12 +59,8 @@ class Admin(commands.Cog):
         """Cache all new problems"""
         query = Query()
         msg = await ctx.send("Caching...")
-        count = 0
         problems = await query.get_problems()
-        for problem in problems:
-            await query.get_problem(problem.code)
-            count += 1
-        return await msg.edit(content=f"Cached {count} problems")
+        return await msg.edit(content=f"Cached {len(problems)} problems")
 
     @commands.command()
     async def update_problems(self, ctx):
