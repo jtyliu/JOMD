@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdt
 import pandas as pd
-from math import pi
 import seaborn as sns
+
+from math import pi
+from datetime import timedelta
 
 
 categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
-
-# TODO: Fiddle around with matplotlib to make the graphs look better
 
 
 def plot_solved(datas):
@@ -37,49 +37,73 @@ def plot_points(datas):
 
 
 def plot_rating(data):
-    # Credit to https://github.com/jacklee1792/dmoj-rating
+    # Setup
     plt.clf()
-    plt.subplots()
-    df = pd.DataFrame(data)
-    df = df.T
-    max_ratings = df.iloc[1:].max()
+    users = data['users']
+    data = sorted(list(data.items())[1:])
 
-    for i in range(len(df.columns)):
-        username = data['users'][i]
-        ddf = df.iloc[:, i].dropna()
-        # Make sure there is data, to plot
-        # Don't plot users with no contest score
-        try:
-            ddf.iloc[1:]\
-                .plot(label=f'{username} ({max_ratings[i] or 0})',
-                      marker='s', markerfacecolor='white')
-        except TypeError:
-            pass
+    # Make a list of tuples (user, user dates, user ratings)
+    all_dates, all_ratings = [], []
+    groups = []
+    for i, user in enumerate(users):
+        user_dates, user_ratings = [], []
+        for date, ratings in data:
+            if ratings[i] is not None:
+                user_dates.append(date)
+                user_ratings.append(ratings[i])
+                all_dates.append(date)
+                all_ratings.append(ratings[i])
+        groups.append((user, user_dates, user_ratings))
 
-    colors = ['#d2d2d3', '#a0ff8f', '#adb0ff', '#f399ff', '#ffd363',
-              '#ff3729', '#a11b00']
-    rng = [[0, 1000], [1001, 1200], [1201, 1500], [1501, 1800],
-           [1801, 2200], [2201, 3000], [3001, 9999]]
+    # Credit to cheran-senthil/TLE for color hexes
+    colors = {
+        (0, 1000): '#CCCCCC',
+        (1000, 1200): '#77FF77',
+        (1200, 1500): '#AAAAFF',
+        (1500, 1800): '#FF88FF',
+        (1800, 2200): '#FFCC88',
+        (2200, 3000): '#FF7777',
+        (3000, 1e9): '#AA0000'
+    }
 
-    ma = df.iloc[1:].max().max()
-    mi = df.iloc[1:].min().min()
-    offset = 100
+    # Add the color blocks
+    for (low, high), color in colors.items():
+        plt.axhspan(low, high, facecolor=color, alpha=0.8)
 
-    for i in range(7):
-        if mi - offset > rng[i][1]:
-            continue
-        elif ma + offset < rng[i][0]:
-            break
-        mi_range = max(mi - offset, rng[i][0])
-        ma_range = min(ma + offset, rng[i][1])
-        plt.axhspan(mi_range, ma_range, facecolor=colors[i])
+    # Set the theme
+    plt.grid(color='w', linestyle='solid', alpha=0.8)
+    plt.gca().set_facecolor('#E7E7F0')
 
-    plt.gca().set_ylim([mi - offset, ma + offset])
-    plt.gca().xaxis.set_major_formatter(mdt.DateFormatter('%m/%d/%Y'))
-    plt.gcf().autofmt_xdate()
-    plt.legend(loc="upper left", prop={"size": 8})
-    plt.xlabel('Date')
-    plt.ylabel('Rating')
+    # X-axis date formatting
+    locator = mdt.AutoDateLocator(minticks=5, maxticks=8)
+    formatter = mdt.ConciseDateFormatter(locator)
+    plt.gca().xaxis.set_major_locator(locator)
+    plt.gca().xaxis.set_major_formatter(formatter)
+
+    # Set the X-axis scaling
+    margin_x = timedelta(days=30)
+    left = min(all_dates) - margin_x
+    right = max(all_dates) + margin_x
+    plt.gca().set_xlim(left=left, right=right)
+
+    # Set the Y-axis scaling
+    margin_y = 200
+    bottom = min(1000, min(all_ratings) - margin_y)
+    top = max(all_ratings) + margin_y
+    plt.gca().set_ylim(bottom=bottom, top=top)
+
+    # Plot the data
+    for user, user_dates, user_ratings in groups:
+        if user_ratings:
+            label = f'{user} ({max(user_ratings)})'
+        else:
+            label = f'{user} (unrated)'
+        plt.plot(user_dates, user_ratings, label=label, marker='s',
+                 markerfacecolor='white', linestyle='-', markersize=5,
+                 markeredgewidth=0.5)
+
+    # Legend
+    plt.legend(loc="upper left", prop={"size": 10})
 
     plt.savefig('./graphs/plot.png')
 
