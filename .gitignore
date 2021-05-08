@@ -5,3 +5,8 @@ __pycache__/
 Test.py
 plot.png
 /graphs/*
+!/graphs/.gitkeep
+*/.env
+*/venv
+*/.DS_Store
+*/.idea
