@@ -735,6 +735,12 @@ class API:
         soup = BeautifulSoup(resp, features="html.parser")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
+    
+    async def get_user_description(self, username):
+        resp = await _query_api(SITE_URL + 'user/' + username, 'text')
+        soup = BeautifulSoup(resp, features="html.parser")
+        description = str(soup.find('div', class_='content-description'))
+        return description
 
     async def get_latest_submission(self, user, num):
         # Don't look at me! I'm hideous!

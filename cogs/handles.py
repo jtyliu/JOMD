@@ -75,46 +75,26 @@ class Handles(commands.Cog):
         if query.get_handle_user(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')
             return
+        
+        #verify from dmoj user description
+        description=await query.get_user_description(username);
+        
+        userKey='x'+str(ctx.author.id*ctx.author.id) #Replace this with a funnier message
 
-        problem = query.get_random_problem()
-
-        if problem is None:
-            await ctx.send('No problems are cached.. '
-                           'Pls do something about that')
-            # Will implement this
-            # Just cache the problems and get a random one
+        if description.find(userKey)==-1:
+            await ctx.send('Put `'+userKey+'` in your DMOJ user description and run the command again.')
             return
-
-        await ctx.send(
-            '%s, submit a compiler error to <https://dmoj.ca/problem/%s> '
-            'within 60 seconds' % (ctx.author.mention, problem.code))
-        await asyncio.sleep(60)
-
-        submissions = await query.get_latest_submissions(username, 10)
-
-        # if the user links twice, it might break the db
-        # Should add decorator to prevent this
-        if query.get_handle(ctx.author.id, ctx.guild.id):
-            return
-
-        for submission in submissions:
-            if (submission.result == 'CE' and
-                    submission.problem[0].code == problem.code):
-
-                handle = Handle_DB()
-                handle.id = ctx.author.id
-                handle.handle = username
-                handle.user_id = user.id
-                handle.guild_id = ctx.guild.id
-                session.add(handle)
-                session.commit()
-                return await ctx.send(
-                    "%s, you now have linked your account to %s." %
-                    (ctx.author.name, username)
-                )
-        else:
-            return await ctx.send('I don\'t see anything :monkey: '
-                                  '(Failed to link accounts)')
+        handle = Handle_DB()
+        handle.id = ctx.author.id
+        handle.handle = username
+        handle.user_id = user.id
+        handle.guild_id = ctx.guild.id
+        session.add(handle)
+        session.commit()
+        return await ctx.send(
+            "%s, you now have linked your account to %s." %
+            (ctx.author.name, username)
+        )
 
     @commands.command(name='set', usage='discord_account dmoj_handle')
     @commands.has_role('Admin')

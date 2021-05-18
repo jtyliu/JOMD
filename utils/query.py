@@ -43,6 +43,9 @@ class Query:
     async def get_pfp(self, username) -> str:
         return await API().get_pfp(username)
 
+    async def get_user_description(self, username) -> str:
+        return await API().get_user_description(username)
+
     async def get_languages(self, common_name=None) -> [Language_DB]:
 
         q = session.query(Language_DB).\
