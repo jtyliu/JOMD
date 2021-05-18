@@ -9,7 +9,7 @@ import asyncio
 def main():
 
     # https://github.com/cheran-senthil/TLE/blob/bae59c2de6a2313be4a6ba4a5a5cbba81352e229/tle/__main__.py
-    BOT_TOKEN = "Nzk5NDc3OTQ1MjE1MDkwNjg4.YAEJ2w.chSTnDIwlKg2sPq3GzyE73ijR1M" #os.environ.get("JOMD_BOT_TOKEN")
+    BOT_TOKEN =os.environ.get("JOMD_BOT_TOKEN")
     # Not needed for now, but will make use of it in the future
     # API_TOKEN = os.environ["JOMD_TOKEN"]
 
@@ -20,7 +20,7 @@ def main():
     intents = discord.Intents.default()  # All but the two privileged ones
     intents.members = True  # Subscribe to the Members intent
 
-    pref = 'x!'
+    pref = '+'
     bot = commands.Bot(command_prefix=commands.when_mentioned_or(pref),
                        intents=intents)
 
