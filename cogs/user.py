@@ -282,38 +282,6 @@ class User(commands.Cog):
             return True
         raise BadArgument('No force argument')
 
-    @commands.command(usage='[username]')
-    async def cache(self, ctx, username: typing.Optional[str] = None):
-        """Caches the submissions of a user, will speed up other commands
-
-        Use surround your username with '' if it can be interpreted as a number
-        """
-        query = Query()
-        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
-
-        username = username.replace('\'', '')
-
-        if username is None:
-            return await ctx.send(f'No username given!')
-
-        user = await query.get_user(username)
-        if user is None:
-            return await ctx.send(f'{username} does not exist on DMOJ')
-
-        username = user.username
-
-        try:
-            msg = await ctx.send(f'Caching {username}\'s submissions')
-        except Exception as e:
-            await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: ' + e)
-            return
-
-        await query.get_submissions(username)
-
-        return await msg.edit(content=f'{username}\'s submissions ' +
-                                      'have been cached.')
-
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
@@ -368,7 +336,20 @@ class User(commands.Cog):
         if result is None:
             return await ctx.send("No problem that satisfies the filter")
         return await ctx.send(embed=result)
-
+    
+    #@commands.command(usage='username [points] [problem types]',aliases=['recommend'])
+    #async def search(self, ctx, username: typing.Optional[parse_gimme] = None,
+    #                points: typing.Optional[point_range] = [1, 50], *filters):
+        
+    @commands.command(usage='[username]',aliases=['sp','stalk'])
+    async def solvedproblems(self, ctx, username = None):
+        query = Query()
+        if username is None:
+            username=query.get_handle(ctx.author.id, ctx.guild.id)
+        submissions=await query.get_submissions(username,result='AC')
+        solved={}
+        for sub in submissions:
+            print(sub.problem[0].code,sub.problem[0].name,sub.date,sub.points)
 
 def setup(bot):
     bot.add_cog(User(bot))
