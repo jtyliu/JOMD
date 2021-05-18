@@ -78,12 +78,11 @@ class Handles(commands.Cog):
         
         #verify from dmoj user description
         description=await query.get_user_description(username);
-        
         userKey='x'+str(ctx.author.id*ctx.author.id) #Replace this with a funnier message
-
         if description.find(userKey)==-1:
             await ctx.send('Put `'+userKey+'` in your DMOJ user description and run the command again.')
             return
+        
         handle = Handle_DB()
         handle.id = ctx.author.id
         handle.handle = username
