@@ -1,3 +1,4 @@
+from utils.jomd_common import scroll_embed
 from discord.ext import commands
 import discord
 from utils.query import Query
@@ -129,9 +130,39 @@ class Handles(commands.Cog):
             "%s, %s is now linked with %s." %
             (ctx.author.name, member.name, username)
         )
-    #@commands.command(aliases=['users'])
-    #async def leaderboard_rating(self, ctx):
-        #how do you get all the users in the database
+    @commands.command(aliases=['users','leaderboard'],usage='[rating|points|solved]')
+    async def top(self, ctx, arg="rating"):
+        arg=arg.lower()
+        if arg!="rating" and arg!="points" and arg!="solved":
+            return await ctx.send_help('top')
+        handles=session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+        def to_handle(handle):
+            return handle.handle
+        handles=set(map(to_handle, handles))
+        users=session.query(User_DB)
+        leaderboard=[]
+        for user in users:
+            if user.username in handles:
+                if arg=="rating":
+                    leaderboard.append([-user.rating,user.username])
+                elif arg=="points":
+                    leaderboard.append([-user.performance_points,user.username])
+                elif arg=="solved":
+                    leaderboard.append([-user.problem_count,user.username])
+        leaderboard.sort()
+        content=[]
+        page=""
+        for i,user in enumerate(leaderboard):
+            page+=f"{i+1} {user[1]} {-round(user[0],3)}\n"
+            if i%10==9:
+                content.append(page)
+                page=""
+        if page!="" or len(content)==0:
+            content.append(page)
+        message=await ctx.send(embed=discord.Embed().add_field(name="Top DMOJ "+arg,value=content[0]))
+        await scroll_embed(ctx,self.bot,message,"Top DMOJ "+arg,content)
+
+
 
 def setup(bot):
     bot.add_cog(Handles(bot))

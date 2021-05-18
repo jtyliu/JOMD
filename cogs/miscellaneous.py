@@ -29,14 +29,6 @@ class Miscellaneous(commands.Cog):
         await ctx.send("The theoretical maximum number of points you can achieve is %.2f\n"
                        "There are %d public problems on DMOJ" % (total_points, total_problems))
         return
-    @commands.command()
-    async def beep(self, ctx):
-        await ctx.send("Boop.")
-    @commands.command()
-    async def repeat(self, ctx, *, arg):
-        for i in range(1):
-            await ctx.send(arg)
-    
 
 
 def setup(bot):

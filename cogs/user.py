@@ -282,38 +282,6 @@ class User(commands.Cog):
             return True
         raise BadArgument('No force argument')
 
-    @commands.command(usage='[username]')
-    async def cache(self, ctx, username: typing.Optional[str] = None):
-        """Caches the submissions of a user, will speed up other commands
-
-        Use surround your username with '' if it can be interpreted as a number
-        """
-        query = Query()
-        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
-
-        username = username.replace('\'', '')
-
-        if username is None:
-            return await ctx.send(f'No username given!')
-
-        user = await query.get_user(username)
-        if user is None:
-            return await ctx.send(f'{username} does not exist on DMOJ')
-
-        username = user.username
-
-        try:
-            msg = await ctx.send(f'Caching {username}\'s submissions')
-        except Exception as e:
-            await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: ' + e)
-            return
-
-        await query.get_submissions(username)
-
-        return await msg.edit(content=f'{username}\'s submissions ' +
-                                      'have been cached.')
-
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
@@ -367,8 +335,7 @@ class User(commands.Cog):
         # print(result)
         if result is None:
             return await ctx.send("No problem that satisfies the filter")
-        return await ctx.send(embed=result)
-
+        return await ctx.send(embed=result)        
 
 def setup(bot):
     bot.add_cog(User(bot))

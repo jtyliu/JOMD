@@ -1,3 +1,4 @@
+import asyncio
 from discord.ext.commands.errors import BadArgument
 import typing
 from utils.query import Query
@@ -120,3 +121,61 @@ async def gimme_common(username, points, types):
     embed.add_field(name='Memory', value=memory, inline=True)
 
     return embed, problem
+
+async def scroll_message(ctx,bot,message,content):
+    PREV="\u2b05"
+    NEXT="\u27A1"
+    PREV2="\u23EE"
+    NEXT2="\u23ED"
+    await message.add_reaction(PREV2)
+    await message.add_reaction(PREV)
+    await message.add_reaction(NEXT)
+    await message.add_reaction(NEXT2)
+    page=0
+    def check(reaction, user): #from stackoverflow :monkey:
+        return not user.bot and str(reaction.emoji) in [PREV,NEXT,PREV2,NEXT2]
+    while True:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
+
+            if str(reaction.emoji) == PREV:
+                page=max(0,min(len(content)-1,page-1))
+            elif str(reaction.emoji) == NEXT:
+                page=max(0,min(len(content)-1,page+1))
+            elif str(reaction.emoji) == PREV2:
+                page=max(0,min(len(content)-1,page-10))
+            elif str(reaction.emoji) == NEXT2:
+                page=max(0,min(len(content)-1,page+10))
+            await message.edit(content=content[page])
+            await message.remove_reaction(reaction, user)
+        except asyncio.TimeoutError:
+            break
+
+async def scroll_embed(ctx,bot,message,title,content):
+    PREV="\u2b05"
+    NEXT="\u27A1"
+    PREV2="\u23EE"
+    NEXT2="\u23ED"
+    await message.add_reaction(PREV2)
+    await message.add_reaction(PREV)
+    await message.add_reaction(NEXT)
+    await message.add_reaction(NEXT2)
+    page=0
+    def check(reaction, user): #from stackoverflow :monkey:
+        return not user.bot and str(reaction.emoji) in [PREV,NEXT,PREV2,NEXT2]
+    while True:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
+
+            if str(reaction.emoji) == PREV:
+                page=max(0,min(len(content)-1,page-1))
+            elif str(reaction.emoji) == NEXT:
+                page=max(0,min(len(content)-1,page+1))
+            elif str(reaction.emoji) == PREV2:
+                page=max(0,min(len(content)-1,page-10))
+            elif str(reaction.emoji) == NEXT2:
+                page=max(0,min(len(content)-1,page+10))
+            await message.edit(embed=discord.Embed().add_field(name=title,value=content[page]))
+            await message.remove_reaction(reaction, user)
+        except asyncio.TimeoutError:
+            break
