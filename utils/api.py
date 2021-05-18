@@ -732,7 +732,7 @@ class API:
 
     async def get_pfp(self, username):
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features="html.parser")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
 
@@ -799,7 +799,7 @@ class API:
             return ret
         resp = await _query_api(SITE_URL +
                                 f'submissions/user/{user}/', 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features="html.parser")
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
@@ -808,7 +808,7 @@ class API:
 
     async def get_placement(self, username):
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features="html.parser")
         rank_str = soup.find('div', class_='user-sidebar')\
                        .findChildren(recursive=False)[3].text
         rank = int(rank_str.split('#')[-1])
