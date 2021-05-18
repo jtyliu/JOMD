@@ -129,7 +129,9 @@ class Handles(commands.Cog):
             "%s, %s is now linked with %s." %
             (ctx.author.name, member.name, username)
         )
-
+    #@commands.command(aliases=['users'])
+    #async def leaderboard_rating(self, ctx):
+        #how do you get all the users in the database
 
 def setup(bot):
     bot.add_cog(Handles(bot))
