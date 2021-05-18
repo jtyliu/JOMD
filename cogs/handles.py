@@ -212,7 +212,6 @@ class Handles(commands.Cog):
                     await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
                 else:
                     missing_roles.append(rank)
-                break
         except Exception as e:
             await ctx.send("An error occurred. " + e)
             return
