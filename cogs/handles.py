@@ -1,7 +1,9 @@
+from operator import itemgetter
 from discord.ext import commands
 import discord
 from utils.query import Query
-from utils.db import session, User as User_DB, Handle as Handle_DB
+from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
+from utils.constants import RATING_TO_RANKS
 # import html
 # import random
 import typing
@@ -150,6 +152,74 @@ class Handles(commands.Cog):
             "%s, %s is now linked with %s." %
             (ctx.author.name, member.name, username)
         )
+    
+    async def _update_rank(self, member, rank, reason):
+        add_role = all([rank.name != role.name for role in member.roles])
+        to_remove = []
+        for role in member.roles:
+            if rank.name != role.name and role.name in RATING_TO_RANKS.values():
+                to_remove.append(role)
+        print(add_role, member, rank, reason)
+        if len(to_remove) != 0:
+            await member.remove_roles(*to_remove, reason=reason)
+        if add_role:
+            await member.add_roles(rank, reason=reason)
+
+    @commands.command()
+    @commands.has_role('Admin')
+    async def update_roles(self, ctx):
+        """Manually update roles"""
+        # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
+        # TODO: Migrate to work with participation table
+
+        msg = await ctx.send('Fetching ratings...')
+
+        contests = session.query(Contest_DB).filter(Contest_DB.is_rated == 1)\
+            .order_by(Contest_DB.end_time.desc()).all()
+
+        users = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+        new_ratings = {}
+        # Yes this will make some of you cry
+        for user in users:
+            new_ratings[user] = None  # unrated
+            for contest in contests:
+                found = False
+                for participation in contest.rankings:
+                    if participation['user'] == user.handle and participation['new_rating'] is not None:
+                        new_ratings[user] = participation['new_rating']
+                        found = True
+                        break
+                if found:
+                    break
+        members = [ctx.guild.get_member(handle.id) for handle in new_ratings]
+
+        def rating_to_rank(rating):
+            if rating is None:
+                return 'Unrated'
+            for rank in RATING_TO_RANKS:
+                if rank[0] <= rating < rank[1]:
+                    return RATING_TO_RANKS[rank]
+
+        rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RATING_TO_RANKS.values()}
+
+        await msg.edit(content="Updating roles...")
+
+        missing_roles = []
+        try:
+            for member, user in zip(members, list(new_ratings.keys())):
+                rank = rating_to_rank(new_ratings[user])
+                if rank in rank_to_role:
+                    await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
+                else:
+                    missing_roles.append(rank)
+                break
+        except Exception as e:
+            await ctx.send("An error occurred. " + e)
+            return
+
+        if len(missing_roles) != 0:
+            await ctx.send("You are missing the " + " ,".join(missing_roles) + " roles")
+        await msg.edit(content="Roles updated")
 
 
 def setup(bot):
