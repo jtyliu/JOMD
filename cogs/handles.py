@@ -185,7 +185,7 @@ class Handles(commands.Cog):
             for contest in contests:
                 found = False
                 for participation in contest.rankings:
-                    if participation['user'] == user.handle and participation['new_rating'] is not None:
+                    if participation['user'].lower() == user.handle.lower() and participation['new_rating'] is not None:
                         new_ratings[user] = participation['new_rating']
                         found = True
                         break
