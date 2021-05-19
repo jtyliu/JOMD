@@ -60,13 +60,29 @@ class User(commands.Cog):
             discordHandle=discordHandle.nick or discordHandle.name
         else:
             discordHandle="Unknown"
-
+        if user.rating is None:
+            color=0xfefefe #it breaks when I set it to white
+        elif user.rating>=3000:
+            color=0x000000
+        elif user.rating>=2200:
+            color=0xee0000
+        elif user.rating>=1800:
+            color=0xffb100
+        elif user.rating>=1500:
+            color=0x800080
+        elif user.rating>=1200:
+            color=0x0000ff
+        elif user.rating>=1000:
+            color=0x00a900
+        else:
+            color=0x999999
+        print(color)
         description = f'Discord name: {discordHandle}'
         embed = discord.Embed(
             title=username,
             url=f'https://dmoj.ca/user/{username}',
             description=description,
-            color=0xfcdb05, #rating color
+            color=color, #rating color
         )
 
         embed.set_thumbnail(url=await query.get_pfp(username))
@@ -83,7 +99,7 @@ class User(commands.Cog):
         embed.add_field(
             name="Rating",
             value=str(user.rating)+"/"+str(user.maxRating),
-            inline=False
+            inline=True
         )
         embed.add_field(
             name="Contests Written",
@@ -100,7 +116,7 @@ class User(commands.Cog):
 
         embed = discord.Embed(
             title=f"{username}'s latest submissions",
-            color=0xfcdb05
+            color=0xffff00
         )
         for submission in submissions:
             problem = submission.problem[0]
