@@ -79,7 +79,7 @@ class Admin(commands.Cog):
         session.commit()
         query = Query()
         await query.get_problems()
-        return await msg.edit(content=f"Updated all problems")
+        return await msg.edit(content="Updated all problems")
 
     @commands.command()
     async def update_submissions(self, ctx):

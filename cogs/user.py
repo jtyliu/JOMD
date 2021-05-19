@@ -161,7 +161,7 @@ class User(commands.Cog):
             amounts.pop(0)
 
         if amounts == []:
-            return await ctx.send(f'No points given!')
+            return await ctx.send('No points given!')
 
         if username is None:
             return
@@ -297,7 +297,7 @@ class User(commands.Cog):
         username = username.replace('\'', '')
 
         if username is None:
-            return await ctx.send(f'No username given!')
+            return await ctx.send('No username given!')
 
         user = await query.get_user(username)
         if user is None:
@@ -348,7 +348,7 @@ class User(commands.Cog):
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
         if username is None:
-            return await ctx.send(f'No username provided')
+            return await ctx.send('No username provided')
 
         user = await query.get_user(username)
         if user is None:
