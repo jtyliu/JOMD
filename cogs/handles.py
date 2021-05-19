@@ -143,7 +143,6 @@ class Handles(commands.Cog):
         session.commit()
         await ctx.send(f"Linked {member.name} with {username}.")
         
-        
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
         if rank in rank_to_role:
