@@ -1,16 +1,18 @@
+from datetime import datetime
 import discord
 from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
+from sqlalchemy.sql.sqltypes import DateTime
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import func, not_, orm
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       User as User_DB, Submission as Submission_DB)
-from utils.jomd_common import (str_not_int, point_range, parse_gimme,
+from utils.jomd_common import (scroll_embed, str_not_int, point_range, parse_gimme,
                                calculate_points, gimme_common)
 from utils.api import ObjectNotFound
-from utils.constants import TZ, SHORTHANDS
+from utils.constants import SITE_URL, TZ, SHORTHANDS
 import asyncio
 import random
 from operator import itemgetter
@@ -20,7 +22,7 @@ class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(usage='[username] [latest submissions]')
+    @commands.command(aliases=['ui'],usage='[username] [latest submissions]')
     async def user(self, ctx, username: typing.Optional[str_not_int] = None,
                    amount: typing.Optional[int] = None):
         """Show user profile and latest submissions
@@ -30,7 +32,6 @@ class User(commands.Cog):
 
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
-
         # If user is not found in db
         if username is None:
             username = str(amount)
@@ -54,29 +55,35 @@ class User(commands.Cog):
         def is_rated(contest):
             return 1 if contest.is_rated else 0
 
-        description = 'Calculated points: %.2f' % user.performance_points
+        discordHandle=ctx.message.guild.get_member(query.get_handle_user(username, ctx.guild.id))
+        if discordHandle:
+            discordHandle=discordHandle.nick or discordHandle.name
+        else:
+            discordHandle="Unknown"
+
+        description = f'Discord name: {discordHandle}'
         embed = discord.Embed(
             title=username,
             url=f'https://dmoj.ca/user/{username}',
             description=description,
-            color=0xfcdb05,
+            color=0xfcdb05, #rating color
         )
 
         embed.set_thumbnail(url=await query.get_pfp(username))
         embed.add_field(
-            name="Rank by points",
-            value=await query.get_placement(username),
-            inline=False
+            name="Points",
+            value=str(round(user.performance_points))+"/"+str(user.points),
+            inline=True
         )
         embed.add_field(
             name="Problems Solved",
             value=user.problem_count,
-            inline=False
+            inline=True
         )
         embed.add_field(
             name="Rating",
-            value=user.rating,
-            inline=True
+            value=str(user.rating)+"/"+str(user.maxRating),
+            inline=False
         )
         embed.add_field(
             name="Contests Written",
@@ -286,8 +293,8 @@ class User(commands.Cog):
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
-    @commands.command(usage='username [points] [problem types]')
-    async def gimme(self, ctx, username: typing.Optional[parse_gimme] = None,
+    @commands.command(aliases=['gimme'],usage='username [points] [problem types]')
+    async def recommend(self, ctx, username: typing.Optional[parse_gimme] = None,
                     points: typing.Optional[point_range] = [1, 50], *filters):
         """
         Recommend a problem
@@ -335,7 +342,51 @@ class User(commands.Cog):
         # print(result)
         if result is None:
             return await ctx.send("No problem that satisfies the filter")
-        return await ctx.send(embed=result)        
+        return await ctx.send(embed=result)   
+    @commands.command(aliases=['stalk','sp'],usage='[username] [p<=points, p>=points]')
+    async def solved(self, ctx, *args):
+        minP=0
+        maxP=100
+        query = Query()
+        username=None
+        for arg in args:
+            if arg.startswith("p>="):
+                minP=max(minP,int(arg[3:]))
+            elif arg.startswith("p<="):
+                maxP=min(maxP,int(arg[3:]))
+            else:
+                username=arg
+        if username is None:
+            username=query.get_handle(ctx.author.id, ctx.guild.id)
+        submissions=await query.get_submissions(username,result='AC')
+        uniqueSubmissions=[]
+        solved=set()
+        x=0
+        for sub in submissions:
+            if not sub._code in solved:
+                solved.add(sub._code)
+                if minP<=sub.points and sub.points<=maxP:
+                    uniqueSubmissions.append(sub)
+        uniqueSubmissions.reverse()
+        page=""
+        content=[]
+        cnt=0
+        for sub in uniqueSubmissions:
+            age=(datetime.now()-sub.date).days
+            page+=f"[{sub.problem[0].name}]({SITE_URL}{sub._code}) [{sub.points}] ({age} days ago)\n" #sub.problem[0].name is rly slow
+            cnt+=1
+            if cnt%10==0:
+                content.append(page)
+                page=""
+        if page!="":
+            content.append(page)
+        if len(content)==0:
+            content.append("No submission")
+        title="Recently solved problems by "+username
+        message=await ctx.send(embed=discord.Embed().add_field(name=title,value=content[0]))
+        await scroll_embed(ctx,self.bot,message,title,content)
+        
+        
 
 def setup(bot):
     bot.add_cog(User(bot))

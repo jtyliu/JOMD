@@ -96,23 +96,34 @@ class Handles(commands.Cog):
             (ctx.author.name, username)
         )
 
-    @commands.command(name='set', usage='discord_account dmoj_handle')
+    @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role('Admin')
     async def _set(self, ctx, member: discord.Member, username: str):
+        
         """Manually link two accounts together"""
         query = Query()
-        user = await query.get_user(username)
+        if username!="+remove":
+            user = await query.get_user(username)
 
-        if user is None:
-            await ctx.send(f'{username} does not exist on dmoj')
-            return
+            if user is None:
+                await ctx.send(f'{username} does not exist on dmoj')
+                return
 
-        username = user.username
+            username = user.username
 
-        if query.get_handle(member.id, ctx.guild.id):
-            await ctx.send(
-                '%s, this handle is already linked with %s.' %
-                (ctx.author.mention, query.get_handle(member.id, ctx.guild.id)))
+        handle=query.get_handle(member.id, ctx.guild.id)
+        if handle==username:
+            return await ctx.send(f'{member.display_name} is already linked with {handle}')
+
+        if handle:
+            handle = session.query(Handle_DB)\
+                .filter(Handle_DB.id == member.id)\
+                .filter(Handle_DB.guild_id == ctx.guild.id).first()
+            session.delete(handle)
+            session.commit()
+            await ctx.send(f'Unlinked {member.display_name} with handle {handle.handle}')
+
+        if username=="+remove":
             return
 
         if query.get_handle_user(username, ctx.guild.id):
@@ -126,14 +137,12 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
-        return await ctx.send(
-            "%s, %s is now linked with %s." %
-            (ctx.author.name, member.name, username)
-        )
-    @commands.command(aliases=['users','leaderboard'],usage='[rating|points|solved]')
+        return await ctx.send(f"Linked {member.name} with {username}.")
+
+    @commands.command(aliases=['users','leaderboard'],usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg="rating"):
         arg=arg.lower()
-        if arg!="rating" and arg!="points" and arg!="solved":
+        if arg!="rating" and arg!="maxrating" and arg!="points" and arg!="solved":
             return await ctx.send_help('top')
         handles=session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
         def to_handle(handle):
@@ -145,6 +154,8 @@ class Handles(commands.Cog):
             if user.username in handles:
                 if arg=="rating":
                     leaderboard.append([-user.rating,user.username])
+                elif arg=="maxrating":
+                    leaderboard.append([-user.maxRating,user.username])
                 elif arg=="points":
                     leaderboard.append([-user.performance_points,user.username])
                 elif arg=="solved":
@@ -157,8 +168,10 @@ class Handles(commands.Cog):
             if i%10==9:
                 content.append(page)
                 page=""
-        if page!="" or len(content)==0:
+        if page!="":
             content.append(page)
+        if len(content)==0:
+            content.append("No users")
         message=await ctx.send(embed=discord.Embed().add_field(name="Top DMOJ "+arg,value=content[0]))
         await scroll_embed(ctx,self.bot,message,"Top DMOJ "+arg,content)
 

@@ -8,7 +8,7 @@ class Miscellaneous(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     @commands.command()
-    async def stats(self, ctx):
+    async def trivia(self, ctx):
         """Display cool dmoj stats that no one asked for"""
         problems = session.query(Problem_DB.points)\
             .order_by(Problem_DB.points.desc()).all()

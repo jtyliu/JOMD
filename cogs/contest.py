@@ -181,7 +181,7 @@ class Contest(commands.Cog):
                 )
             output += "\n"
             if(len(output)+len(outputEnd)*2>1980):
-                output+=hyphens+"\n"
+                output+=outputEnd
                 content.append("```yaml\n" + output + "```")
                 output=outputBegin
         output += outputEnd

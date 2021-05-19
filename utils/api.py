@@ -326,6 +326,7 @@ class User:
         self.problem_count = data["problem_count"]
         self.rank = data["problem_count"]
         self.rating = data["rating"]
+        self.maxRating = data["rating"]
         self.volatility = data["volatility"]
         self._solved_problems = data.get("solved_problems", [])
         self.solved_problems = []
@@ -377,6 +378,10 @@ class User:
                         session.commit()
                 break
         self.organizations = organization_qq.all()
+
+        for contest in self._contests:
+            if contest['rating']:
+                self.maxRating=max(self.maxRating or 0, contest['rating'])
 
         def get_key(contest):
             return contest["key"]
