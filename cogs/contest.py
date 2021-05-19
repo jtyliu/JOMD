@@ -62,7 +62,8 @@ class Contest(commands.Cog):
         # How does evan do it?
         import requests
         r = requests.get(f"https://evanzhang.ca/rating/contest/{key}/api")
-        rankings = r.json()["users"]
+        if r:
+            rankings = r.json()["users"]
 
         # Don't really need this, just sanity check
         # users = await asyncio.gather(*[query.get_user(username)

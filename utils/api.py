@@ -1,7 +1,7 @@
 # from utils.submission import Submission
 # from utils.problem import Problem
 from bs4 import BeautifulSoup
-from utils.constants import SITE_URL, DEBUG_API
+from utils.constants import SITE_URL, DEBUG_API, API_TOKEN
 import urllib.parse
 import functools
 import aiohttp
@@ -125,7 +125,10 @@ async def _query_api(url, resp_obj):
             start = time.time()
             print("Calling", url)
         if _session is None:
-            _session = aiohttp.ClientSession()
+            if API_TOKEN:
+                _session = aiohttp.ClientSession(headers={'Authorization':'Bearer '+API_TOKEN})
+            else:
+                _session = aiohttp.ClientSession()
         async with _session.get(url) as resp:
             if resp_obj == 'text':
                 resp = await resp.text()
