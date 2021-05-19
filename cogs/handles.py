@@ -110,6 +110,14 @@ class Handles(commands.Cog):
                 handle.guild_id = ctx.guild.id
                 session.add(handle)
                 session.commit()
+
+                rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
+                rank = self.rating_to_rank(user.rating)
+                if rank in rank_to_role:
+                    await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
+                else:
+                    await ctx.send("You are missing the " + rank.name + " role")
+
                 return await ctx.send(
                     "%s, you now have linked your account to %s." %
                     (ctx.author.name, username)
@@ -148,18 +156,33 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
+
+        rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
+        rank = self.rating_to_rank(user.rating)
+        if rank in rank_to_role:
+            await self._update_rank(member, rank_to_role[rank], 'Dmoj account linked')
+        else:
+            await ctx.send("You are missing the " + rank.name + " role")
+
         return await ctx.send(
             "%s, %s is now linked with %s." %
             (ctx.author.name, member.name, username)
         )
-    
+
+    def rating_to_rank(self, rating):
+        if rating is None:
+            return RANKS[0]  # Unrated
+        for rank in RATING_TO_RANKS:
+            if rank[0] <= rating < rank[1]:
+                return RATING_TO_RANKS[rank]
+
     async def _update_rank(self, member, rank, reason):
         add_role = all([rank.name != role.name for role in member.roles])
         to_remove = []
         for role in member.roles:
             if rank.name != role.name and role.name in RATING_TO_RANKS.values():
                 to_remove.append(role)
-        print(add_role, member, rank, reason)
+
         if len(to_remove) != 0:
             await member.remove_roles(*to_remove, reason=reason)
         if add_role:
@@ -193,13 +216,6 @@ class Handles(commands.Cog):
                     break
         members = [ctx.guild.get_member(handle.id) for handle in new_ratings]
 
-        def rating_to_rank(rating):
-            if rating is None:
-                return RANKS[0]  # Unrated
-            for rank in RATING_TO_RANKS:
-                if rank[0] <= rating < rank[1]:
-                    return RATING_TO_RANKS[rank]
-
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
 
         await msg.edit(content="Updating roles...")
@@ -210,7 +226,7 @@ class Handles(commands.Cog):
                 if member is None:
                     continue
 
-                rank = rating_to_rank(new_ratings[user])
+                rank = self.rating_to_rank(new_ratings[user])
                 if rank in rank_to_role:
                     await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
                 elif rank not in missing_roles:
