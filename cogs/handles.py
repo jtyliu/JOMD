@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
-from utils.constants import RATING_TO_RANKS
+from utils.constants import RATING_TO_RANKS, RANKS
 # import html
 # import random
 import typing
@@ -195,12 +195,12 @@ class Handles(commands.Cog):
 
         def rating_to_rank(rating):
             if rating is None:
-                return 'Unrated'
+                return RANKS[0]  # Unrated
             for rank in RATING_TO_RANKS:
                 if rank[0] <= rating < rank[1]:
                     return RATING_TO_RANKS[rank]
 
-        rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RATING_TO_RANKS.values()}
+        rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
 
         await msg.edit(content="Updating roles...")
 
@@ -220,7 +220,7 @@ class Handles(commands.Cog):
             return
 
         if len(missing_roles) != 0:
-            await ctx.send("You are missing the " + " ,".join(missing_roles) + " roles")
+            await ctx.send("You are missing the " + ", ".join(missing_roles) + " roles")
         await msg.edit(content="Roles updated")
 
 

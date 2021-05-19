@@ -51,6 +51,17 @@ GRAPH_RANK_COLOURS = {
     (3000, 1e9): '#AA0000'
 }
 
+RANKS = [
+    'Unrated',
+    'Newbie',
+    'Amateur',
+    'Expert',
+    'Candidate Master',
+    'Master',
+    'Grandmaster',
+    'Target',
+]
+
 RATING_TO_RANKS = {
     (-1e9, 1000): 'Newbie',
     (1000, 1200): 'Amateur',
