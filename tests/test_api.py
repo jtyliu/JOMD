@@ -106,7 +106,6 @@ class APITest(unittest.TestCase):
 
     @async_test
     async def test_parse_error(self):
-        api_data = self.api.Data
         self.api.Data = self.DataMock
         data = {
             "api_version": "v2",
@@ -119,7 +118,6 @@ class APITest(unittest.TestCase):
         }
         with self.assertRaises(ObjectNotFound):
             await self.api.parse(data, object)
-
 
 
 if __name__ == '__main__':
