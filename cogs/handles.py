@@ -209,11 +209,11 @@ class Handles(commands.Cog):
             for member, user in zip(members, list(new_ratings.keys())):
                 if member is None:
                     continue
-                
+
                 rank = rating_to_rank(new_ratings[user])
                 if rank in rank_to_role:
                     await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
-                else:
+                elif rank not in missing_roles:
                     missing_roles.append(rank)
         except Exception as e:
             await ctx.send("An error occurred. " + str(e))
