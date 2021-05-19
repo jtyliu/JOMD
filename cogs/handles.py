@@ -141,8 +141,9 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
+        await ctx.send(f"Linked {member.name} with {username}.")
         
-        #wait what, is there no way to turn this off
+        
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
         if rank in rank_to_role:
@@ -150,7 +151,6 @@ class Handles(commands.Cog):
         else:
             await ctx.send("You are missing the " + rank.name + " role")
 
-        return await ctx.send(f"Linked {member.name} with {username}.")
 
     @commands.command(aliases=['users','leaderboard'],usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg="rating"):
