@@ -18,7 +18,7 @@ def main():
     intents = discord.Intents.default()  # All but the two privileged ones
     intents.members = True  # Subscribe to the Members intent
 
-    pref = 'x!'
+    pref = '+'
     bot = commands.Bot(command_prefix=commands.when_mentioned_or(pref),
                        intents=intents)
 
