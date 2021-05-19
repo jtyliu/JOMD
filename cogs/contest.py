@@ -42,20 +42,19 @@ class Contest(commands.Cog):
 
         q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
         handles = q.all()
-        def to_handle(handle):
-            return handle.handle
-
+        
         usernames=[]
         showAll=False
         if len(args)==0:
-            usernames.extend(list(map(to_handle, handles)))
+            usernames.extend(list(map(lambda handle:handle.handle, handles)))
         for arg in args:
+            arg = arg.lower()
             if arg=="+server":
-                usernames.extend(list(map(to_handle, handles)))
+                usernames.extend(list(map(lambda handle:handle.handle, handles)))
             elif arg=="+all":
                 showAll=True
             else:
-                usernames.append(arg)
+                usernames.append((await query.get_user(arg)).username)
 
         # The only way to calculate rating changes is by getting the volitility of all the users
         # that means 100+ seperate api calls

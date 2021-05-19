@@ -125,10 +125,10 @@ async def _query_api(url, resp_obj):
             start = time.time()
             print("Calling", url)
         if _session is None:
-            if API_TOKEN:
-                _session = aiohttp.ClientSession(headers={'Authorization':'Bearer '+API_TOKEN})
-            else:
+            if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
+            else:
+                _session = aiohttp.ClientSession(headers={'Authorization':'Bearer '+API_TOKEN})
         async with _session.get(url) as resp:
             if resp_obj == 'text':
                 resp = await resp.text()

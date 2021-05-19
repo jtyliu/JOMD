@@ -76,7 +76,6 @@ class User(commands.Cog):
             color=0x00a900
         else:
             color=0x999999
-        print(color)
         description = f'Discord name: {discordHandle}'
         embed = discord.Embed(
             title=username,
@@ -88,7 +87,7 @@ class User(commands.Cog):
         embed.set_thumbnail(url=await query.get_pfp(username))
         embed.add_field(
             name="Points",
-            value=str(round(user.performance_points))+"/"+str(user.points),
+            value=str(round(user.performance_points))+"/"+str(round(user.points)),
             inline=True
         )
         embed.add_field(
@@ -260,7 +259,9 @@ class User(commands.Cog):
 
         query = Query()
         if usernames == []:
-            usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
+            username=query.get_handle(ctx.author.id, ctx.guild.id)
+            if username:
+                usernames = [username]
 
         users = await asyncio.gather(*[query.get_user(username)
                                      for username in usernames])
@@ -361,6 +362,7 @@ class User(commands.Cog):
         return await ctx.send(embed=result)   
     @commands.command(aliases=['stalk','sp'],usage='[username] [p<=points, p>=points]')
     async def solved(self, ctx, *args):
+        """Shows a user's last solved problems"""
         minP=0
         maxP=100
         query = Query()
@@ -371,7 +373,7 @@ class User(commands.Cog):
             elif arg.startswith("p<="):
                 maxP=min(maxP,int(arg[3:]))
             else:
-                username=arg
+                username=(await query.get_user(arg)).username
         if username is None:
             username=query.get_handle(ctx.author.id, ctx.guild.id)
         submissions=await query.get_submissions(username,result='AC')

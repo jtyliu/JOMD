@@ -98,10 +98,12 @@ class Handles(commands.Cog):
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role('Admin')
-    async def _set(self, ctx, member: discord.Member, username: str):
+    async def _set(self, ctx, member, username: str):
         
         """Manually link two accounts together"""
         query = Query()
+        member=await query.parseUser(ctx,member)
+
         if username!="+remove":
             user = await query.get_user(username)
 
@@ -141,6 +143,7 @@ class Handles(commands.Cog):
 
     @commands.command(aliases=['users','leaderboard'],usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg="rating"):
+        """"Shows registered server members in ranked order"""
         arg=arg.lower()
         if arg!="rating" and arg!="maxrating" and arg!="points" and arg!="solved":
             return await ctx.send_help('top')
