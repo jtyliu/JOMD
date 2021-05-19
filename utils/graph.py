@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdt
 import pandas as pd
 import seaborn as sns
-
+from utils.constants import GRAPH_RANK_COLOURS
 from math import pi
 from datetime import timedelta
 
@@ -55,19 +55,8 @@ def plot_rating(data):
                 all_ratings.append(ratings[i])
         groups.append((user, user_dates, user_ratings))
 
-    # Credit to cheran-senthil/TLE for color hexes
-    colors = {
-        (0, 1000): '#CCCCCC',
-        (1000, 1200): '#77FF77',
-        (1200, 1500): '#AAAAFF',
-        (1500, 1800): '#FF88FF',
-        (1800, 2200): '#FFCC88',
-        (2200, 3000): '#FF7777',
-        (3000, 1e9): '#AA0000'
-    }
-
     # Add the color blocks
-    for (low, high), color in colors.items():
+    for (low, high), color in GRAPH_RANK_COLOURS.items():
         plt.axhspan(low, high, facecolor=color, alpha=0.8)
 
     # Set the theme

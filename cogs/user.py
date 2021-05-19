@@ -292,11 +292,14 @@ class User(commands.Cog):
 
         # When problems are private, it says there are no problems
         window = 'No'
+        is_rated = 'Not Rated'
         if contest.time_limit:
             window = f"{contest.time_limit/60/60} Hr"
+        if contest.is_rated:
+            is_rated = "Rated"
         embed = discord.Embed(
             title=contest.name, url=f"https://dmoj.ca/contest/{contest.key}",
-            description=f"{window} window | {len(contest.problems)} Problems",
+            description=f"{window} window | {len(contest.problems)} Problems | {is_rated}",
             color=0xfcdb05
         )
         await ctx.send(embed=embed)

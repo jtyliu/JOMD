@@ -40,3 +40,35 @@ RATING_TO_POINT = {
     2600: 25,
     3000: 30,
 }
+
+# Credit to cheran-senthil/TLE for color hexes
+GRAPH_RANK_COLOURS = {
+    (0, 1000): '#CCCCCC',
+    (1000, 1200): '#77FF77',
+    (1200, 1500): '#AAAAFF',
+    (1500, 1800): '#FF88FF',
+    (1800, 2200): '#FFCC88',
+    (2200, 3000): '#FF7777',
+    (3000, 1e9): '#AA0000'
+}
+
+RANKS = [
+    'Unrated',
+    'Newbie',
+    'Amateur',
+    'Expert',
+    'Candidate Master',
+    'Master',
+    'Grandmaster',
+    'Target',
+]
+
+RATING_TO_RANKS = {
+    (-1e9, 1000): 'Newbie',
+    (1000, 1200): 'Amateur',
+    (1200, 1500): 'Expert',
+    (1500, 1800): 'Candidate Master',
+    (1800, 2200): 'Master',
+    (2200, 3000): 'Grandmaster',
+    (3000, 1e9): 'Target',
+}

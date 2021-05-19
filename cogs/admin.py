@@ -63,8 +63,17 @@ class Admin(commands.Cog):
         return await msg.edit(content=f"Cached {len(problems)} problems")
 
     @commands.command()
+    async def cache_contests(self, ctx):
+        query = Query()
+        msg = await ctx.send("Caching...")
+        contests = await query.get_contests()
+        for contest in contests:
+            await query.get_contest(contest.key)
+        return await msg.edit(content=f"Cached {len(contests)} problems")
+
+    @commands.command()
     async def update_problems(self, ctx):
-        """Update all problems in db"""
+        """Update all problems in db (For when Nick nukes problems)"""
         msg = await ctx.send("Updating...")
         session.query(Problem_DB).delete()
         session.commit()
