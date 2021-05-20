@@ -174,7 +174,7 @@ async def scroll_embed(ctx,bot,message,title,content):
     await message.add_reaction(LAST)
     page=0
     def check(reaction, user): #from stackoverflow :monkey:
-        return not user.bot and str(reaction.emoji) in [PREV,NEXT,PREV2,NEXT2]
+        return not user.bot and str(reaction.emoji) in [PREV,NEXT,PREV2,NEXT2,FIRST,LAST]
     while True:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
