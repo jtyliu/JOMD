@@ -9,6 +9,7 @@ from utils.constants import RATING_TO_RANKS, RANKS
 # import random
 import typing
 import asyncio
+import hashlib
 
 
 class Handles(commands.Cog):
@@ -81,7 +82,7 @@ class Handles(commands.Cog):
         
         #verify from dmoj user description
         description=await query.get_user_description(username);
-        userKey='x'+str(ctx.author.id*ctx.author.id) #Replace this with a funnier message
+        userKey='x'+hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
         if description.find(userKey)==-1:
             await ctx.send('Put `'+userKey+'` in your DMOJ user description and run the command again.')
             return
