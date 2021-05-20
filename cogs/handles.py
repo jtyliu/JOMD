@@ -94,10 +94,17 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
-        return await ctx.send(
+        await ctx.send(
             "%s, you now have linked your account to %s." %
             (ctx.author.name, username)
         )
+        
+        rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
+        rank = self.rating_to_rank(user.rating)
+        if rank in rank_to_role:
+            await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
+        else:
+            await ctx.send("You are missing the " + rank.name + " role")
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role('Admin')

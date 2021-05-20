@@ -740,13 +740,13 @@ class API:
 
     async def get_pfp(self, username):
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features="html.parser")
+        soup = BeautifulSoup(resp, features="html5lib")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
     
     async def get_user_description(self, username):
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features="html.parser")
+        soup = BeautifulSoup(resp, features="html5lib")
         description = str(soup.find('div', class_='content-description'))
         return description
 
