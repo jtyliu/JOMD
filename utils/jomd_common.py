@@ -123,10 +123,10 @@ async def gimme_common(username, points, types):
     return embed, problem
 
 async def scroll_message(ctx,bot,message,content):
-    PREV="\u2b05"
-    NEXT="\u27A1"
-    PREV2="\u23EE"
-    NEXT2="\u23ED"
+    PREV="\u25C0"
+    NEXT="\u25B6"
+    PREV2="\u23EA"
+    NEXT2="\u23E9"
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
     await message.add_reaction(NEXT)
@@ -152,10 +152,10 @@ async def scroll_message(ctx,bot,message,content):
             break
 
 async def scroll_embed(ctx,bot,message,title,content):
-    PREV="\u2b05"
-    NEXT="\u27A1"
-    PREV2="\u23EE"
-    NEXT2="\u23ED"
+    PREV="\u25C0"
+    NEXT="\u25B6"
+    PREV2="\u23EA"
+    NEXT2="\u23E9"
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
     await message.add_reaction(NEXT)

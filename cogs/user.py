@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
-from sqlalchemy.sql.sqltypes import DateTime
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import func, not_, orm
