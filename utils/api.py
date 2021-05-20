@@ -813,7 +813,7 @@ class API:
             return ret
         resp = await _query_api(SITE_URL +
                                 f'submissions/user/{user}/', 'text')
-        soup = BeautifulSoup(resp, features="html.parser")
+        soup = BeautifulSoup(resp, features="html5lib")
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
