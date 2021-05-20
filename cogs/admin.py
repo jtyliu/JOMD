@@ -69,7 +69,7 @@ class Admin(commands.Cog):
         contests = await query.get_contests()
         for contest in contests:
             await query.get_contest(contest.key)
-        return await msg.edit(content=f"Cached {len(contests)} problems")
+        return await msg.edit(content=f"Cached {len(contests)} contests")
 
     @commands.command()
     async def update_problems(self, ctx):
