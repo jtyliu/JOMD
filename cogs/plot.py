@@ -105,7 +105,7 @@ class Plot(commands.Cog):
             title='Problems Solved',
             color=0xfcdb05,
         )
-        embed.set_image(url=f'attachment://plot.png',)
+        embed.set_image(url='attachment://plot.png')
 
         return await ctx.send(embed=embed, file=file)
 
@@ -187,7 +187,7 @@ class Plot(commands.Cog):
             title='Point Progression',
             color=0xfcdb05,
         )
-        embed.set_image(url=f'attachment://plot.png',)
+        embed.set_image(url='attachment://plot.png')
 
         return await ctx.send(embed=embed, file=file)
 
@@ -243,7 +243,7 @@ class Plot(commands.Cog):
             title='Contest Rating',
             color=0xfcdb05,
         )
-        embed.set_image(url=f'attachment://plot.png',)
+        embed.set_image(url='attachment://plot.png')
 
         return await ctx.send(embed=embed, file=file)
 
@@ -342,7 +342,7 @@ class Plot(commands.Cog):
             title='Problem types solved',
             color=0xfcdb05,
         )
-        embed.set_image(url=f'attachment://plot.png',)
+        embed.set_image(url='attachment://plot.png')
 
         return await ctx.send(embed=embed, file=file)
 

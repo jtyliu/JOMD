@@ -182,7 +182,7 @@ class User(commands.Cog):
             amounts.pop(0)
 
         if amounts == []:
-            return await ctx.send(f'No points given!')
+            return await ctx.send('No points given!')
 
         if username is None:
             return
@@ -307,7 +307,7 @@ class User(commands.Cog):
         if argument == '+f':
             return True
         raise BadArgument('No force argument')
-
+      
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
@@ -339,7 +339,7 @@ class User(commands.Cog):
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
         if username is None:
-            return await ctx.send(f'No username provided')
+            return await ctx.send('No username provided')
 
         user = await query.get_user(username)
         if user is None:

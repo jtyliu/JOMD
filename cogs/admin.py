@@ -69,7 +69,7 @@ class Admin(commands.Cog):
         contests = await query.get_contests()
         for contest in contests:
             await query.get_contest(contest.key)
-        return await msg.edit(content=f"Cached {len(contests)} problems")
+        return await msg.edit(content=f"Cached {len(contests)} contests")
 
     @commands.command()
     async def update_problems(self, ctx):
@@ -79,7 +79,7 @@ class Admin(commands.Cog):
         session.commit()
         query = Query()
         await query.get_problems()
-        return await msg.edit(content=f"Updated all problems")
+        return await msg.edit(content="Updated all problems")
 
     @commands.command()
     async def update_submissions(self, ctx):
