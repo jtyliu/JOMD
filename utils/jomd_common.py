@@ -128,7 +128,7 @@ async def scroll_message(ctx,bot,message,content):
     PREV2="\u23EA"
     NEXT2="\u23E9"
     FIRST="\u23EE"
-    LAST="\23ED"
+    LAST="\u23ED"
     await message.add_reaction(FIRST)
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
