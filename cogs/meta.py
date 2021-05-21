@@ -71,7 +71,8 @@ class Meta(commands.Cog):
                        value="[Documentation site](https://victorgao001.gitbook.io/jomd/)", inline=False)\
             .add_field(name="Commands", value="[Command List](https://victorgao001.gitbook.io/jomd/)", inline=False)\
             .add_field(name="Invite",
-                       value="[Invite link](https://discord.com/api/oauth2/authorize?client_id=725004198466551880&scope=bot)",
+                       value="[Invite link](https://discord.com/api/oauth2/" +
+                       "authorize?client_id=725004198466551880&scope=bot)",
                        inline=False)\
             .add_field(name="Support", value="[Server link](https://discord.gg/VEWFpgPhnz)", inline=False)
         await ctx.send(embed=embed)

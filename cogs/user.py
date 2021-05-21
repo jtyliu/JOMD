@@ -388,7 +388,7 @@ class User(commands.Cog):
         uniqueSubmissions = []
         solved = set()
         for sub in submissions:
-            if not sub._code in solved:
+            if sub._code not in solved:
                 solved.add(sub._code)
                 if minP <= sub.points and sub.points <= maxP:
                     uniqueSubmissions.append(sub)
