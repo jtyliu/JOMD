@@ -20,6 +20,7 @@ class Query:
     """
     Every object returned from this should be a DB object, not class object
     """
+
     def parse(self, key, val):
         cond = True
         if val is not None:
@@ -449,7 +450,7 @@ class Query:
             .filter(or_(*conds))
         return q.all()
 
-    def get_member_named(self,guild,name):
+    def get_member_named(self, guild, name):
         result = None
         members = guild.members
         if len(name) > 5 and name[-5] == '#':
@@ -464,14 +465,16 @@ class Query:
             if result is not None:
                 return result
 
-        name=name.casefold()
+        name = name.casefold()
+
         def pred(m):
             return m.nick and m.nick.casefold() == name or m.name.casefold() == name
 
         return utils.find(pred, members)
-    async def parseUser(self,ctx,arg):
+
+    async def parseUser(self, ctx, arg):
         try:
-            return await commands.MemberConverter().convert(ctx,arg)
+            return await commands.MemberConverter().convert(ctx, arg)
         except MemberNotFound:
-            return self.get_member_named(ctx.guild,arg)
+            return self.get_member_named(ctx.guild, arg)
             return None

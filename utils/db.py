@@ -289,7 +289,7 @@ class User(Base):
         self.solved_problems += user.solved_problems
         self.organizations += user.organizations
         self.contests += user.contests
-        self.maxRating=user.maxRating
+        self.maxRating = user.maxRating
 
 
 class Submission(Base):

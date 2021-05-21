@@ -128,7 +128,7 @@ async def _query_api(url, resp_obj):
             if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
             else:
-                _session = aiohttp.ClientSession(headers={'Authorization':'Bearer '+API_TOKEN})
+                _session = aiohttp.ClientSession(headers={'Authorization': 'Bearer ' + API_TOKEN})
         async with _session.get(url) as resp:
             if resp_obj == 'text':
                 resp = await resp.text()
@@ -384,7 +384,7 @@ class User:
 
         for contest in self._contests:
             if contest['rating']:
-                self.maxRating=max(self.maxRating or 0, contest['rating'])
+                self.maxRating = max(self.maxRating or 0, contest['rating'])
 
         def get_key(contest):
             return contest["key"]
@@ -743,7 +743,7 @@ class API:
         soup = BeautifulSoup(resp, features="html5lib")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
-    
+
     async def get_user_description(self, username):
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
         soup = BeautifulSoup(resp, features="html5lib")
