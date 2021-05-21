@@ -230,7 +230,8 @@ class Plot(commands.Cog):
             changes = get_rating_change(contest.rankings, users)
             data[contest.end_time] = []
             for user in users:
-                if user.username in changes and (not peak or changes[user.username] >= userPrevRating.get(user.username, -9999)):
+                if user.username in changes \
+                        and (not peak or changes[user.username] >= userPrevRating.get(user.username, -9999)):
                     change = changes[user.username]
                     userPrevRating[user.username] = change
                     data[contest.end_time].append(change)
