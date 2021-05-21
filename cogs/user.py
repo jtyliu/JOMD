@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
+from sqlalchemy.sql.sqltypes import DateTime
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import func, not_, orm
@@ -63,6 +64,8 @@ class User(commands.Cog):
             color=0xfefefe #it breaks when I set it to white
         elif user.rating>=3000:
             color=0x000000
+        elif user.rating>=2600:
+            color=0xa00000
         elif user.rating>=2200:
             color=0xee0000
         elif user.rating>=1800:
@@ -73,8 +76,10 @@ class User(commands.Cog):
             color=0x0000ff
         elif user.rating>=1000:
             color=0x00a900
-        else:
+        elif user.rating>=0:
             color=0x999999
+        else:
+            color=0x000000
         description = f'Discord name: {discordHandle}'
         embed = discord.Embed(
             title=username,
@@ -182,7 +187,7 @@ class User(commands.Cog):
             amounts.pop(0)
 
         if amounts == []:
-            return await ctx.send('No points given!')
+            return await ctx.send(f'No points given!')
 
         if username is None:
             return
@@ -307,7 +312,7 @@ class User(commands.Cog):
         if argument == '+f':
             return True
         raise BadArgument('No force argument')
-      
+
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
@@ -339,7 +344,7 @@ class User(commands.Cog):
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
         if username is None:
-            return await ctx.send('No username provided')
+            return await ctx.send(f'No username provided')
 
         user = await query.get_user(username)
         if user is None:
