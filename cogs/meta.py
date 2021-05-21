@@ -5,6 +5,7 @@ from utils.api import API
 from utils.db import session, Problem as Problem_DB
 import typing
 
+
 class Meta(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -56,20 +57,22 @@ class Meta(commands.Cog):
         except Exception as e:
             await ctx.send('Seems like I\'m getting cloud flared, rip. ' +
                            str(e))
+
     @commands.command()
     async def info(self, ctx):
         """Bot info"""
-        guildCount=len(self.bot.guilds)
-        userCount=len(set(self.bot.get_all_members()))
-        embed=discord.Embed()\
-            .set_author(name=self.bot.user,icon_url=self.bot.user.avatar_url)\
-            .add_field(name="Guilds:",value=guildCount,inline=True)\
-            .add_field(name="Users:",value=userCount,inline=True)\
-            .add_field(name="Documentation",value="[Documentation site](https://victorgao001.gitbook.io/jomd/)",inline=False)\
-            .add_field(name="Commands",value="[Command List](https://victorgao001.gitbook.io/jomd/)",inline=False)\
-            .add_field(name="Invite",value="[Invite link](https://discord.com/api/oauth2/authorize?client_id=725004198466551880&permissions=73792&scope=bot)",inline=False)\
-            .add_field(name="Support",value="[Server link](https://discord.gg/VEWFpgPhnz)",inline=False)
+        guildCount = len(self.bot.guilds)
+        userCount = len(set(self.bot.get_all_members()))
+        embed = discord.Embed()\
+            .set_author(name=self.bot.user, icon_url=self.bot.user.avatar_url)\
+            .add_field(name="Guilds:", value=guildCount, inline=True)\
+            .add_field(name="Users:", value=userCount, inline=True)\
+            .add_field(name="Documentation", value="[Documentation site](https://victorgao001.gitbook.io/jomd/)", inline=False)\
+            .add_field(name="Commands", value="[Command List](https://victorgao001.gitbook.io/jomd/)", inline=False)\
+            .add_field(name="Invite", value="[Invite link](https://discord.com/api/oauth2/authorize?client_id=725004198466551880&permissions=73792&scope=bot)", inline=False)\
+            .add_field(name="Support", value="[Server link](https://discord.gg/VEWFpgPhnz)", inline=False)
         await ctx.send(embed=embed)
+
     @commands.command()
     async def stats(self, ctx):
         """Display cool dmoj stats that no one asked for"""
@@ -91,8 +94,6 @@ class Meta(commands.Cog):
         total_points = calculate_points(problems, total_problems)
         await ctx.send("The theoretical maximum number of points you can achieve is %.2f\n"
                        "There are %d public problems on DMOJ" % (total_points, total_problems))
-    
-    
 
 
 def setup(bot):

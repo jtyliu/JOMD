@@ -79,14 +79,14 @@ class Handles(commands.Cog):
         if query.get_handle_user(username, ctx.guild.id):
             await ctx.send('This handle is already linked with another user')
             return
-        
-        #verify from dmoj user description
-        description=await query.get_user_description(username);
-        userKey='x'+hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
+
+        # verify from dmoj user description
+        description = await query.get_user_description(username)
+        userKey = 'x' + hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
         if userKey not in description:
-            await ctx.send('Put `'+userKey+'` in your DMOJ user description and run the command again.')
+            await ctx.send('Put `' + userKey + '` in your DMOJ user description and run the command again.')
             return
-        
+
         handle = Handle_DB()
         handle.id = ctx.author.id
         handle.handle = username
@@ -98,7 +98,7 @@ class Handles(commands.Cog):
             "%s, you now have linked your account to %s." %
             (ctx.author.name, username)
         )
-        
+
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
         if rank in rank_to_role:
@@ -109,12 +109,12 @@ class Handles(commands.Cog):
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role('Admin')
     async def _set(self, ctx, member, username: str):
-        
+
         """Manually link two accounts together"""
         query = Query()
-        member=await query.parseUser(ctx,member)
+        member = await query.parseUser(ctx, member)
 
-        if username!="+remove":
+        if username != "+remove":
             user = await query.get_user(username)
 
             if user is None:
@@ -123,8 +123,8 @@ class Handles(commands.Cog):
 
             username = user.username
 
-        handle=query.get_handle(member.id, ctx.guild.id)
-        if handle==username:
+        handle = query.get_handle(member.id, ctx.guild.id)
+        if handle == username:
             return await ctx.send(f'{member.display_name} is already linked with {handle}')
 
         if handle:
@@ -135,7 +135,7 @@ class Handles(commands.Cog):
             session.commit()
             await ctx.send(f'Unlinked {member.display_name} with handle {handle.handle}')
 
-        if username=="+remove":
+        if username == "+remove":
             return
 
         if query.get_handle_user(username, ctx.guild.id):
@@ -150,7 +150,7 @@ class Handles(commands.Cog):
         session.add(handle)
         session.commit()
         await ctx.send(f"Linked {member.name} with {username}.")
-        
+
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
         if rank in rank_to_role:
@@ -158,43 +158,43 @@ class Handles(commands.Cog):
         else:
             await ctx.send("You are missing the " + rank.name + " role")
 
-
-    @commands.command(aliases=['users','leaderboard'],usage='[rating|maxrating|points|solved]')
+    @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg="rating"):
         """"Shows registered server members in ranked order"""
-        arg=arg.lower()
-        if arg!="rating" and arg!="maxrating" and arg!="points" and arg!="solved":
+        arg = arg.lower()
+        if arg != "rating" and arg != "maxrating" and arg != "points" and arg != "solved":
             return await ctx.send_help('top')
-        handles=session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+        handles = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+
         def to_handle(handle):
             return handle.handle
-        handles=set(map(to_handle, handles))
-        users=session.query(User_DB)
-        leaderboard=[]
+        handles = set(map(to_handle, handles))
+        users = session.query(User_DB)
+        leaderboard = []
         for user in users:
             if user.username in handles:
-                if arg=="rating":
-                    leaderboard.append([-user.rating,user.username])
-                elif arg=="maxrating":
-                    leaderboard.append([-user.maxRating,user.username])
-                elif arg=="points":
-                    leaderboard.append([-user.performance_points,user.username])
-                elif arg=="solved":
-                    leaderboard.append([-user.problem_count,user.username])
+                if arg == "rating":
+                    leaderboard.append([-user.rating, user.username])
+                elif arg == "maxrating":
+                    leaderboard.append([-user.maxRating, user.username])
+                elif arg == "points":
+                    leaderboard.append([-user.performance_points, user.username])
+                elif arg == "solved":
+                    leaderboard.append([-user.problem_count, user.username])
         leaderboard.sort()
-        content=[]
-        page=""
-        for i,user in enumerate(leaderboard):
-            page+=f"{i+1} {user[1]} {-round(user[0],3)}\n"
-            if i%10==9:
+        content = []
+        page = ""
+        for i, user in enumerate(leaderboard):
+            page += f"{i+1} {user[1]} {-round(user[0],3)}\n"
+            if i % 10 == 9:
                 content.append(page)
-                page=""
-        if page!="":
+                page = ""
+        if page != "":
             content.append(page)
-        if len(content)==0:
+        if len(content) == 0:
             content.append("No users")
-        message=await ctx.send(embed=discord.Embed().add_field(name="Top DMOJ "+arg,value=content[0]))
-        await scroll_embed(ctx,self.bot,message,"Top DMOJ "+arg,content)
+        message = await ctx.send(embed=discord.Embed().add_field(name="Top DMOJ " + arg, value=content[0]))
+        await scroll_embed(ctx, self.bot, message, "Top DMOJ " + arg, content)
 
     def rating_to_rank(self, rating):
         if rating is None:

@@ -22,7 +22,7 @@ class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['ui'],usage='[username] [latest submissions]')
+    @commands.command(aliases=['ui'], usage='[username] [latest submissions]')
     async def user(self, ctx, username: typing.Optional[str_not_int] = None,
                    amount: typing.Optional[int] = None):
         """Show user profile and latest submissions
@@ -55,43 +55,43 @@ class User(commands.Cog):
         def is_rated(contest):
             return 1 if contest.is_rated else 0
 
-        discordHandle=ctx.message.guild.get_member(query.get_handle_user(username, ctx.guild.id))
+        discordHandle = ctx.message.guild.get_member(query.get_handle_user(username, ctx.guild.id))
         if discordHandle:
-            discordHandle=discordHandle.nick or discordHandle.name
+            discordHandle = discordHandle.nick or discordHandle.name
         else:
-            discordHandle="Unknown"
+            discordHandle = "Unknown"
         if user.rating is None:
-            color=0xfefefe #it breaks when I set it to white
-        elif user.rating>=3000:
-            color=0x000000
-        elif user.rating>=2600:
-            color=0xa00000
-        elif user.rating>=2200:
-            color=0xee0000
-        elif user.rating>=1800:
-            color=0xffb100
-        elif user.rating>=1500:
-            color=0x800080
-        elif user.rating>=1200:
-            color=0x0000ff
-        elif user.rating>=1000:
-            color=0x00a900
-        elif user.rating>=0:
-            color=0x999999
+            color = 0xfefefe  # it breaks when I set it to white
+        elif user.rating >= 3000:
+            color = 0x000000
+        elif user.rating >= 2600:
+            color = 0xa00000
+        elif user.rating >= 2200:
+            color = 0xee0000
+        elif user.rating >= 1800:
+            color = 0xffb100
+        elif user.rating >= 1500:
+            color = 0x800080
+        elif user.rating >= 1200:
+            color = 0x0000ff
+        elif user.rating >= 1000:
+            color = 0x00a900
+        elif user.rating >= 0:
+            color = 0x999999
         else:
-            color=0x000000
+            color = 0x000000
         description = f'Discord name: {discordHandle}'
         embed = discord.Embed(
             title=username,
             url=f'https://dmoj.ca/user/{username}',
             description=description,
-            color=color, #rating color
+            color=color,  # rating color
         )
 
         embed.set_thumbnail(url=await query.get_pfp(username))
         embed.add_field(
             name="Points",
-            value=str(round(user.performance_points))+"/"+str(round(user.points)),
+            value=str(round(user.performance_points)) + "/" + str(round(user.points)),
             inline=True
         )
         embed.add_field(
@@ -101,7 +101,7 @@ class User(commands.Cog):
         )
         embed.add_field(
             name="Rating",
-            value=str(user.rating)+"/"+str(user.maxRating),
+            value=str(user.rating) + "/" + str(user.maxRating),
             inline=True
         )
         embed.add_field(
@@ -263,7 +263,7 @@ class User(commands.Cog):
 
         query = Query()
         if usernames == []:
-            username=query.get_handle(ctx.author.id, ctx.guild.id)
+            username = query.get_handle(ctx.author.id, ctx.guild.id)
             if username:
                 usernames = [username]
 
@@ -317,9 +317,9 @@ class User(commands.Cog):
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
-    @commands.command(aliases=['gimme'],usage='username [points] [problem types]')
+    @commands.command(aliases=['gimme'], usage='username [points] [problem types]')
     async def recommend(self, ctx, username: typing.Optional[parse_gimme] = None,
-                    points: typing.Optional[point_range] = [1, 50], *filters):
+                        points: typing.Optional[point_range] = [1, 50], *filters):
         """
         Recommend a problem
 
@@ -366,52 +366,53 @@ class User(commands.Cog):
         # print(result)
         if result is None:
             return await ctx.send("No problem that satisfies the filter")
-        return await ctx.send(embed=result)   
-    @commands.command(aliases=['stalk','sp'],usage='[username] [p<=points, p>=points]')
+        return await ctx.send(embed=result)
+
+    @commands.command(aliases=['stalk', 'sp'], usage='[username] [p<=points, p>=points]')
     async def solved(self, ctx, *args):
         """Shows a user's last solved problems"""
-        minP=0
-        maxP=100
+        minP = 0
+        maxP = 100
         query = Query()
-        username=None
+        username = None
         for arg in args:
             if arg.startswith("p>="):
-                minP=max(minP,int(arg[3:]))
+                minP = max(minP, int(arg[3:]))
             elif arg.startswith("p<="):
-                maxP=min(maxP,int(arg[3:]))
+                maxP = min(maxP, int(arg[3:]))
             else:
-                username=(await query.get_user(arg)).username
+                username = (await query.get_user(arg)).username
         if username is None:
-            username=query.get_handle(ctx.author.id, ctx.guild.id)
-        submissions=await query.get_submissions(username,result='AC')
-        uniqueSubmissions=[]
-        solved=set()
-        x=0
+            username = query.get_handle(ctx.author.id, ctx.guild.id)
+        submissions = await query.get_submissions(username, result='AC')
+        uniqueSubmissions = []
+        solved = set()
+        x = 0
         for sub in submissions:
             if not sub._code in solved:
                 solved.add(sub._code)
-                if minP<=sub.points and sub.points<=maxP:
+                if minP <= sub.points and sub.points <= maxP:
                     uniqueSubmissions.append(sub)
         uniqueSubmissions.reverse()
-        page=""
-        content=[]
-        cnt=0
+        page = ""
+        content = []
+        cnt = 0
         for sub in uniqueSubmissions:
-            age=(datetime.now()-sub.date).days
-            page+=f"[{sub.problem[0].name}]({SITE_URL}{sub._code}) [{sub.points}] ({age} days ago)\n" #sub.problem[0].name is rly slow
-            cnt+=1
-            if cnt%10==0:
+            age = (datetime.now() - sub.date).days
+            # sub.problem[0].name is rly slow
+            page += f"[{sub.problem[0].name}]({SITE_URL}{sub._code}) [{sub.points}] ({age} days ago)\n"
+            cnt += 1
+            if cnt % 10 == 0:
                 content.append(page)
-                page=""
-        if page!="":
+                page = ""
+        if page != "":
             content.append(page)
-        if len(content)==0:
+        if len(content) == 0:
             content.append("No submission")
-        title="Recently solved problems by "+username
-        message=await ctx.send(embed=discord.Embed().add_field(name=title,value=content[0]))
-        await scroll_embed(ctx,self.bot,message,title,content)
-        
-        
+        title = "Recently solved problems by " + username
+        message = await ctx.send(embed=discord.Embed().add_field(name=title, value=content[0]))
+        await scroll_embed(ctx, self.bot, message, title, content)
+
 
 def setup(bot):
     bot.add_cog(User(bot))

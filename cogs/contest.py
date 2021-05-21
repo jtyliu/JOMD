@@ -12,7 +12,7 @@ from utils.api import ObjectNotFound
 import discord
 from discord.ext import commands
 from discord.utils import get
-from datetime import datetime,timezone
+from datetime import datetime, timezone
 from sqlalchemy import orm
 import asyncio
 from operator import itemgetter
@@ -25,7 +25,7 @@ class Contest(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["contest"],usage="[contest key] [+server, +all, dmoj_handles]")
+    @commands.command(aliases=["contest"], usage="[contest key] [+server, +all, dmoj_handles]")
     async def ranklist(self, ctx, key, *args):
         """List rating predictions of a contest"""
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
@@ -42,17 +42,17 @@ class Contest(commands.Cog):
 
         q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
         handles = q.all()
-        
-        usernames=[]
-        showAll=False
-        if len(args)==0:
-            usernames.extend(list(map(lambda handle:handle.handle, handles)))
+
+        usernames = []
+        showAll = False
+        if len(args) == 0:
+            usernames.extend(list(map(lambda handle: handle.handle, handles)))
         for arg in args:
             arg = arg.lower()
-            if arg=="+server":
-                usernames.extend(list(map(lambda handle:handle.handle, handles)))
-            elif arg=="+all":
-                showAll=True
+            if arg == "+server":
+                usernames.extend(list(map(lambda handle: handle.handle, handles)))
+            elif arg == "+all":
+                showAll = True
             else:
                 usernames.append((await query.get_user(arg)).username)
 
@@ -71,7 +71,7 @@ class Contest(commands.Cog):
         # Filter for those who participated in contest
         user_rankings = list(map(itemgetter("user"), contest.rankings))
         if showAll:
-            usernames=list(set(user_rankings))
+            usernames = list(set(user_rankings))
         else:
             usernames = list(set(usernames) & set(user_rankings))
 
@@ -115,8 +115,8 @@ class Contest(commands.Cog):
         max_len["rank"] = len("#")
         max_len["username"] = len("Handle")
         for i in range(1, problems + 1):
-            max_len[str(i)]=len(str(i))
-        max_len["rating_change"]=max_len["old_rating"]=max_len["new_rating"]=3
+            max_len[str(i)] = len(str(i))
+        max_len["rating_change"] = max_len["old_rating"] = max_len["new_rating"] = 3
 
         for rank in data:
             for k, v in rank.items():
@@ -159,10 +159,10 @@ class Contest(commands.Cog):
         hyphens = format_output.format(*hyphen_format)
         outputBegin += hyphens
         outputBegin += "\n"
-        outputEnd=hyphens+"\n"
+        outputEnd = hyphens + "\n"
 
-        content=[]
-        output=outputBegin
+        content = []
+        output = outputBegin
         for rank in data:
             if contest.is_rated:
                 output += format_output.format(
@@ -180,16 +180,17 @@ class Contest(commands.Cog):
                     *[rank[str(i)] for i in range(1, problems + 1)],
                 )
             output += "\n"
-            if(len(output)+len(outputEnd)*2>1980):
-                output+=outputEnd
+            if(len(output) + len(outputEnd) * 2 > 1980):
+                output += outputEnd
                 content.append("```yaml\n" + output + "```")
-                output=outputBegin
+                output = outputBegin
         output += outputEnd
         content.append("```yaml\n" + output + "```")
-        await ctx.send("Results for "+contest.name+"("+SITE_URL+"contest/"+key+"): ")
-        message=await ctx.send(content[0])
-        await scroll_message(ctx,self.bot,message,content)
-    @commands.command(aliases=['pc'],usage="[contest key]")
+        await ctx.send("Results for " + contest.name + "(" + SITE_URL + "contest/" + key + "): ")
+        message = await ctx.send(content[0])
+        await scroll_message(ctx, self.bot, message, content)
+
+    @commands.command(aliases=['pc'], usage="[contest key]")
     async def postcontest(self, ctx, key):
         """Updates post-contest role"""
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
@@ -207,12 +208,12 @@ class Contest(commands.Cog):
         q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
         handles = q.all()
 
-        participants=set()
+        participants = set()
         for ranking in contest.rankings:
-            endTime=datetime.strptime(ranking['end_time'],'%Y-%m-%dT%H:%M:%S%z')
-            if endTime<datetime.now(timezone.utc).astimezone():
+            endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+            if endTime < datetime.now(timezone.utc).astimezone():
                 participants.add(ranking['user'])
-        role=get(ctx.guild.roles,name="postcontest "+key)
+        role = get(ctx.guild.roles, name="postcontest " + key)
         if not role:
             return await ctx.send(f"No `postcontest {key}` role found.")
         for user in handles:
@@ -221,7 +222,8 @@ class Contest(commands.Cog):
                     await ctx.guild.get_member(user.id).add_roles(role)
                 except discord.Forbidden:
                     return await ctx.send("No permission to assign the role.")
-        await ctx.send("Updated post contest for "+key)
+        await ctx.send("Updated post contest for " + key)
+
 
 def setup(bot):
     bot.add_cog(Contest(bot))
