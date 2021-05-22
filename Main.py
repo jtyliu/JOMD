@@ -7,11 +7,9 @@ import asyncio
 
 
 def main():
-
     # https://github.com/cheran-senthil/TLE/blob/bae59c2de6a2313be4a6ba4a5a5cbba81352e229/tle/__main__.py
-    BOT_TOKEN = os.environ["JOMD_BOT_TOKEN"]
+    BOT_TOKEN = os.environ.get("JOMD_BOT_TOKEN")
     # Not needed for now, but will make use of it in the future
-    # API_TOKEN = os.environ["JOMD_TOKEN"]
 
     if not BOT_TOKEN:
         print('Missing bot token')

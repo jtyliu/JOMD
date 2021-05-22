@@ -1,3 +1,6 @@
+from discord import utils
+from discord.ext import commands
+from discord.ext.commands.errors import MemberNotFound
 from utils.api import API
 from sqlalchemy import or_, func
 from utils.db import (session, Problem as Problem_DB,
@@ -17,6 +20,7 @@ class Query:
     """
     Every object returned from this should be a DB object, not class object
     """
+
     def parse(self, key, val):
         cond = True
         if val is not None:
@@ -42,6 +46,9 @@ class Query:
 
     async def get_pfp(self, username) -> str:
         return await API().get_pfp(username)
+
+    async def get_user_description(self, username) -> str:
+        return await API().get_user_description(username)
 
     async def get_languages(self, common_name=None) -> [Language_DB]:
 
@@ -442,3 +449,32 @@ class Query:
             .filter(func.ifnull(sub_q.c.points, 0) != 0)\
             .filter(or_(*conds))
         return q.all()
+
+    def get_member_named(self, guild, name):
+        result = None
+        members = guild.members
+        if len(name) > 5 and name[-5] == '#':
+            # The 5 length is checking to see if #0000 is in the string,
+            # as a#0000 has a length of 6, the minimum for a potential
+            # discriminator lookup.
+            potential_discriminator = name[-4:]
+
+            # do the actual lookup and return if found
+            # if it isn't found then we'll do a full name lookup below.
+            result = utils.get(members, name=name[:-5], discriminator=potential_discriminator)
+            if result is not None:
+                return result
+
+        name = name.casefold()
+
+        def pred(m):
+            return m.nick and m.nick.casefold() == name or m.name.casefold() == name
+
+        return utils.find(pred, members)
+
+    async def parseUser(self, ctx, arg):
+        try:
+            return await commands.MemberConverter().convert(ctx, arg)
+        except MemberNotFound:
+            return self.get_member_named(ctx.guild, arg)
+            return None
