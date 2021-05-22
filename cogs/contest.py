@@ -200,7 +200,7 @@ class Contest(commands.Cog):
 
         if username is None:
             return await ctx.send("Your account is not linked!")
-
+          
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
         # Clear cache
         if q.count():
@@ -217,7 +217,7 @@ class Contest(commands.Cog):
             return await ctx.send(f"No `postcontest {key}` role found.")
 
         for ranking in contest.rankings:
-            if ranking['user'] != username:
+            if ranking['user'].lower() != username.lower():
                 continue
 
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
