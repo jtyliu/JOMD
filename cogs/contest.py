@@ -212,6 +212,10 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
+        role = get(ctx.guild.roles, name="postcontest " + key)
+        if not role:
+            return await ctx.send(f"No `postcontest {key}` role found.")
+
         for ranking in contest.rankings:
             if ranking['user'] != username:
                 continue
@@ -219,15 +223,12 @@ class Contest(commands.Cog):
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
             if endTime > datetime.now(timezone.utc).astimezone():
                 return ctx.send("Your window is not done.")
-
-        role = get(ctx.guild.roles, name="postcontest " + key)
-        if not role:
-            return await ctx.send(f"No `postcontest {key}` role found.")
-        try:
-            await ctx.author.add_roles(role)
-        except discord.Forbidden:
-            return await ctx.send("No permission to assign the role.")
-        return await ctx.send("You've been added to post contest.")
+            else:
+                try:
+                    await ctx.author.add_roles(role)
+                except discord.Forbidden:
+                    return await ctx.send("No permission to assign the role.")
+                return await ctx.send("You've been added to post contest.")
 
 
 def setup(bot):
