@@ -229,6 +229,7 @@ class Contest(commands.Cog):
                 except discord.Forbidden:
                     return await ctx.send("No permission to assign the role.")
                 return await ctx.send("You've been added to post contest.")
+        return await ctx.send("You haven't joined the contest yet.")
 
 
 def setup(bot):
