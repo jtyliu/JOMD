@@ -201,7 +201,7 @@ class Contest(commands.Cog):
 
         if username is None:
             return await ctx.send("Your account is not linked!")
-          
+
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
         # Clear cache
         if q.count():
