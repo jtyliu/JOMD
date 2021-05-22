@@ -18,8 +18,8 @@ import json
 
 URI = 'sqlite:///utils/db/JOMD1.db'
 
-Base = declarative_base()
 engine = create_engine(URI, echo=DEBUG_DB)
+Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()
 
@@ -434,4 +434,4 @@ class CurrentGitgud(Base):
     time = Column(DateTime)
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

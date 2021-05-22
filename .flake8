@@ -3,6 +3,7 @@ max-line-length = 120
 application-import-names = dmoj,judge,django_ace
 import-order-style = pycharm
 enable-extensions = G
+exclude = alembic
 ignore =
     W504, # line break occurred after a binary operator
     # allow only generator_stop and annotations future imports
