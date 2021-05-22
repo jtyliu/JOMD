@@ -193,36 +193,41 @@ class Contest(commands.Cog):
     @commands.command(aliases=['pc'], usage="[contest key]")
     async def postcontest(self, ctx, key):
         """Updates post-contest role"""
+
+        query = Query()
+
+        username = query.get_handle(ctx.author.id, ctx.guild.id)
+
+        if username is None:
+            return await ctx.send("Your account is not linked!")
+
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
         # Clear cache
         if q.count():
             q.delete()
             session.commit()
-        query = Query()
         try:
             contest = await query.get_contest(key)
         except ObjectNotFound:
             await ctx.send("Contest not found")
             return
 
-        q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
-        handles = q.all()
-
-        participants = set()
         for ranking in contest.rankings:
+            if ranking['user'] != username:
+                continue
+
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
-            if endTime < datetime.now(timezone.utc).astimezone():
-                participants.add(ranking['user'])
+            if endTime > datetime.now(timezone.utc).astimezone():
+                return ctx.send("Your window is not done.")
+
         role = get(ctx.guild.roles, name="postcontest " + key)
         if not role:
             return await ctx.send(f"No `postcontest {key}` role found.")
-        for user in handles:
-            if user.handle in participants:
-                try:
-                    await ctx.guild.get_member(user.id).add_roles(role)
-                except discord.Forbidden:
-                    return await ctx.send("No permission to assign the role.")
-        await ctx.send("Updated post contest for " + key)
+        try:
+            await ctx.author.add_roles(role)
+        except discord.Forbidden:
+            return await ctx.send("No permission to assign the role.")
+        return await ctx.send("You've been added to post contest.")
 
 
 def setup(bot):
