@@ -1,3 +1,4 @@
+from datetime import datetime
 import discord
 from discord.ext import commands
 import typing
@@ -7,10 +8,10 @@ from utils.db import session
 from sqlalchemy import func, not_, orm
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       User as User_DB, Submission as Submission_DB)
-from utils.jomd_common import (str_not_int, point_range, parse_gimme,
+from utils.jomd_common import (scroll_embed, str_not_int, point_range, parse_gimme,
                                calculate_points, gimme_common)
 from utils.api import ObjectNotFound
-from utils.constants import TZ, SHORTHANDS
+from utils.constants import SITE_URL, TZ, SHORTHANDS
 import asyncio
 import random
 from operator import itemgetter
@@ -24,7 +25,6 @@ class User(commands.Cog):
     async def user(self, ctx, username: typing.Optional[str_not_int] = None,
                    amount: typing.Optional[int] = None):
         """Show user profile and latest submissions
-
         Use surround your username with '' if it can be interpreted as a number
         """
 
@@ -94,6 +94,156 @@ class User(commands.Cog):
         embed = discord.Embed(
             title=f"{username}'s latest submissions",
             color=0xfcdb05
+        )
+        for submission in submissions:
+            problem = submission.problem[0]
+            if problem.points is not None:
+                points = str(int(problem.points)) + 'p'
+                if problem.partial:
+                    points += 'p'
+            else:
+                points = '???'
+
+            true_short_name = submission.language[0].short_name
+            if true_short_name == '':
+                # wtf dmoj
+                true_short_name = submission.language[0].key
+
+            embed.add_field(
+                name="%s / %s" %
+                     (str(submission.score_num), str(submission.score_denom)),
+                value="%s | %s" % (submission.result,
+                                   true_short_name),
+                inline=True
+            )
+
+            embed.add_field(
+                name="%s (%s)" %
+                     (submission.problem[0].name, points),
+                value="%s | [Problem](https://dmoj.ca/problem/%s)" %
+                      (submission.date.astimezone(TZ).
+                       strftime("%b. %d, %Y, %I:%M %p").
+                       replace('AM', 'a.m.').
+                       replace('PM', 'p.m.'),
+                       submission.problem[0].code),
+                      # Jan. 13, 2021, 12:17 a.m.
+                      # %b. %d, %Y, %I:%M %p
+                inline=True
+            )
+            try:
+                embed.add_field(
+                    name="%.2fs" % submission.time,
+                    value="%s" % submission.memory_str,
+                    inline=True,
+                )
+            except TypeError:
+                embed.add_field(
+                    name="---",
+                    value="%s" % submission.memory_str,
+                    inline=True,
+                )
+
+        await ctx.send(embed=embed)
+        return None
+
+    @commands.command(aliases=['ui'], usage='[username] [latest submissions]')
+    async def userinfo(self, ctx, username: typing.Optional[str_not_int] = None,
+                       amount: typing.Optional[int] = None):
+        """Show user profile and latest submissions
+
+        Use surround your username with '' if it can be interpreted as a number
+        """
+
+        query = Query()
+        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
+        # If user is not found in db
+        if username is None:
+            username = str(amount)
+            amount = None
+
+        if username is None:
+            return
+
+        if amount is not None:
+            amount = min(amount, 8)
+            if amount < 1:
+                return await ctx.send('Please request at least one submission')
+
+        try:
+            user = await query.get_user(username)
+        except ObjectNotFound:
+            return await ctx.send(f'{username} does not exist on DMOJ')
+
+        username = user.username
+
+        def is_rated(contest):
+            return 1 if contest.is_rated else 0
+
+        discordHandle = ctx.message.guild.get_member(query.get_handle_user(username, ctx.guild.id))
+        if discordHandle:
+            discordHandle = discordHandle.nick or discordHandle.name
+        else:
+            discordHandle = "Unknown"
+        if user.rating is None:
+            color = 0xfefefe  # it breaks when I set it to white
+        elif user.rating >= 3000:
+            color = 0x000000
+        elif user.rating >= 2600:
+            color = 0xa00000
+        elif user.rating >= 2200:
+            color = 0xee0000
+        elif user.rating >= 1800:
+            color = 0xffb100
+        elif user.rating >= 1500:
+            color = 0x800080
+        elif user.rating >= 1200:
+            color = 0x0000ff
+        elif user.rating >= 1000:
+            color = 0x00a900
+        elif user.rating >= 0:
+            color = 0x999999
+        else:
+            color = 0x000000
+        description = f'Discord name: {discordHandle}'
+        embed = discord.Embed(
+            title=username,
+            url=f'https://dmoj.ca/user/{username}',
+            description=description,
+            color=color,  # rating color
+        )
+
+        embed.set_thumbnail(url=await query.get_pfp(username))
+        embed.add_field(
+            name="Points",
+            value=str(round(user.performance_points)) + "/" + str(round(user.points)),
+            inline=True
+        )
+        embed.add_field(
+            name="Problems Solved",
+            value=user.problem_count,
+            inline=True
+        )
+        embed.add_field(
+            name="Rating",
+            value=str(user.rating) + "/" + str(user.maxRating),
+            inline=True
+        )
+        embed.add_field(
+            name="Contests Written",
+            value=sum(map(is_rated, user.contests)),
+            inline=True
+        )
+
+        await ctx.send(embed=embed)
+
+        if amount is None:
+            return
+
+        submissions = await query.get_latest_submissions(username, amount)
+
+        embed = discord.Embed(
+            title=f"{username}'s latest submissions",
+            color=0xffff00
         )
         for submission in submissions:
             problem = submission.problem[0]
@@ -237,7 +387,9 @@ class User(commands.Cog):
 
         query = Query()
         if usernames == []:
-            usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
+            username = query.get_handle(ctx.author.id, ctx.guild.id)
+            if username:
+                usernames = [username]
 
         users = await asyncio.gather(*[query.get_user(username)
                                      for username in usernames])
@@ -285,45 +437,13 @@ class User(commands.Cog):
             return True
         raise BadArgument('No force argument')
 
-    @commands.command(usage='[username]')
-    async def cache(self, ctx, username: typing.Optional[str] = None):
-        """Caches the submissions of a user, will speed up other commands
-
-        Use surround your username with '' if it can be interpreted as a number
-        """
-        query = Query()
-        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
-
-        username = username.replace('\'', '')
-
-        if username is None:
-            return await ctx.send('No username given!')
-
-        user = await query.get_user(username)
-        if user is None:
-            return await ctx.send(f'{username} does not exist on DMOJ')
-
-        username = user.username
-
-        try:
-            msg = await ctx.send(f'Caching {username}\'s submissions')
-        except Exception as e:
-            await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: ' + e)
-            return
-
-        await query.get_submissions(username)
-
-        return await msg.edit(content=f'{username}\'s submissions ' +
-                                      'have been cached.')
-
     @commands.command(hidden=True)
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
-    @commands.command(usage='username [points] [problem types]')
-    async def gimme(self, ctx, username: typing.Optional[parse_gimme] = None,
-                    points: typing.Optional[point_range] = [1, 50], *filters):
+    @commands.command(aliases=['gimme'], usage='username [points] [problem types]')
+    async def recommend(self, ctx, username: typing.Optional[parse_gimme] = None,
+                        points: typing.Optional[point_range] = [1, 50], *filters):
         """
         Recommend a problem
 
@@ -371,6 +491,50 @@ class User(commands.Cog):
         if result is None:
             return await ctx.send("No problem that satisfies the filter")
         return await ctx.send(embed=result)
+
+    @commands.command(aliases=['stalk', 'sp'], usage='[username] [p<=points, p>=points]')
+    async def solved(self, ctx, *args):
+        """Shows a user's last solved problems"""
+        minP = 0
+        maxP = 100
+        query = Query()
+        username = None
+        for arg in args:
+            if arg.startswith("p>="):
+                minP = max(minP, int(arg[3:]))
+            elif arg.startswith("p<="):
+                maxP = min(maxP, int(arg[3:]))
+            else:
+                username = (await query.get_user(arg)).username
+        if username is None:
+            username = query.get_handle(ctx.author.id, ctx.guild.id)
+        submissions = await query.get_submissions(username, result='AC')
+        uniqueSubmissions = []
+        solved = set()
+        for sub in submissions:
+            if sub._code not in solved:
+                solved.add(sub._code)
+                if minP <= sub.points and sub.points <= maxP:
+                    uniqueSubmissions.append(sub)
+        uniqueSubmissions.reverse()
+        page = ""
+        content = []
+        cnt = 0
+        for sub in uniqueSubmissions:
+            age = (datetime.now() - sub.date).days
+            # sub.problem[0].name is rly slow
+            page += f"[{sub.problem[0].name}]({SITE_URL}{sub._code}) [{sub.points}] ({age} days ago)\n"
+            cnt += 1
+            if cnt % 10 == 0:
+                content.append(page)
+                page = ""
+        if page != "":
+            content.append(page)
+        if len(content) == 0:
+            content.append("No submission")
+        title = "Recently solved problems by " + username
+        message = await ctx.send(embed=discord.Embed().add_field(name=title, value=content[0]))
+        await scroll_embed(ctx, self.bot, message, title, content)
 
 
 def setup(bot):

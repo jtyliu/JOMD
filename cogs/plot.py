@@ -46,6 +46,13 @@ class Plot(commands.Cog):
             return False
         raise BadArgument('Argument not known')
 
+    def plot_peak(argument) -> typing.Optional[bool]:
+        if argument == '+peak':
+            return True
+        if argument == '+max':
+            return True
+        raise BadArgument('Argument not known')
+
     @plot.command(usage='[usernames]')
     async def solved(self, ctx, *usernames):
         """Plot problems solved over time"""
@@ -184,8 +191,8 @@ class Plot(commands.Cog):
 
         return await ctx.send(embed=embed, file=file)
 
-    @plot.command(usage='[usernames]')
-    async def rating(self, ctx, *usernames):
+    @plot.command(usage='[+peak] [usernames]')
+    async def rating(self, ctx, peak: typing.Optional[plot_peak] = False, *usernames):
         """Plot rating progression"""
         usernames = list(usernames)
 
@@ -218,12 +225,15 @@ class Plot(commands.Cog):
 
         data = {}
         data['users'] = [user.username for user in users]
+        userPrevRating = {}
         for contest in contests:
             changes = get_rating_change(contest.rankings, users)
             data[contest.end_time] = []
             for user in users:
-                if user.username in changes:
+                if user.username in changes \
+                        and (not peak or changes[user.username] >= userPrevRating.get(user.username, -9999)):
                     change = changes[user.username]
+                    userPrevRating[user.username] = change
                     data[contest.end_time].append(change)
                 else:
                     data[contest.end_time].append(None)

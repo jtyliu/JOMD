@@ -1,7 +1,7 @@
 # from utils.submission import Submission
 # from utils.problem import Problem
 from bs4 import BeautifulSoup
-from utils.constants import SITE_URL, DEBUG_API
+from utils.constants import SITE_URL, DEBUG_API, API_TOKEN
 import urllib.parse
 import functools
 import aiohttp
@@ -125,7 +125,10 @@ async def _query_api(url, resp_obj):
             start = time.time()
             print("Calling", url)
         if _session is None:
-            _session = aiohttp.ClientSession()
+            if API_TOKEN is None:
+                _session = aiohttp.ClientSession()
+            else:
+                _session = aiohttp.ClientSession(headers={'Authorization': 'Bearer ' + API_TOKEN})
         async with _session.get(url) as resp:
             if resp_obj == 'text':
                 resp = await resp.text()
@@ -326,6 +329,7 @@ class User:
         self.problem_count = data["problem_count"]
         self.rank = data["problem_count"]
         self.rating = data["rating"]
+        self.maxRating = data["rating"]
         self.volatility = data["volatility"]
         self._solved_problems = data.get("solved_problems", [])
         self.solved_problems = []
@@ -377,6 +381,10 @@ class User:
                         session.commit()
                 break
         self.organizations = organization_qq.all()
+
+        for contest in self._contests:
+            if contest['rating']:
+                self.maxRating = max(self.maxRating or 0, contest['rating'])
 
         def get_key(contest):
             return contest["key"]
@@ -735,6 +743,12 @@ class API:
         soup = BeautifulSoup(resp, features="html5lib")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
+
+    async def get_user_description(self, username):
+        resp = await _query_api(SITE_URL + 'user/' + username, 'text')
+        soup = BeautifulSoup(resp, features="html5lib")
+        description = str(soup.find('div', class_='content-description'))
+        return description
 
     async def get_latest_submission(self, user, num):
         # Don't look at me! I'm hideous!
