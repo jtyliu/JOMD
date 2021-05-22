@@ -15,7 +15,7 @@ from discord.utils import get
 from datetime import datetime, timezone
 from sqlalchemy import orm
 import asyncio
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 
 # Post new contests
 # Rating change predictions for all users in a server
