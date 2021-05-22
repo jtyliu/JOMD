@@ -82,7 +82,7 @@ class Handles(commands.Cog):
 
         # verify from dmoj user description
         description = await query.get_user_description(username)
-        userKey = 'x' + hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
+        userKey = hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
         if userKey not in description:
             await ctx.send('Put `' + userKey + '` in your DMOJ user description and run the command again.')
             return
