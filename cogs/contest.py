@@ -194,6 +194,7 @@ class Contest(commands.Cog):
     async def postcontest(self, ctx, key):
         """Updates post-contest role"""
 
+        await ctx.message.delete()
         query = Query()
 
         username = query.get_handle(ctx.author.id, ctx.guild.id)
