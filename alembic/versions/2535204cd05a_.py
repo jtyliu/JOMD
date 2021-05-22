@@ -1,4 +1,4 @@
-"""empty message
+"""Database creation
 
 Revision ID: 2535204cd05a
 Revises: 

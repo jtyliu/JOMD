@@ -329,7 +329,7 @@ class User:
         self.problem_count = data["problem_count"]
         self.rank = data["problem_count"]
         self.rating = data["rating"]
-        self.maxRating = data["rating"]
+        self.max_rating = data["rating"]
         self.volatility = data["volatility"]
         self._solved_problems = data.get("solved_problems", [])
         self.solved_problems = []
@@ -384,7 +384,7 @@ class User:
 
         for contest in self._contests:
             if contest['rating']:
-                self.maxRating = max(self.maxRating or 0, contest['rating'])
+                self.max_rating = max(self.max_rating or 0, contest['rating'])
 
         def get_key(contest):
             return contest["key"]

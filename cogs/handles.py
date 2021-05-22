@@ -171,7 +171,7 @@ class Handles(commands.Cog):
             if arg == "rating":
                 leaderboard.append([-user.rating, user.username])
             elif arg == "maxrating":
-                leaderboard.append([-user.maxRating, user.username])
+                leaderboard.append([-user.max_rating, user.username])
             elif arg == "points":
                 leaderboard.append([-user.performance_points, user.username])
             elif arg == "solved":

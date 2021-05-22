@@ -225,7 +225,7 @@ class User(commands.Cog):
         )
         embed.add_field(
             name="Rating",
-            value=str(user.rating) + "/" + str(user.maxRating),
+            value=str(user.rating) + "/" + str(user.max_rating),
             inline=True
         )
         embed.add_field(
