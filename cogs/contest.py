@@ -50,7 +50,7 @@ class Contest(commands.Cog):
         for arg in args:
             arg = arg.lower()
             if arg == "+server":
-                usernames.extend(list(map(lambda handle: handle.handle, handles)))
+                usernames += list(map(attrgetter('handle'), handles))
             elif arg == "+all":
                 showAll = True
             else:
