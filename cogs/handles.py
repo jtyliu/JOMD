@@ -164,23 +164,18 @@ class Handles(commands.Cog):
         arg = arg.lower()
         if arg != "rating" and arg != "maxrating" and arg != "points" and arg != "solved":
             return await ctx.send_help('top')
-        handles = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
-
-        def to_handle(handle):
-            return handle.handle
-        handles = set(map(to_handle, handles))
-        users = session.query(User_DB)
+        users = session.query(User_DB).join(Handle_DB, Handle_DB.handle == User_DB.username)\
+            .filter(Handle_DB.guild_id == ctx.guild.id)
         leaderboard = []
         for user in users:
-            if user.username in handles:
-                if arg == "rating":
-                    leaderboard.append([-user.rating, user.username])
-                elif arg == "maxrating":
-                    leaderboard.append([-user.maxRating, user.username])
-                elif arg == "points":
-                    leaderboard.append([-user.performance_points, user.username])
-                elif arg == "solved":
-                    leaderboard.append([-user.problem_count, user.username])
+            if arg == "rating":
+                leaderboard.append([-user.rating, user.username])
+            elif arg == "maxrating":
+                leaderboard.append([-user.maxRating, user.username])
+            elif arg == "points":
+                leaderboard.append([-user.performance_points, user.username])
+            elif arg == "solved":
+                leaderboard.append([-user.problem_count, user.username])
         leaderboard.sort()
         content = []
         page = ""

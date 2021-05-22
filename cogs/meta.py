@@ -63,16 +63,16 @@ class Meta(commands.Cog):
         """Bot info"""
         guildCount = len(self.bot.guilds)
         userCount = len(set(self.bot.get_all_members()))
-        embed = discord.Embed()\
+        embed = discord.Embed(color=0xffff00)\
             .set_author(name=self.bot.user, icon_url=self.bot.user.avatar_url)\
             .add_field(name="Guilds:", value=guildCount, inline=True)\
             .add_field(name="Users:", value=userCount, inline=True)\
-            .add_field(name="Documentation",
-                       value="[Documentation site](https://victorgao001.gitbook.io/jomd/)", inline=False)\
-            .add_field(name="Commands", value="[Command List](https://victorgao001.gitbook.io/jomd/)", inline=False)\
             .add_field(name="Invite",
                        value="[Invite link](https://discord.com/api/oauth2/" +
                        "authorize?client_id=725004198466551880&scope=bot)",
+                       inline=False)\
+            .add_field(name="Github",
+                       value="[Github link](https://github.com/JoshuaTianYangLiu/JOMD)",
                        inline=False)\
             .add_field(name="Support", value="[Server link](https://discord.gg/VEWFpgPhnz)", inline=False)
         await ctx.send(embed=embed)

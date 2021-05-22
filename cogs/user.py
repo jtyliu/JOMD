@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
-from sqlalchemy.sql.sqltypes import DateTime
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import func, not_, orm
@@ -22,9 +21,134 @@ class User(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['ui'], usage='[username] [latest submissions]')
+    @commands.command(usage='[username] [latest submissions]')
     async def user(self, ctx, username: typing.Optional[str_not_int] = None,
                    amount: typing.Optional[int] = None):
+        """Show user profile and latest submissions
+        Use surround your username with '' if it can be interpreted as a number
+        """
+
+        query = Query()
+        username = username or query.get_handle(ctx.author.id, ctx.guild.id)
+
+        # If user is not found in db
+        if username is None:
+            username = str(amount)
+            amount = None
+
+        if username is None:
+            return
+
+        if amount is not None:
+            amount = min(amount, 8)
+            if amount < 1:
+                return await ctx.send('Please request at least one submission')
+
+        try:
+            user = await query.get_user(username)
+        except ObjectNotFound:
+            return await ctx.send(f'{username} does not exist on DMOJ')
+
+        username = user.username
+
+        def is_rated(contest):
+            return 1 if contest.is_rated else 0
+
+        description = 'Calculated points: %.2f' % user.performance_points
+        embed = discord.Embed(
+            title=username,
+            url=f'https://dmoj.ca/user/{username}',
+            description=description,
+            color=0xfcdb05,
+        )
+
+        embed.set_thumbnail(url=await query.get_pfp(username))
+        embed.add_field(
+            name="Rank by points",
+            value=await query.get_placement(username),
+            inline=False
+        )
+        embed.add_field(
+            name="Problems Solved",
+            value=user.problem_count,
+            inline=False
+        )
+        embed.add_field(
+            name="Rating",
+            value=user.rating,
+            inline=True
+        )
+        embed.add_field(
+            name="Contests Written",
+            value=sum(map(is_rated, user.contests)),
+            inline=True
+        )
+
+        await ctx.send(embed=embed)
+
+        if amount is None:
+            return
+
+        submissions = await query.get_latest_submissions(username, amount)
+
+        embed = discord.Embed(
+            title=f"{username}'s latest submissions",
+            color=0xfcdb05
+        )
+        for submission in submissions:
+            problem = submission.problem[0]
+            if problem.points is not None:
+                points = str(int(problem.points)) + 'p'
+                if problem.partial:
+                    points += 'p'
+            else:
+                points = '???'
+
+            true_short_name = submission.language[0].short_name
+            if true_short_name == '':
+                # wtf dmoj
+                true_short_name = submission.language[0].key
+
+            embed.add_field(
+                name="%s / %s" %
+                     (str(submission.score_num), str(submission.score_denom)),
+                value="%s | %s" % (submission.result,
+                                   true_short_name),
+                inline=True
+            )
+
+            embed.add_field(
+                name="%s (%s)" %
+                     (submission.problem[0].name, points),
+                value="%s | [Problem](https://dmoj.ca/problem/%s)" %
+                      (submission.date.astimezone(TZ).
+                       strftime("%b. %d, %Y, %I:%M %p").
+                       replace('AM', 'a.m.').
+                       replace('PM', 'p.m.'),
+                       submission.problem[0].code),
+                      # Jan. 13, 2021, 12:17 a.m.
+                      # %b. %d, %Y, %I:%M %p
+                inline=True
+            )
+            try:
+                embed.add_field(
+                    name="%.2fs" % submission.time,
+                    value="%s" % submission.memory_str,
+                    inline=True,
+                )
+            except TypeError:
+                embed.add_field(
+                    name="---",
+                    value="%s" % submission.memory_str,
+                    inline=True,
+                )
+
+        await ctx.send(embed=embed)
+        return None
+
+    @commands.command(aliases=['ui'], usage='[username] [latest submissions]')
+    async def userinfo(self, ctx, username: typing.Optional[str_not_int] = None,
+                       amount: typing.Optional[int] = None):
         """Show user profile and latest submissions
 
         Use surround your username with '' if it can be interpreted as a number

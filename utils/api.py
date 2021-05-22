@@ -822,7 +822,7 @@ class API:
 
     async def get_placement(self, username):
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
-        soup = BeautifulSoup(resp, features="html.parser")
+        soup = BeautifulSoup(resp, features="html5lib")
         rank_str = soup.find('div', class_='user-sidebar')\
                        .findChildren(recursive=False)[3].text
         rank = int(rank_str.split('#')[-1])
