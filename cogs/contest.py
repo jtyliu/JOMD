@@ -86,17 +86,27 @@ class Contest(commands.Cog):
                 if ranking["user"] == username:
                     # If contest is not rated, this crashes
                     if contest.is_rated:
-                        evan_ranking = rankings[username]
-                        rank_dict = {
-                            "rank": int(evan_ranking["rank"]),
-                            "username": username + ":",
-                            "old_rating": evan_ranking["old_rating"],
-                            "new_rating": evan_ranking["new_rating"],
-                        }
-                        if evan_ranking["rating_change"] and evan_ranking["rating_change"] > 0:
-                            rank_dict["rating_change"] = "+" + str(evan_ranking["rating_change"])
+                        if username in rankings:
+                            evan_ranking = rankings[username]
+                            rank_dict = {
+                                "rank": int(evan_ranking["rank"]),
+                                "username": username + ":",
+                                "old_rating": evan_ranking["old_rating"],
+                                "new_rating": evan_ranking["new_rating"],
+                            }
+                            if evan_ranking["rating_change"] and evan_ranking["rating_change"] > 0:
+                                rank_dict["rating_change"] = "+" + str(evan_ranking["rating_change"])
+                            else:
+                                rank_dict["rating_change"] = evan_ranking["rating_change"]
                         else:
-                            rank_dict["rating_change"] = evan_ranking["rating_change"]
+                            # User joined contest but was not rated
+                            rank_dict = {
+                                "rank": len(rankings) + 1,
+                                "username": username + ":",
+                                "old_rating": "N/A",
+                                "new_rating": "N/A",
+                                "rating_change": "N/A"
+                            }
                     else:
                         rank_dict = {
                             "rank": rank_num + 1,
@@ -222,7 +232,7 @@ class Contest(commands.Cog):
 
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
             if endTime > datetime.now(timezone.utc).astimezone():
-                return ctx.send("Your window is not done.")
+                return await ctx.send("Your window is not done.")
             else:
                 try:
                     await ctx.author.add_roles(role)
