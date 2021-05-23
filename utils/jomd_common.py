@@ -38,9 +38,9 @@ def point_range(argument) -> typing.Optional[list]:
         if len(argument) != 2:
             raise BadArgument('Too many -, invalid range')
         try:
-            point_high = int(argument[0])
-            point_low = int(argument[1])
-            return [point_high, point_low]
+            point_low = int(argument[0])
+            point_high = int(argument[1])
+            return [point_low, point_high]
         except ValueError:
             raise BadArgument('Point values are not an integer')
     try:
