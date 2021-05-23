@@ -40,6 +40,12 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
+        if contest.hidden_scoreboard and contest.end_time > datetime.now():
+            return await ctx.send("Contest ongoing")
+
+        if contest.is_organization_private:
+            return await ctx.send("Contest not found")
+
         q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
         handles = q.all()
 
