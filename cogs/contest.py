@@ -204,6 +204,7 @@ class Contest(commands.Cog):
     async def postcontest(self, ctx, key):
         """Updates post-contest role"""
 
+        await ctx.message.delete()
         query = Query()
 
         username = query.get_handle(ctx.author.id, ctx.guild.id)
@@ -227,7 +228,7 @@ class Contest(commands.Cog):
             return await ctx.send(f"No `postcontest {key}` role found.")
 
         for ranking in contest.rankings:
-            if ranking['user'] != username:
+            if ranking['user'].lower() != username.lower():
                 continue
 
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
