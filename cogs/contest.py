@@ -229,6 +229,9 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
+        if contest.is_organization_private:
+            return await ctx.send("Contest not found")
+
         role = get(ctx.guild.roles, name="postcontest " + key)
         if not role:
             return await ctx.send(f"No `postcontest {key}` role found.")
