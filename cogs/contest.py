@@ -40,6 +40,12 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
+        if contest.hidden_scoreboard and contest.end_time > datetime.now():
+            return await ctx.send("Contest ongoing")
+
+        if contest.is_organization_private:
+            return await ctx.send("Contest not found")
+
         q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
         handles = q.all()
 
@@ -86,17 +92,27 @@ class Contest(commands.Cog):
                 if ranking["user"] == username:
                     # If contest is not rated, this crashes
                     if contest.is_rated:
-                        evan_ranking = rankings[username]
-                        rank_dict = {
-                            "rank": int(evan_ranking["rank"]),
-                            "username": username + ":",
-                            "old_rating": evan_ranking["old_rating"],
-                            "new_rating": evan_ranking["new_rating"],
-                        }
-                        if evan_ranking["rating_change"] and evan_ranking["rating_change"] > 0:
-                            rank_dict["rating_change"] = "+" + str(evan_ranking["rating_change"])
+                        if username in rankings:
+                            evan_ranking = rankings[username]
+                            rank_dict = {
+                                "rank": int(evan_ranking["rank"]),
+                                "username": username + ":",
+                                "old_rating": evan_ranking["old_rating"],
+                                "new_rating": evan_ranking["new_rating"],
+                            }
+                            if evan_ranking["rating_change"] and evan_ranking["rating_change"] > 0:
+                                rank_dict["rating_change"] = "+" + str(evan_ranking["rating_change"])
+                            else:
+                                rank_dict["rating_change"] = evan_ranking["rating_change"]
                         else:
-                            rank_dict["rating_change"] = evan_ranking["rating_change"]
+                            # User joined contest but was not rated
+                            rank_dict = {
+                                "rank": len(rankings) + 1,
+                                "username": username + ":",
+                                "old_rating": "N/A",
+                                "new_rating": "N/A",
+                                "rating_change": "N/A"
+                            }
                     else:
                         rank_dict = {
                             "rank": rank_num + 1,
@@ -194,6 +210,7 @@ class Contest(commands.Cog):
     async def postcontest(self, ctx, key):
         """Updates post-contest role"""
 
+        await ctx.message.delete()
         query = Query()
 
         username = query.get_handle(ctx.author.id, ctx.guild.id)
@@ -212,17 +229,20 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
+        if contest.is_organization_private:
+            return await ctx.send("Contest not found")
+
         role = get(ctx.guild.roles, name="postcontest " + key)
         if not role:
             return await ctx.send(f"No `postcontest {key}` role found.")
 
         for ranking in contest.rankings:
-            if ranking['user'] != username:
+            if ranking['user'].lower() != username.lower():
                 continue
 
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
             if endTime > datetime.now(timezone.utc).astimezone():
-                return ctx.send("Your window is not done.")
+                return await ctx.send("Your window is not done.")
             else:
                 try:
                     await ctx.author.add_roles(role)

@@ -121,6 +121,8 @@ class Query:
 
         a = API()
         await a.get_problem(code)
+        q = session.query(Problem_DB).\
+            filter(Problem_DB.code == a.data.object.code)
         if q.count():
             q.delete()
         session.add(Problem_DB(a.data.object))
@@ -174,6 +176,9 @@ class Query:
                 return q.first()
         a = API()
         await a.get_contest(key)
+        # Requery the key to prevent path traversal from killing db
+        q = session.query(Contest_DB).\
+            filter(Contest_DB.key == a.data.object.key)
         if q.count():
             q.delete()
         session.add(Contest_DB(a.data.object))
@@ -220,6 +225,8 @@ class Query:
 
         a = API()
         await a.get_user(username)
+        q = session.query(User_DB).\
+            filter(func.lower(User_DB.username) == func.lower(a.data.object.username))
         if q.count():
             # Needs to be fetch, the default (evaluate) is not able to eval
             # the query

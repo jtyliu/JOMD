@@ -38,9 +38,9 @@ def point_range(argument) -> typing.Optional[list]:
         if len(argument) != 2:
             raise BadArgument('Too many -, invalid range')
         try:
-            point_high = int(argument[0])
-            point_low = int(argument[1])
-            return [point_high, point_low]
+            point_low = int(argument[0])
+            point_high = int(argument[1])
+            return [point_low, point_high]
         except ValueError:
             raise BadArgument('Point values are not an integer')
     try:
@@ -184,6 +184,7 @@ async def scroll_embed(ctx, bot, message, title, content):
     while True:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
+
             if str(reaction.emoji) == PREV:
                 page = max(0, min(len(content) - 1, page - 1))
             elif str(reaction.emoji) == NEXT:
