@@ -508,7 +508,16 @@ class User(commands.Cog):
                 username = (await query.get_user(arg)).username
         if username is None:
             username = query.get_handle(ctx.author.id, ctx.guild.id)
-        submissions = await query.get_submissions(username, result='AC')
+        await query.get_submissions(username, result='AC')
+        # I'm pretty sure you can leak problems like this, 
+        submissions = session.query(Submission_DB)\
+            .filter(Submission_DB._user == username)\
+            .filter(Submission_DB.result == 'AC')\
+            .options(orm.joinedload(Submission_DB.problem, innerjoin=True))\
+            .join(Submission_DB.problem)\
+            .filter(Problem_DB.is_organization_private == 0)\
+            .filter(Problem_DB.is_public == 1)\
+            .order_by(Submission_DB.date).all()
         uniqueSubmissions = []
         solved = set()
         for sub in submissions:
@@ -523,7 +532,7 @@ class User(commands.Cog):
         for sub in uniqueSubmissions:
             age = (datetime.now() - sub.date).days
             # sub.problem[0].name is rly slow
-            page += f"[{sub.problem[0].name}]({SITE_URL}{sub._code}) [{sub.points}] ({age} days ago)\n"
+            page += f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n"
             cnt += 1
             if cnt % 10 == 0:
                 content.append(page)
