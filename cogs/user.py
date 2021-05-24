@@ -509,7 +509,7 @@ class User(commands.Cog):
         if username is None:
             username = query.get_handle(ctx.author.id, ctx.guild.id)
         await query.get_submissions(username, result='AC')
-        # I'm pretty sure you can leak problems like this, 
+
         submissions = session.query(Submission_DB)\
             .filter(Submission_DB._user == username)\
             .filter(Submission_DB.result == 'AC')\
