@@ -139,7 +139,8 @@ async def scroll_message(ctx, bot, message, content):
     page = 0
 
     def check(reaction, user):  # from stackoverflow :monkey:
-        return not user.bot and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
+        return not user.bot and reaction.message == message\
+            and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
     while True:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
@@ -178,7 +179,8 @@ async def scroll_embed(ctx, bot, message, title, content):
     page = 0
 
     def check(reaction, user):  # from stackoverflow :monkey:
-        return not user.bot and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
+        return not user.bot and reaction.message == message\
+            and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
     while True:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
