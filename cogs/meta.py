@@ -47,7 +47,7 @@ class Meta(commands.Cog):
         """Check if the bot has been rate limited"""
         api = API()
         try:
-            await api.get_judges()
+            await api.get_user('JoshuaL')
             user = api.data.objects
             if user is None:
                 await ctx.send('There is something wrong with the api, '
