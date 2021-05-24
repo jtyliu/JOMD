@@ -18,6 +18,7 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
                       Language as Language_DB, Judge as Judge_DB)
 from operator import itemgetter
 from contextlib import asynccontextmanager
+import typing
 
 
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
@@ -630,7 +631,7 @@ class API:
             dat = self.Data()
             self.data = await dat.parse(data["data"], _type)
 
-    async def get_contests(self, tag=None, organization=None, page=None):
+    async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
             "tag": tag,
             "organization": organization,
@@ -640,14 +641,14 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Contest)
 
-    async def get_contest(self, contest_key):
+    async def get_contest(self, contest_key: str) -> None:
         resp = await _query_api(SITE_URL + 'api/v2/contest/' +
                                 contest_key, 'json')
         await self.parse(resp, Contest)
 
-    async def get_participations(self, contest=None, user=None,
-                                 is_disqualified=None,
-                                 virtual_participation_number=None, page=None):
+    async def get_participations(self, contest: str = None, user: str = None,
+                                 is_disqualified: bool = None,
+                                 virtual_participation_number: int = None, page: int = None) -> None:
         params = {
             "contest": contest,
             "user": user,
@@ -659,8 +660,8 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Participation)
 
-    async def get_problems(self, partial=None, group=None, _type=None,
-                           organization=None, search=None, page=None):
+    async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
+                           organization: str = None, search: str = None, page: int = None) -> None:
         params = {
             "partial": partial,
             "group": group,
@@ -673,12 +674,12 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Problem)
 
-    async def get_problem(self, code):
+    async def get_problem(self, code: str) -> None:
         resp = await _query_api(SITE_URL + 'api/v2/problem/' +
                                 code, 'json')
         await self.parse(resp, Problem)
 
-    async def get_users(self, organization=None, page=None):
+    async def get_users(self, organization: str = None, page: int = None) -> None:
         params = {
             "organization": organization,
             "page": page,
@@ -687,13 +688,13 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, User)
 
-    async def get_user(self, username):
+    async def get_user(self, username: str) -> None:
         resp = await _query_api(SITE_URL + 'api/v2/user/' +
                                 username, 'json')
         await self.parse(resp, User)
 
-    async def get_submissions(self, user=None, problem=None,
-                              language=None, result=None, page=None):
+    async def get_submissions(self, user: str = None, problem: str = None,
+                              language: str = None, result: str = None, page: int = None) -> None:
         params = {
             "user": user,
             "problem": problem,
@@ -705,14 +706,14 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Submission)
 
-    async def get_submission(self, submission_id):
+    async def get_submission(self, submission_id: typing.Union[int, str]) -> None:
         # Should only accept a string, perhaps I should do something
         # if it were an int
         resp = await _query_api(SITE_URL + 'api/v2/submission/' +
-                                submission_id, 'json')
+                                str(submission_id), 'json')
         await self.parse(resp, Submission)
 
-    async def get_organizations(self, is_open=None, page=None):
+    async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
         params = {
             "is_open": is_open,
             "page": page,
@@ -721,7 +722,7 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Organization)
 
-    async def get_languages(self, common_name=None, page=None):
+    async def get_languages(self, common_name: str = None, page: int = None) -> None:
         params = {
             "common_name": common_name,
             "page": page,
@@ -730,7 +731,7 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Language)
 
-    async def get_judges(self, page=None):
+    async def get_judges(self, page: int = None) -> None:
         params = {
             "page": page,
         }
@@ -738,19 +739,19 @@ class API:
                                 self.url_encode(params), 'json')
         await self.parse(resp, Judge)
 
-    async def get_pfp(self, username):
+    async def get_pfp(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
 
-    async def get_user_description(self, username):
+    async def get_user_description(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         description = str(soup.find('div', class_='content-description'))
         return description
 
-    async def get_latest_submission(self, user, num):
+    async def get_latest_submission(self, username: str, num: int) -> Submission:
         # Don't look at me! I'm hideous!
         def soup_parse(soup):
             submission_id = soup['id']
@@ -797,7 +798,7 @@ class API:
             res = {
                 "id": submission_id,
                 "problem": problem,
-                "user": user,
+                "user": username,
                 "date": date,
                 "language": lang,
                 "time": time,
@@ -812,7 +813,7 @@ class API:
             ret = Submission(res)
             return ret
         resp = await _query_api(SITE_URL +
-                                f'submissions/user/{user}/', 'text')
+                                f'submissions/user/{username}/', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
@@ -820,7 +821,7 @@ class API:
         await Submission.async_map(Submission, ret)
         return ret
 
-    async def get_placement(self, username):
+    async def get_placement(self, username: str) -> int:
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
         soup = BeautifulSoup(resp, features="html5lib")
         rank_str = soup.find('div', class_='user-sidebar')\

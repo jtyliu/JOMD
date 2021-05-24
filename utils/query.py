@@ -32,6 +32,8 @@ class Query:
                         cond = or_(key.contains(v) for v in val)
                     elif isinstance(val, functions.Function):
                         cond = key == val
+                    elif isinstance(val, bool):
+                        cond = key == val
                     return cond
             except AttributeError:
                 # cols which are relationship break this
@@ -42,15 +44,17 @@ class Query:
                 cond = key.in_(val)
             elif isinstance(val, functions.Function):
                 cond = key == val
+            elif isinstance(val, bool):
+                cond = key == val
         return cond
 
-    async def get_pfp(self, username) -> str:
+    async def get_pfp(self, username: str) -> str:
         return await API().get_pfp(username)
 
-    async def get_user_description(self, username) -> str:
+    async def get_user_description(self, username: str) -> str:
         return await API().get_user_description(username)
 
-    async def get_languages(self, common_name=None) -> [Language_DB]:
+    async def get_languages(self, common_name: str = None) -> List[Language_DB]:
 
         q = session.query(Language_DB).\
             filter(self.parse(Language_DB.common_name, common_name))
@@ -64,8 +68,8 @@ class Query:
         session.commit()
         return languages
 
-    async def get_problems(self, partial=None, group=None, _type=None,
-                           organization=None, search=None, cached=False) -> List[Problem_DB]:
+    async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
+                           organization: str = None, search: str = None, cached: bool = False) -> List[Problem_DB]:
 
         q = session.query(Problem_DB).\
             filter(self.parse(Problem_DB.partial, partial)).\
@@ -111,7 +115,7 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_problem(self, code, cached=True) -> Problem_DB:
+    async def get_problem(self, code: str, cached: bool = True) -> Problem_DB:
         q = session.query(Problem_DB).\
             filter(Problem_DB.code == code)
         if q.count() and cached:
@@ -135,8 +139,8 @@ class Query:
         await a.get_judges()
         return list(map(Judge_DB, a.data.objects))
 
-    async def get_contests(self, tag=None,
-                           organization=None) -> List[Contest_DB]:
+    async def get_contests(self, tag: str = None,
+                           organization: str = None) -> List[Contest_DB]:
         a = API()
 
         page = 1
@@ -167,7 +171,7 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_contest(self, key) -> Contest_DB:
+    async def get_contest(self, key: str) -> Contest_DB:
         q = session.query(Contest_DB).\
             filter(Contest_DB.key == key)
         if q.count():
@@ -185,7 +189,7 @@ class Query:
         session.commit()
         return q.first()
 
-    async def get_users(self, organization=None) -> List[User_DB]:
+    async def get_users(self, organization: str = None) -> List[User_DB]:
         a = API()
 
         page = 1
@@ -215,7 +219,7 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_user(self, username) -> User_DB:
+    async def get_user(self, username: str) -> User_DB:
         q = session.query(User_DB).\
             filter(func.lower(User_DB.username) == func.lower(username))
         # if q.count():
@@ -236,8 +240,8 @@ class Query:
         return q.first()
 
     async def get_participations(
-        self, contest=None, user=None, is_disqualified=None,
-        virtual_participation_number=None
+        self, contest: str = None, user: str = None, is_disqualified: bool = None,
+        virtual_participation_number: int = None
     ) -> List[Participation_DB]:
         a = API()
 
@@ -312,8 +316,8 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_submissions(self, user=None, problem=None, language=None,
-                              result=None) -> List[Submission_DB]:
+    async def get_submissions(self, user: str = None, problem: str = None, language: str = None,
+                              result: str = None) -> List[Submission_DB]:
         # This function is the only one which might take a while to run and
         # has data that is added reguarly. asyncio.gather can apply to all
         # functions but this one is the only one which really needs it
@@ -360,17 +364,6 @@ class Query:
         apis = []
         to_gather = []
 
-        async def get_submission(api, user, problem, language, result, page):
-            try:
-                api.get_submissions(user=user, problem=problem,
-                                    language=language,
-                                    result=result, page=page)
-            except Exception:
-                # Sometimes when caching a user with many pages one might not return correctly
-                # this will silently return nothing
-                # Perhaps I should implement some sort of error catching in the cogs
-                pass
-
         for _ in range(2, total_pages + 1):
             page += 1
             api = API()
@@ -393,41 +386,42 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_submission(self, id):
+    async def get_submission(self, id: int) -> Submission_DB:
         # Can't use this till i figure out whether or not to use api token
-        pass
+        raise NotImplementedError
+        # pass
 
-    async def get_latest_submissions(self, user, num) -> List[Submission_DB]:
+    async def get_latest_submissions(self, user: str, num: int) -> List[Submission_DB]:
         a = API()
         ret = await a.get_latest_submission(user, num)
         return ret
 
-    async def get_placement(self, username) -> int:
+    async def get_placement(self, username: str) -> int:
         a = API()
         return await a.get_placement(username)
 
-    def get_handle(self, id, guild_id):
+    def get_handle(self, id: int, guild_id: int) -> str:
         q = session.query(Handle_DB).\
             filter(Handle_DB.id == id).\
             filter(Handle_DB.guild_id == guild_id)
         if q.count():
             return q.first().handle
 
-    def get_handle_user(self, handle, guild_id):
+    def get_handle_user(self, handle: str, guild_id: int) -> int:
         q = session.query(Handle_DB).\
             filter(Handle_DB.handle == handle).\
             filter(Handle_DB.guild_id == guild_id)
         if q.count():
             return q.first().id
 
-    def get_random_problem(self, low=1, high=10):
+    def get_random_problem(self, low: int = 1, high: int = 10) -> Problem_DB:
         q = session.query(Problem_DB)\
             .filter(Problem_DB.points.between(low, high))\
             .order_by(func.random()).limit(1)
         if q.count():
             return q.first()
 
-    def get_unsolved_problems(self, username, types, low=1, high=50):
+    def get_unsolved_problems(self, username: str, types: List[str], low: int = 1, high: int = 50) -> Problem_DB:
         # Does not find problems if you first
         # +update_problems
         # +gimme
@@ -446,7 +440,7 @@ class Query:
             .filter(Problem_DB.is_public == 1)
         return q.all()
 
-    def get_attempted_problems(self, username, types):
+    def get_attempted_problems(self, username: str, types: List[str]) -> Problem_DB:
         conds = [Problem_DB.types.contains(_type) for _type in types]
         sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
             .filter(Submission_DB._user == username)\
