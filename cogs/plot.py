@@ -74,6 +74,7 @@ class Plot(commands.Cog):
         total_data = {}
         not_cached = []
         for username in usernames:
+            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
@@ -130,6 +131,7 @@ class Plot(commands.Cog):
         total_data = {}
         not_cached = []
         for username in usernames:
+            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .options(orm.joinedload('problem'))\
                 .join(User_DB, User_DB.username == Submission_DB._user,
@@ -302,6 +304,7 @@ class Plot(commands.Cog):
         not_cached = []
 
         for username in usernames:
+            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
