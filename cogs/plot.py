@@ -297,7 +297,6 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                not_cached.append(username)
                 await ctx.send(f"`{username}` does not have any cached submissions,caching now`")
                 await query.get_submissions(username)
 
