@@ -74,11 +74,11 @@ class Plot(commands.Cog):
         total_data = {}
         not_cached = []
         for username in usernames:
-            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
                 not_cached.append(username)
+                await query.get_submissions(username)
 
             q = session.query(func.min(Submission_DB.date))\
                 .join(Problem_DB, Problem_DB.code == Submission_DB._code)\
@@ -131,7 +131,6 @@ class Plot(commands.Cog):
         total_data = {}
         not_cached = []
         for username in usernames:
-            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .options(orm.joinedload('problem'))\
                 .join(User_DB, User_DB.username == Submission_DB._user,
@@ -149,6 +148,8 @@ class Plot(commands.Cog):
             submissions = q.all()
             if len(submissions) == 0:
                 not_cached.append(username)
+                await query.get_submissions(username)
+                submissions = q.all()
             problems_ACed = dict()
             code_to_points = dict()
 
@@ -304,11 +305,11 @@ class Plot(commands.Cog):
         not_cached = []
 
         for username in usernames:
-            await query.get_submissions(username)
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
                 not_cached.append(username)
+                await query.get_submissions(username)
 
         for i, types in enumerate(important_types):
             total_problems = await query.get_problems(_type=types, cached=True)
