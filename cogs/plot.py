@@ -76,7 +76,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions,caching now`")
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
                 await query.get_submissions(username)
 
             q = session.query(func.min(Submission_DB.date))\
@@ -141,7 +141,7 @@ class Plot(commands.Cog):
 
             submissions = q.all()
             if len(submissions) == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions,caching now`")
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
                 await query.get_submissions(username)
                 submissions = q.all()
             problems_ACed = dict()
@@ -297,7 +297,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions,caching now`")
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
                 await query.get_submissions(username)
 
         for i, types in enumerate(important_types):
