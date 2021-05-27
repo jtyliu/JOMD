@@ -48,7 +48,7 @@ class Meta(commands.Cog):
         api = API()
         try:
             await api.get_user('JoshuaL')
-            user = api.data.objects
+            user = api.data.object
             if user is None:
                 await ctx.send('There is something wrong with the api, '
                                'please contact an admin')
