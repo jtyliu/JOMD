@@ -404,7 +404,7 @@ class User:
                     await api.get_contest(contest_key)
                     # This causes db errors, and in the case the above doesn't catch it.
                     # This will be a last ditch effort
-                    if session.query(Contest_DB).filter(Contest_DB.key == contest_key).exists():
+                    if session.query(Contest_DB).filter(Contest_DB.key == contest_key).count():
                         continue
                     session.add(Contest_DB(api.data.object))
                     session.commit()
