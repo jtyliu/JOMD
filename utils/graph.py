@@ -15,7 +15,11 @@ def plot_solved(datas):
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
-        df.plot(label="%s (%d)" % (username, df.max()))
+        solved_num = df.max()
+        print(type(solved_num))
+        if isinstance(solved_num, float):
+            solved_num = 0
+        df.plot(label="%s (%d)" % (username, solved_num))
     sns.set_style("whitegrid")
     plt.xlabel('Date')
     plt.ylabel('Problem Solved Count')

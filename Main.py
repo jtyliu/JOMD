@@ -2,6 +2,7 @@ import os
 from discord.ext import commands
 from pathlib import Path
 import discord
+from utils.db import session, Problem as Problem_DB
 from utils.query import Query
 import asyncio
 
@@ -33,9 +34,10 @@ def main():
         return True
 
     # Get preliminary data
-    q = Query()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(q.get_problems())
+    if session.query(Problem_DB).count() == 0:
+        q = Query()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(q.get_problems())
 
     # Restrict bot usage to inside guild channels only.
     bot.add_check(no_dm_check)
