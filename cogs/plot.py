@@ -72,12 +72,12 @@ class Plot(commands.Cog):
             return await ctx.send('Too many users given, max 10')
 
         total_data = {}
-        not_cached = []
         for username in usernames:
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                not_cached.append(username)
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await query.get_submissions(username)
 
             q = session.query(func.min(Submission_DB.date))\
                 .join(Problem_DB, Problem_DB.code == Submission_DB._code)\
@@ -94,10 +94,6 @@ class Plot(commands.Cog):
             total_data[username] = data_to_plot
 
         plot_solved(total_data)
-
-        if len(not_cached):
-            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
-                           f"submissions. Please use +cache [username]`")
 
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
@@ -128,7 +124,6 @@ class Plot(commands.Cog):
             return await ctx.send('Too many users given, max 10')
 
         total_data = {}
-        not_cached = []
         for username in usernames:
             q = session.query(Submission_DB)\
                 .options(orm.joinedload('problem'))\
@@ -146,7 +141,9 @@ class Plot(commands.Cog):
 
             submissions = q.all()
             if len(submissions) == 0:
-                not_cached.append(username)
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await query.get_submissions(username)
+                submissions = q.all()
             problems_ACed = dict()
             code_to_points = dict()
 
@@ -174,10 +171,6 @@ class Plot(commands.Cog):
                                                   len(problems_ACed))
                     data_to_plot[submission.date] = cur_points
             total_data[username] = data_to_plot
-
-        if len(not_cached):
-            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
-                           f"submissions. Please use +cache [username]`")
 
         plot_points(total_data)
 
@@ -299,13 +292,13 @@ class Plot(commands.Cog):
             return problem.points
 
         max_percentage = 0
-        not_cached = []
 
         for username in usernames:
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                not_cached.append(username)
+                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await query.get_submissions(username)
 
         for i, types in enumerate(important_types):
             total_problems = await query.get_problems(_type=types, cached=True)
@@ -328,9 +321,6 @@ class Plot(commands.Cog):
                 data[labels[i]].append(percentage)
 
         print(data)
-        if len(not_cached):
-            await ctx.send(f"`{', '.join(not_cached)} do not have any cached "
-                           f"submissions. Please use +cache [username]`")
 
         if graph == 'radar':
             plot_type_radar(data, as_percent, max_percentage)
