@@ -60,6 +60,7 @@ def plot_rating(data):
         plt.axhspan(low, high, facecolor=color, alpha=0.8)
 
     # Set the theme
+    plt.style.use('default')
     plt.grid(color='w', linestyle='solid', alpha=0.8)
     plt.gca().set_facecolor('#E7E7F0')
 
