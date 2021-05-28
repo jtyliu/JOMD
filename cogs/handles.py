@@ -160,7 +160,7 @@ class Handles(commands.Cog):
 
     @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg="rating"):
-        """"Shows registered server members in ranked order"""
+        """Shows registered server members in ranked order"""
         arg = arg.lower()
         if arg != "rating" and arg != "maxrating" and arg != "points" and arg != "solved":
             return await ctx.send_help('top')
