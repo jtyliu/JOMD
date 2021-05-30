@@ -412,13 +412,22 @@ class User(commands.Cog):
             q = q.filter(not_(Contest_DB.rankings.contains(user.username)))\
                 .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))\
                 .filter(Contest_DB.is_private == 0)\
-                .filter(Contest_DB.is_organization_private == 1)
+                .filter(Contest_DB.is_organization_private == 0)
 
         if q.count() == 0:
             await ctx.send("Cannot find any contests which "
                            "all users have not done")
             return
-        contest = random.choice(q.all())
+
+        contests = q.all()
+
+        while True:
+            contest = random.choice(contests)
+            try:
+                contest = await query.get_contest(contest.key, cached=False)
+                break
+            except ObjectNotFound:
+                pass
 
         # When problems are private, it says there are no problems
         window = 'No'

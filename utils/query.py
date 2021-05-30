@@ -171,10 +171,10 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_contest(self, key: str) -> Contest_DB:
+    async def get_contest(self, key: str, cached: bool = True) -> Contest_DB:
         q = session.query(Contest_DB).\
             filter(Contest_DB.key == key)
-        if q.count():
+        if q.count() and cached:
             # is_rated checks if it has detailed rows
             if q.first().is_rated is not None:
                 return q.first()
