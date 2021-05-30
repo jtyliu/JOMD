@@ -410,7 +410,9 @@ class User(commands.Cog):
                 .filter(func.ifnull(sub_q.c.points, 0) != 0)
             sub_q = list(map(itemgetter(0), sub_q.all()))
             q = q.filter(not_(Contest_DB.rankings.contains(user.username)))\
-                .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))
+                .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))\
+                .filter(Contest_DB.is_private == 0)\
+                .filter(Contest_DB.is_organization_private == 1)
 
         if q.count() == 0:
             await ctx.send("Cannot find any contests which "
@@ -422,7 +424,7 @@ class User(commands.Cog):
         window = 'No'
         is_rated = 'Not Rated'
         if contest.time_limit:
-            window = f"{contest.time_limit/60/60} Hr"
+            window = f"{round(contest.time_limit/60/60, 2)} Hr"
         if contest.is_rated:
             is_rated = "Rated"
         embed = discord.Embed(
