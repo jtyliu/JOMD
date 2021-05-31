@@ -1,5 +1,5 @@
 from utils.jomd_common import scroll_message
-from utils.constants import SITE_URL
+from utils.constants import SITE_URL, TZ
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -40,7 +40,7 @@ class Contest(commands.Cog):
             await ctx.send("Contest not found")
             return
 
-        if contest.hidden_scoreboard and contest.end_time > datetime.now():
+        if contest.hidden_scoreboard and contest.end_time > datetime.utcnow():
             return await ctx.send("Contest ongoing")
 
         if contest.is_organization_private:
@@ -207,16 +207,24 @@ class Contest(commands.Cog):
         await scroll_message(ctx, self.bot, message, content)
 
     @commands.command(aliases=['pc'], usage="[contest key]")
-    async def postcontest(self, ctx, key):
+    async def postcontest(self, ctx, key, option):
         """Updates post-contest role"""
 
         await ctx.message.delete()
+
+        role = get(ctx.guild.roles, name="Admin")
+
+        update_all = option == '+all' and role in ctx.author.roles
+
         query = Query()
 
-        username = query.get_handle(ctx.author.id, ctx.guild.id)
+        if update_all:
+            usernames = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+        else:
+            username = query.get_handle(ctx.author.id, ctx.guild.id)
 
-        if username is None:
-            return await ctx.send("Your account is not linked!")
+            if username is None:
+                return await ctx.send("Your account is not linked!")
 
         q = session.query(Contest_DB).filter(Contest_DB.key == key)
         # Clear cache
@@ -235,6 +243,21 @@ class Contest(commands.Cog):
         role = get(ctx.guild.roles, name="postcontest " + key)
         if not role:
             return await ctx.send(f"No `postcontest {key}` role found.")
+
+        if update_all:
+            participants = set()
+            for ranking in contest.rankings:
+                endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
+                if endTime < datetime.now(timezone.utc).astimezone():
+                    participants.add(ranking['user'])
+
+            for user in usernames:
+                if user.handle in participants:
+                    try:
+                        await ctx.guild.get_member(user.id).add_roles(role)
+                    except discord.Forbidden:
+                        return await ctx.send("No permission to assign the role.")
+            return await ctx.send("Updated post contest for " + key)
 
         for ranking in contest.rankings:
             if ranking['user'].lower() != username.lower():
