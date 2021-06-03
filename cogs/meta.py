@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from utils.query import Query
 from utils.api import API
-from utils.db import session, Problem as Problem_DB
+from utils.db import session, Problem as Problem_DB, Submission as Submission_DB
 import typing
 
 
@@ -31,6 +31,7 @@ class Meta(commands.Cog):
         username = user.username
 
         msg = await ctx.send(f'Caching {username}\'s submissions')
+        session.query(Submission_DB).filter(Submission_DB._user == username).delete()
         await query.get_submissions(username)
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached')
