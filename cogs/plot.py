@@ -9,6 +9,7 @@ from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB)
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
                          plot_points, plot_solved)
+from utils.jomd_common import calculate_points
 from operator import itemgetter
 from sqlalchemy import or_, orm, func
 import asyncio
@@ -160,7 +161,7 @@ class Plot(commands.Cog):
                         points_arr.remove(code_to_points[code])
                         code_to_points[code] = points
                         bisect.insort(points_arr, points)
-                    cur_points = calculate_partial_points(points_arr[::-1],
+                    cur_points = calculate_points(points_arr[::-1],
                                                   len(problems_ACed))
                     data_to_plot[submission.date] = cur_points
             total_data[username] = data_to_plot
