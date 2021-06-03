@@ -133,15 +133,15 @@ class Problem(Base):
     points = Column(Integer)
     partial = Column(Boolean)
     short_circuit = Column(Boolean)
-    languages = relationship("Language", secondary=language_problem,
+    languages = relationship('Language', secondary=language_problem,
                              back_populates='problems')
     is_organization_private = Column(Boolean)
-    organizations = relationship("Organization",
+    organizations = relationship('Organization',
                                  secondary=organization_problem,
                                  back_populates='problems')
     is_public = Column(Boolean)
 
-    contests = relationship("Contest", secondary=contest_problem,
+    contests = relationship('Contest', secondary=contest_problem,
                             back_populates='problems')
     solved_users = relationship('User', secondary=problem_user,
                                 back_populates='solved_problems')

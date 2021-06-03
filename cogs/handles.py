@@ -43,7 +43,7 @@ class Handles(commands.Cog):
 
     @commands.command()
     async def unlink(self, ctx):
-        """Unlink your discord account with your dmoj account"""
+        '''Unlink your discord account with your dmoj account'''
         query = Query()
         if not query.get_handle(ctx.author.id, ctx.guild.id):
             await ctx.send('You are not linked with any user')
@@ -57,13 +57,13 @@ class Handles(commands.Cog):
 
     @commands.command(usage='dmoj_handle')
     async def link(self, ctx, username: str):
-        """Links your discord account to your dmoj account"""
+        '''Links your discord account to your dmoj account'''
         # Check if user exists
         query = Query()
         user = await query.get_user(username)
 
         if user is None:
-            await ctx.send(f"{username} does not exist on DMOJ")
+            await ctx.send(f'{username} does not exist on DMOJ')
             return
 
         username = user.username
@@ -96,7 +96,7 @@ class Handles(commands.Cog):
         session.add(handle)
         session.commit()
         await ctx.send(
-            "%s, you now have linked your account to %s" %
+            '%s, you now have linked your account to %s' %
             (ctx.author.name, username)
         )
 
@@ -105,17 +105,17 @@ class Handles(commands.Cog):
         if rank in rank_to_role:
             await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
         else:
-            await ctx.send("You are missing the " + rank.name + " role")
+            await ctx.send('You are missing the ' + rank.name + ' role')
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role(ADMIN_ROLE)
     async def _set(self, ctx, member, username: str):
 
-        """Manually link two accounts together"""
+        '''Manually link two accounts together'''
         query = Query()
         member = await query.parseUser(ctx, member)
 
-        if username != "+remove":
+        if username != '+remove':
             user = await query.get_user(username)
 
             if user is None:
@@ -136,7 +136,7 @@ class Handles(commands.Cog):
             session.commit()
             await ctx.send(f'Unlinked {member.display_name} with handle {handle.handle}')
 
-        if username == "+remove":
+        if username == '+remove':
             return
 
         if query.get_handle_user(username, ctx.guild.id):
@@ -150,50 +150,50 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
-        await ctx.send(f"Linked {member.name} with {username}")
+        await ctx.send(f'Linked {member.name} with {username}')
 
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
         if rank in rank_to_role:
             await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
         else:
-            await ctx.send("You are missing the " + rank.name + " role")
+            await ctx.send('You are missing the ' + rank.name + ' role')
 
     @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
-    async def top(self, ctx, arg="rating"):
-        """Shows registered server members in ranked order"""
+    async def top(self, ctx, arg='rating'):
+        '''Shows registered server members in ranked order'''
         arg = arg.lower()
-        if arg != "rating" and arg != "maxrating" and arg != "points" and arg != "solved":
+        if arg != 'rating' and arg != 'maxrating' and arg != 'points' and arg != 'solved':
             return await ctx.send_help('top')
         users = session.query(User_DB).join(Handle_DB, Handle_DB.handle == User_DB.username)\
             .filter(Handle_DB.guild_id == ctx.guild.id)
         leaderboard = []
         for user in users:
-            if arg == "rating":
+            if arg == 'rating':
                 leaderboard.append([-user.rating, user.username])
-            elif arg == "maxrating":
+            elif arg == 'maxrating':
                 leaderboard.append([-user.max_rating, user.username])
-            elif arg == "points":
+            elif arg == 'points':
                 leaderboard.append([-user.performance_points, user.username])
-            elif arg == "solved":
+            elif arg == 'solved':
                 if user.problem_count is None:
                     leaderboard.append([1, user.username])
                 else:
                     leaderboard.append([-user.problem_count, user.username])
         leaderboard.sort()
         content = []
-        page = ""
+        page = ''
         for i, user in enumerate(leaderboard):
-            page += f"{i+1} {user[1]} {-round(user[0],3)}\n"
+            page += f'{i+1} {user[1]} {-round(user[0],3)}\n'
             if i % 10 == 9:
                 content.append(page)
-                page = ""
-        if page != "":
+                page = ''
+        if page != '':
             content.append(page)
         if len(content) == 0:
-            content.append("No users")
-        message = await ctx.send(embed=discord.Embed().add_field(name="Top DMOJ " + arg, value=content[0]))
-        await scroll_embed(ctx, self.bot, message, "Top DMOJ " + arg, content)
+            content.append('No users')
+        message = await ctx.send(embed=discord.Embed().add_field(name='Top DMOJ ' + arg, value=content[0]))
+        await scroll_embed(ctx, self.bot, message, 'Top DMOJ ' + arg, content)
 
     def rating_to_rank(self, rating):
         if rating is None:
@@ -217,7 +217,7 @@ class Handles(commands.Cog):
     @commands.command()
     @commands.has_role(ADMIN_ROLE)
     async def update_roles(self, ctx):
-        """Manually update roles"""
+        '''Manually update roles'''
         # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
         # TODO: Migrate to work with participation table
 
@@ -244,7 +244,7 @@ class Handles(commands.Cog):
 
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
 
-        await msg.edit(content="Updating roles...")
+        await msg.edit(content='Updating roles...')
 
         missing_roles = []
         try:
@@ -258,12 +258,12 @@ class Handles(commands.Cog):
                 elif rank not in missing_roles:
                     missing_roles.append(rank)
         except Exception as e:
-            await ctx.send("An error occurred. " + str(e))
+            await ctx.send('An error occurred. ' + str(e))
             return
 
         if len(missing_roles) != 0:
-            await ctx.send("You are missing the " + ", ".join(missing_roles) + " roles")
-        await msg.edit(content="Roles updated")
+            await ctx.send('You are missing the ' + ', '.join(missing_roles) + ' roles')
+        await msg.edit(content='Roles updated')
 
 
 def setup(bot):

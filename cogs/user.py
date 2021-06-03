@@ -24,9 +24,9 @@ class User(commands.Cog):
     @commands.command(usage='[username] [latest submissions]')
     async def user(self, ctx, username: typing.Optional[str_not_int] = None,
                    amount: typing.Optional[int] = None):
-        """Show user profile and latest submissions
+        '''Show user profile and latest submissions
         Use surround your username with '' if it can be interpreted as a number
-        """
+        '''
 
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
@@ -64,22 +64,22 @@ class User(commands.Cog):
 
         embed.set_thumbnail(url=await query.get_pfp(username))
         embed.add_field(
-            name="Rank by points",
+            name='Rank by points',
             value=await query.get_placement(username),
             inline=False
         )
         embed.add_field(
-            name="Problems Solved",
+            name='Problems Solved',
             value=user.problem_count,
             inline=False
         )
         embed.add_field(
-            name="Rating",
+            name='Rating',
             value=user.rating,
             inline=True
         )
         embed.add_field(
-            name="Contests Written",
+            name='Contests Written',
             value=sum(map(is_rated, user.contests)),
             inline=True
         )
@@ -92,7 +92,7 @@ class User(commands.Cog):
         submissions = await query.get_latest_submissions(username, amount)
 
         embed = discord.Embed(
-            title=f"{username}'s latest submissions",
+            title=f'{username}\'s latest submissions',
             color=0xfcdb05
         )
         for submission in submissions:
@@ -110,19 +110,19 @@ class User(commands.Cog):
                 true_short_name = submission.language[0].key
 
             embed.add_field(
-                name="%s / %s" %
+                name='%s / %s' %
                      (str(submission.score_num), str(submission.score_denom)),
-                value="%s | %s" % (submission.result,
+                value='%s | %s' % (submission.result,
                                    true_short_name),
                 inline=True
             )
 
             embed.add_field(
-                name="%s (%s)" %
+                name='%s (%s)' %
                      (submission.problem[0].name, points),
-                value="%s | [Problem](https://dmoj.ca/problem/%s)" %
+                value='%s | [Problem](https://dmoj.ca/problem/%s)' %
                       (submission.date.astimezone(TZ).
-                       strftime("%b. %d, %Y, %I:%M %p").
+                       strftime('%b. %d, %Y, %I:%M %p').
                        replace('AM', 'a.m.').
                        replace('PM', 'p.m.'),
                        submission.problem[0].code),
@@ -132,14 +132,14 @@ class User(commands.Cog):
             )
             try:
                 embed.add_field(
-                    name="%.2fs" % submission.time,
-                    value="%s" % submission.memory_str,
+                    name='%.2fs' % submission.time,
+                    value='%s' % submission.memory_str,
                     inline=True,
                 )
             except TypeError:
                 embed.add_field(
-                    name="---",
-                    value="%s" % submission.memory_str,
+                    name='---',
+                    value='%s' % submission.memory_str,
                     inline=True,
                 )
 
@@ -149,10 +149,10 @@ class User(commands.Cog):
     @commands.command(aliases=['ui'], usage='[username] [latest submissions]')
     async def userinfo(self, ctx, username: typing.Optional[str_not_int] = None,
                        amount: typing.Optional[int] = None):
-        """Show user profile and latest submissions
+        '''Show user profile and latest submissions
 
         Use surround your username with '' if it can be interpreted as a number
-        """
+        '''
 
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
@@ -183,7 +183,7 @@ class User(commands.Cog):
         if discordHandle:
             discordHandle = discordHandle.nick or discordHandle.name
         else:
-            discordHandle = "Unknown"
+            discordHandle = 'Unknown'
         if user.rating is None:
             color = 0xfefefe  # it breaks when I set it to white
         elif user.rating >= 3000:
@@ -214,22 +214,22 @@ class User(commands.Cog):
 
         embed.set_thumbnail(url=await query.get_pfp(username))
         embed.add_field(
-            name="Points",
-            value=str(round(user.performance_points)) + "/" + str(round(user.points)),
+            name='Points',
+            value=str(round(user.performance_points)) + '/' + str(round(user.points)),
             inline=True
         )
         embed.add_field(
-            name="Problems Solved",
+            name='Problems Solved',
             value=user.problem_count,
             inline=True
         )
         embed.add_field(
-            name="Rating",
-            value=str(user.rating) + "/" + str(user.max_rating),
+            name='Rating',
+            value=str(user.rating) + '/' + str(user.max_rating),
             inline=True
         )
         embed.add_field(
-            name="Contests Written",
+            name='Contests Written',
             value=sum(map(is_rated, user.contests)),
             inline=True
         )
@@ -242,7 +242,7 @@ class User(commands.Cog):
         submissions = await query.get_latest_submissions(username, amount)
 
         embed = discord.Embed(
-            title=f"{username}'s latest submissions",
+            title=f'{username}\'s latest submissions',
             color=0xffff00
         )
         for submission in submissions:
@@ -260,19 +260,19 @@ class User(commands.Cog):
                 true_short_name = submission.language[0].key
 
             embed.add_field(
-                name="%s / %s" %
+                name='%s / %s' %
                      (str(submission.score_num), str(submission.score_denom)),
-                value="%s | %s" % (submission.result,
+                value='%s | %s' % (submission.result,
                                    true_short_name),
                 inline=True
             )
 
             embed.add_field(
-                name="%s (%s)" %
+                name='%s (%s)' %
                      (submission.problem[0].name, points),
-                value="%s | [Problem](https://dmoj.ca/problem/%s)" %
+                value='%s | [Problem](https://dmoj.ca/problem/%s)' %
                       (submission.date.astimezone(TZ).
-                       strftime("%b. %d, %Y, %I:%M %p").
+                       strftime('%b. %d, %Y, %I:%M %p').
                        replace('AM', 'a.m.').
                        replace('PM', 'p.m.'),
                        submission.problem[0].code),
@@ -282,14 +282,14 @@ class User(commands.Cog):
             )
             try:
                 embed.add_field(
-                    name="%.2fs" % submission.time,
-                    value="%s" % submission.memory_str,
+                    name='%.2fs' % submission.time,
+                    value='%s' % submission.memory_str,
                     inline=True,
                 )
             except TypeError:
                 embed.add_field(
-                    name="---",
-                    value="%s" % submission.memory_str,
+                    name='---',
+                    value='%s' % submission.memory_str,
                     inline=True,
                 )
 
@@ -299,10 +299,10 @@ class User(commands.Cog):
     @commands.command(usage='username [points solved]')
     async def predict(self, ctx, username: typing.Optional[str_not_int] = None,
                       amounts: commands.Greedy[int] = []):
-        """Predict total points after solving N pointer problem(s)
+        '''Predict total points after solving N pointer problem(s)
 
         Use surround your username with '' if it can be interpreted as a number
-        """
+        '''
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
 
@@ -370,8 +370,8 @@ class User(commands.Cog):
             points.sort(reverse=True)
             updated_points = calculate_points(points, fully_solved)
             embed.add_field(
-                name="Solve another %sp" % predict_val,
-                value="Total points: %.2fp" % updated_points,
+                name='Solve another %sp' % predict_val,
+                value='Total points: %.2fp' % updated_points,
                 inline=False,
             )
 
@@ -382,7 +382,7 @@ class User(commands.Cog):
 
     @commands.command(usage='[usernames]')
     async def vc(self, ctx, *usernames):
-        """Suggest a contest"""
+        '''Suggest a contest'''
         usernames = list(usernames)
 
         query = Query()
@@ -415,8 +415,8 @@ class User(commands.Cog):
                 .filter(Contest_DB.is_organization_private == 0)
 
         if q.count() == 0:
-            await ctx.send("Cannot find any contests which "
-                           "all users have not done")
+            await ctx.send('Cannot find any contests which '
+                           'all users have not done')
             return
 
         contests = q.all()
@@ -433,12 +433,12 @@ class User(commands.Cog):
         window = 'No'
         is_rated = 'Not Rated'
         if contest.time_limit:
-            window = f"{round(contest.time_limit/60/60, 2)} Hr"
+            window = f'{round(contest.time_limit/60/60, 2)} Hr'
         if contest.is_rated:
-            is_rated = "Rated"
+            is_rated = 'Rated'
         embed = discord.Embed(
-            title=contest.name, url=f"https://dmoj.ca/contest/{contest.key}",
-            description=f"{window} window | {len(contest.problems)} Problems | {is_rated}",
+            title=contest.name, url=f'https://dmoj.ca/contest/{contest.key}',
+            description=f'{window} window | {len(contest.problems)} Problems | {is_rated}',
             color=0xfcdb05
         )
         await ctx.send(embed=embed)
@@ -455,7 +455,7 @@ class User(commands.Cog):
     @commands.command(aliases=['recommend'], usage='username [points] [problem types]')
     async def gimme(self, ctx, username: typing.Optional[parse_gimme] = None,
                     points: typing.Optional[point_range] = [1, 50], *filters):
-        """
+        '''
         Recommend a problem
 
         Use surround your username with '' if it can be interpreted as a number
@@ -473,7 +473,7 @@ class User(commands.Cog):
         - greedy
         - regex
         - string
-        """
+        '''
         filters = list(filters)
         query = Query()
         username = username or query.get_handle(ctx.author.id, ctx.guild.id)
@@ -500,20 +500,20 @@ class User(commands.Cog):
         result, problem = await gimme_common(username, points, filters)
         # print(result)
         if result is None:
-            return await ctx.send("No problem that satisfies the filter")
+            return await ctx.send('No problem that satisfies the filter')
         return await ctx.send(embed=result)
 
     @commands.command(aliases=['stalk', 'sp'], usage='[username] [p<=points, p>=points]')
     async def solved(self, ctx, *args):
-        """Shows a user's last solved problems"""
+        '''Shows a user's last solved problems'''
         minP = 0
         maxP = 100
         query = Query()
         username = None
         for arg in args:
-            if arg.startswith("p>="):
+            if arg.startswith('p>='):
                 minP = max(minP, int(arg[3:]))
-            elif arg.startswith("p<="):
+            elif arg.startswith('p<='):
                 maxP = min(maxP, int(arg[3:]))
             else:
                 username = (await query.get_user(arg)).username
@@ -537,22 +537,22 @@ class User(commands.Cog):
                 if minP <= sub.points and sub.points <= maxP:
                     uniqueSubmissions.append(sub)
         uniqueSubmissions.reverse()
-        page = ""
+        page = ''
         content = []
         cnt = 0
         for sub in uniqueSubmissions:
             age = (datetime.now() - sub.date).days
             # sub.problem[0].name is rly slow
-            page += f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n"
+            page += f'[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n'
             cnt += 1
             if cnt % 10 == 0:
                 content.append(page)
-                page = ""
-        if page != "":
+                page = ''
+        if page != '':
             content.append(page)
         if len(content) == 0:
-            content.append("No submission")
-        title = "Recently solved problems by " + username
+            content.append('No submission')
+        title = 'Recently solved problems by ' + username
         message = await ctx.send(embed=discord.Embed().add_field(name=title, value=content[0]))
         await scroll_embed(ctx, self.bot, message, title, content)
 

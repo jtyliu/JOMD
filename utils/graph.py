@@ -19,8 +19,8 @@ def plot_solved(datas):
         print(type(solved_num))
         if isinstance(solved_num, float):
             solved_num = 0
-        df.plot(label="%s (%d)" % (username, solved_num))
-    sns.set_style("whitegrid")
+        df.plot(label='%s (%d)' % (username, solved_num))
+    sns.set_style('whitegrid')
     plt.xlabel('Date')
     plt.ylabel('Problem Solved Count')
     plt.legend(loc='upper left', fontsize='8')
@@ -32,8 +32,8 @@ def plot_points(datas):
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
-        df.plot(label="%s (%.2f)" % (username, df.max()))
-    sns.set_style("whitegrid")
+        df.plot(label='%s (%.2f)' % (username, df.max()))
+    sns.set_style('whitegrid')
     plt.xlabel('Date')
     plt.ylabel('Points')
     plt.legend(loc='upper left', fontsize='8')
@@ -97,7 +97,7 @@ def plot_rating(data):
                  markeredgewidth=0.5)
 
     # Legend
-    plt.legend(loc="upper left", prop={"size": 10})
+    plt.legend(loc='upper left', prop={'size': 10})
 
     plt.savefig('./graphs/plot.png')
 
@@ -111,7 +111,7 @@ def plot_type_bar(data, as_percent):
     df = pd.melt(df, id_vars='Users', var_name='Problem Type',
                  value_name=ylabel)
     sns.set_theme()
-    sns.set_style("whitegrid")
+    sns.set_style('whitegrid')
     sns.barplot(x='Problem Type', y=ylabel, hue='Users', data=df,
                 palette='tab10')
     plt.legend(loc='upper right', fontsize='8')
@@ -153,21 +153,21 @@ def plot_type_radar(data, as_percent, maxval):
         plt.yticks(
             [scale / 4, scale / 2, 3 * scale / 4],
             [
-                "%.1f%%" % (scale / 4),
-                "%.1f%%" % (scale / 2),
-                "%.1f%%" % (3 * scale / 4)
+                '%.1f%%' % (scale / 4),
+                '%.1f%%' % (scale / 2),
+                '%.1f%%' % (3 * scale / 4)
             ],
-            color="grey", size=7
+            color='grey', size=7
         )
     else:
         plt.yticks(
             [scale / 4, scale / 2, 3 * scale / 4],
             [
-                "%.1f" % (scale / 4),
-                "%.1f" % (scale / 2),
-                "%.1f" % (3 * scale / 4)
+                '%.1f' % (scale / 4),
+                '%.1f' % (scale / 2),
+                '%.1f' % (3 * scale / 4)
             ],
-            color="grey", size=7
+            color='grey', size=7
         )
     plt.ylim(0, maxval * 1.1)
 

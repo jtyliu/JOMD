@@ -124,7 +124,7 @@ async def _query_api(url, resp_obj):
     async with rate_limiter.throttle():
         if DEBUG_API:
             start = time.time()
-            print("Calling", url)
+            print('Calling', url)
         if _session is None:
             if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
@@ -139,30 +139,30 @@ async def _query_api(url, resp_obj):
             # might just change to error trapping
             #     raise ApiError
             if DEBUG_API:
-                print("Parsed data, returning... Time:", time.time() - start)
+                print('Parsed data, returning... Time:', time.time() - start)
     return resp
 
 
 class Problem:
     def __init__(self, data):
-        self.code = data["code"]
-        self.name = data["name"]
-        self.types = data["types"]
-        self.group = data["group"]
-        self.points = data["points"]
-        self.partial = data["partial"]
-        self.authors = data.get("authors")
-        self.time_limit = data.get("time_limit")
-        self.memory_limit = data.get("memory_limit")
-        self.language_resource_limits = data.get("language_resource_limits")
-        self.short_circuit = data.get("short_circuit")
-        self._languages = data.get("languages", [])
+        self.code = data['code']
+        self.name = data['name']
+        self.types = data['types']
+        self.group = data['group']
+        self.points = data['points']
+        self.partial = data['partial']
+        self.authors = data.get('authors')
+        self.time_limit = data.get('time_limit')
+        self.memory_limit = data.get('memory_limit')
+        self.language_resource_limits = data.get('language_resource_limits')
+        self.short_circuit = data.get('short_circuit')
+        self._languages = data.get('languages', [])
         self.languages = []
-        self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations", [])
+        self.is_organization_private = data.get('is_organization_private')
+        self._organizations = data.get('organizations', [])
         self.organizations = []
 
-        self.is_public = data.get("is_public")
+        self.is_public = data.get('is_public')
 
     @staticmethod
     async def async_map(_type, objects):
@@ -209,25 +209,25 @@ class Problem:
 class Contest:
 
     def __init__(self, data):
-        self.key = data["key"]
-        self.name = data["name"]
-        self.start_time = datetime.fromisoformat(data["start_time"])
-        self.end_time = datetime.fromisoformat(data["end_time"])
-        self.time_limit = data["time_limit"]
-        self.tags = data["tags"]
-        self.is_rated = data.get("is_rated")
-        self.rate_all = data.get("rate_all")
-        self.has_rating = data.get("has_rating")
-        self.rating_floor = data.get("rating_floor")
-        self.rating_ceiling = data.get("rating_ceiling")
-        self.hidden_scoreboard = data.get("hidden_scoreboard")
-        self.is_organization_private = data.get("is_organization_private")
-        self._organizations = data.get("organizations", [])
+        self.key = data['key']
+        self.name = data['name']
+        self.start_time = datetime.fromisoformat(data['start_time'])
+        self.end_time = datetime.fromisoformat(data['end_time'])
+        self.time_limit = data['time_limit']
+        self.tags = data['tags']
+        self.is_rated = data.get('is_rated')
+        self.rate_all = data.get('rate_all')
+        self.has_rating = data.get('has_rating')
+        self.rating_floor = data.get('rating_floor')
+        self.rating_ceiling = data.get('rating_ceiling')
+        self.hidden_scoreboard = data.get('hidden_scoreboard')
+        self.is_organization_private = data.get('is_organization_private')
+        self._organizations = data.get('organizations', [])
         self.organizations = []
-        self.is_private = data.get("is_private")
-        self.format = data.get("format")
-        self.rankings = data.get("rankings")
-        self._problems = data.get("problems", [])
+        self.is_private = data.get('is_private')
+        self.format = data.get('format')
+        self.rankings = data.get('rankings')
+        self._problems = data.get('problems', [])
         self.problems = []
 
     @staticmethod
@@ -257,7 +257,7 @@ class Contest:
 
         # perhaps I should check if it's the general or detailed version
         def get_code(problem):
-            return problem["code"]
+            return problem['code']
         self._problem_codes = list(map(get_code, self._problems))
         problem_qq = session.query(Problem_DB).\
             filter(Problem_DB.code.in_(self._problem_codes))
@@ -265,7 +265,7 @@ class Contest:
             filter(Problem_DB.code.in_(self._problem_codes)).all()
         problem_q = list(map(itemgetter(0), problem_q))
         for problem_dict in self._problems:
-            problem_code = problem_dict["code"]
+            problem_code = problem_dict['code']
             try:
                 if problem_code not in problem_q:
                     api = API()
@@ -280,17 +280,17 @@ class Contest:
 class Participation:
 
     def __init__(self, data):
-        self.id = data["user"] + "&" + data["contest"] + "&" \
-                               + str(data["virtual_participation_number"])
-        self._user = data["user"]
+        self.id = data['user'] + '&' + data['contest'] + '&' \
+                               + str(data['virtual_participation_number'])
+        self._user = data['user']
         self.user = None
-        self._contest = data["contest"]
+        self._contest = data['contest']
         self.contest = None
-        self.score = data["score"]
-        self.cumulative_time = data["cumulative_time"]
-        self.tiebreaker = data["tiebreaker"]
-        self.is_disqualified = data["is_disqualified"]
-        self.virtual_participation_number = data["virtual_participation_number"]
+        self.score = data['score']
+        self.cumulative_time = data['cumulative_time']
+        self.tiebreaker = data['tiebreaker']
+        self.is_disqualified = data['is_disqualified']
+        self.virtual_participation_number = data['virtual_participation_number']
 
     @staticmethod
     async def async_map(_type, objects):
@@ -323,20 +323,20 @@ class Participation:
 
 class User:
     def __init__(self, data):
-        self.id = data["id"]
-        self.username = data["username"]
-        self.points = data["points"]
-        self.performance_points = data["performance_points"]
-        self.problem_count = data["problem_count"]
-        self.rank = data["problem_count"]
-        self.rating = data["rating"]
-        self.max_rating = data["rating"]
-        self.volatility = data["volatility"]
-        self._solved_problems = data.get("solved_problems", [])
+        self.id = data['id']
+        self.username = data['username']
+        self.points = data['points']
+        self.performance_points = data['performance_points']
+        self.problem_count = data['problem_count']
+        self.rank = data['problem_count']
+        self.rating = data['rating']
+        self.max_rating = data['rating']
+        self.volatility = data['volatility']
+        self._solved_problems = data.get('solved_problems', [])
         self.solved_problems = []
-        self._organizations = data.get("organizations", [])
+        self._organizations = data.get('organizations', [])
         self.organizations = []
-        self._contests = data.get("contests", [])
+        self._contests = data.get('contests', [])
         self.contests = []
 
     @staticmethod
@@ -388,7 +388,7 @@ class User:
                 self.max_rating = max(self.max_rating or 0, contest['rating'])
 
         def get_key(contest):
-            return contest["key"]
+            return contest['key']
 
         self._contest_keys = list(map(get_key, self._contests))
 
@@ -415,24 +415,24 @@ class User:
 
 class Submission:
     def __init__(self, data):
-        self.id = data["id"]
-        self._problem = data["problem"]
+        self.id = data['id']
+        self._problem = data['problem']
         # self.problem = []
-        self._user = data["user"]
+        self._user = data['user']
         # self.user = []
-        self.date = datetime.fromisoformat(data["date"])
-        self._language = data["language"]
+        self.date = datetime.fromisoformat(data['date'])
+        self._language = data['language']
         # self.language = []
-        self.time = data["time"]
-        self.memory = data["memory"]
-        self.points = data["points"]
-        self.result = data["result"]
-        self.status = data.get("status")
-        self.case_points = data.get("case_points")
-        self.case_total = data.get("case_total")
-        self.cases = data.get("cases")
-        self.score_num = data.get("score_num")
-        self.score_denom = data.get("score_denom")
+        self.time = data['time']
+        self.memory = data['memory']
+        self.points = data['points']
+        self.result = data['result']
+        self.status = data.get('status')
+        self.case_points = data.get('case_points')
+        self.case_total = data.get('case_total')
+        self.cases = data.get('cases')
+        self.score_num = data.get('score_num')
+        self.score_denom = data.get('score_denom')
         self.problem = None
         self.user = None
         self.language = None
@@ -440,13 +440,13 @@ class Submission:
     @property
     def memory_str(self):
         if self.memory is None or self.memory == 0:
-            return "---"
+            return '---'
         if self.memory < 1024:
-            return "%.1f KB" % (self.memory)
+            return '%.1f KB' % (self.memory)
         elif self.memory < 1024**2:
-            return "%.1f MB" % (self.memory / 1024)
+            return '%.1f MB' % (self.memory / 1024)
         else:
-            return "%.1f GB" % (self.memory / 1024 / 1024)
+            return '%.1f GB' % (self.memory / 1024 / 1024)
 
     @staticmethod
     async def async_map(_type, objects):
@@ -523,11 +523,11 @@ class Submission:
 
 class Organization:
     def __init__(self, data):
-        self.id = data["id"]
-        self.slug = data["slug"]
-        self.short_name = data["short_name"]
-        self.is_open = data["is_open"]
-        self.member_count = data["member_count"]
+        self.id = data['id']
+        self.slug = data['slug']
+        self.short_name = data['short_name']
+        self.is_open = data['is_open']
+        self.member_count = data['member_count']
 
     @staticmethod
     async def async_map(_type, objects):
@@ -539,13 +539,13 @@ class Organization:
 
 class Language:
     def __init__(self, data):
-        self.id = data["id"]
-        self.key = data["key"]
-        self.short_name = data["short_name"]
-        self.common_name = data["common_name"]
-        self.ace_mode_name = data["ace_mode_name"]
-        self.pygments_name = data["pygments_name"]
-        self.code_template = data["code_template"]
+        self.id = data['id']
+        self.key = data['key']
+        self.short_name = data['short_name']
+        self.common_name = data['common_name']
+        self.ace_mode_name = data['ace_mode_name']
+        self.pygments_name = data['pygments_name']
+        self.code_template = data['code_template']
 
     @staticmethod
     async def async_map(_type, objects):
@@ -557,11 +557,11 @@ class Language:
 
 class Judge:
     def __init__(self, data):
-        self.name = data["name"]
-        self.start_time = datetime.fromisoformat(data["start_time"])
-        self.ping = data["ping"]
-        self.load = data["load"]
-        self.languages = data["languages"]
+        self.name = data['name']
+        self.start_time = datetime.fromisoformat(data['start_time'])
+        self.ping = data['ping']
+        self.load = data['load']
+        self.languages = data['languages']
 
     @staticmethod
     async def async_map(_type, objects):
@@ -573,8 +573,8 @@ class Judge:
 
 class ObjectNotFound(Exception):
     def __init__(self, data):
-        self.code = data["code"]
-        self.message = data["message"]
+        self.code = data['code']
+        self.message = data['message']
         super().__init__(self.message)
 
 
@@ -591,19 +591,19 @@ class API:
             return ret
 
         async def parse(self, data, _type):
-            if "object" in data:
-                self.object = _type(data["object"])
+            if 'object' in data:
+                self.object = _type(data['object'])
                 self._object = await self.object.async_init()
                 self.objects = None
             else:
-                self.current_object_count = data["current_object_count"]
-                self.objects_per_page = data["objects_per_page"]
-                self.page_index = data["page_index"]
-                self.has_more = data["has_more"]
-                self.total_pages = data["total_pages"]
-                self.total_objects = data["total_objects"]
+                self.current_object_count = data['current_object_count']
+                self.objects_per_page = data['objects_per_page']
+                self.page_index = data['page_index']
+                self.has_more = data['has_more']
+                self.total_pages = data['total_pages']
+                self.total_objects = data['total_objects']
 
-                self.objects = list(map(_type, data["objects"]))
+                self.objects = list(map(_type, data['objects']))
                 await _type.async_map(_type, self.objects)
                 self.object = None
             return self
@@ -625,21 +625,21 @@ class API:
         return '?' + urllib.parse.urlencode(query_args)
 
     async def parse(self, data, _type):
-        self.api_version = data["api_version"]
-        self.method = data["method"]
-        self.fetched = data["fetched"]
-        if "error" in data:
-            raise ObjectNotFound(data["error"])
+        self.api_version = data['api_version']
+        self.method = data['method']
+        self.fetched = data['fetched']
+        if 'error' in data:
+            raise ObjectNotFound(data['error'])
         else:
-            # print((data["data"], _type))
+            # print((data['data'], _type))
             dat = self.Data()
-            self.data = await dat.parse(data["data"], _type)
+            self.data = await dat.parse(data['data'], _type)
 
     async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
-            "tag": tag,
-            "organization": organization,
-            "page": page,
+            'tag': tag,
+            'organization': organization,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/contests' +
                                 self.url_encode(params), 'json')
@@ -654,11 +654,11 @@ class API:
                                  is_disqualified: bool = None,
                                  virtual_participation_number: int = None, page: int = None) -> None:
         params = {
-            "contest": contest,
-            "user": user,
-            "is_disqualified": is_disqualified,
-            "virtual_participation_number": virtual_participation_number,
-            "page": page,
+            'contest': contest,
+            'user': user,
+            'is_disqualified': is_disqualified,
+            'virtual_participation_number': virtual_participation_number,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/participations' +
                                 self.url_encode(params), 'json')
@@ -667,12 +667,12 @@ class API:
     async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
                            organization: str = None, search: str = None, page: int = None) -> None:
         params = {
-            "partial": partial,
-            "group": group,
-            "type": _type,
-            "organization": organization,
-            "search": search,
-            "page": page,
+            'partial': partial,
+            'group': group,
+            'type': _type,
+            'organization': organization,
+            'search': search,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/problems' +
                                 self.url_encode(params), 'json')
@@ -685,8 +685,8 @@ class API:
 
     async def get_users(self, organization: str = None, page: int = None) -> None:
         params = {
-            "organization": organization,
-            "page": page,
+            'organization': organization,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/users' +
                                 self.url_encode(params), 'json')
@@ -700,11 +700,11 @@ class API:
     async def get_submissions(self, user: str = None, problem: str = None,
                               language: str = None, result: str = None, page: int = None) -> None:
         params = {
-            "user": user,
-            "problem": problem,
-            "language": language,
-            "result": result,
-            "page": page,
+            'user': user,
+            'problem': problem,
+            'language': language,
+            'result': result,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/submissions' +
                                 self.url_encode(params), 'json')
@@ -719,8 +719,8 @@ class API:
 
     async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
         params = {
-            "is_open": is_open,
-            "page": page,
+            'is_open': is_open,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/organizations' +
                                 self.url_encode(params), 'json')
@@ -728,8 +728,8 @@ class API:
 
     async def get_languages(self, common_name: str = None, page: int = None) -> None:
         params = {
-            "common_name": common_name,
-            "page": page,
+            'common_name': common_name,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/languages' +
                                 self.url_encode(params), 'json')
@@ -737,7 +737,7 @@ class API:
 
     async def get_judges(self, page: int = None) -> None:
         params = {
-            "page": page,
+            'page': page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/judges' +
                                 self.url_encode(params), 'json')
@@ -745,13 +745,13 @@ class API:
 
     async def get_pfp(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features='html5lib')
         pfp = soup.find('div', class_='user-gravatar').find('img')['src']
         return pfp
 
     async def get_user_description(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features='html5lib')
         description = str(soup.find('div', class_='content-description'))
         return description
 
@@ -800,25 +800,25 @@ class API:
                 memory = 0
 
             res = {
-                "id": submission_id,
-                "problem": problem,
-                "user": username,
-                "date": date,
-                "language": lang,
-                "time": time,
-                "memory": memory,
-                "points": points,
-                "result": result,
-                "score_num": score_num,
-                "score_denom": score_denom,
-                "problem_name": html.unescape(name),
+                'id': submission_id,
+                'problem': problem,
+                'user': username,
+                'date': date,
+                'language': lang,
+                'time': time,
+                'memory': memory,
+                'points': points,
+                'result': result,
+                'score_num': score_num,
+                'score_denom': score_denom,
+                'problem_name': html.unescape(name),
             }
             print(res)
             ret = Submission(res)
             return ret
         resp = await _query_api(SITE_URL +
                                 f'submissions/user/{username}/', 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features='html5lib')
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
@@ -827,7 +827,7 @@ class API:
 
     async def get_placement(self, username: str) -> int:
         resp = await _query_api(SITE_URL + f'user/{username}', 'text')
-        soup = BeautifulSoup(resp, features="html5lib")
+        soup = BeautifulSoup(resp, features='html5lib')
         rank_str = soup.find('div', class_='user-sidebar')\
                        .findChildren(recursive=False)[3].text
         rank = int(rank_str.split('#')[-1])

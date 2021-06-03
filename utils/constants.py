@@ -2,7 +2,7 @@ import os
 import datetime
 import pytz
 
-API_TOKEN = os.environ.get("JOMD_TOKEN", None)
+API_TOKEN = os.environ.get('JOMD_TOKEN', None)
 # Has no use, URI located at db.py
 DB_DIR = 'utils/db/JOMD.db'
 SITE_URL = 'https://dmoj.ca/'

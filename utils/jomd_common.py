@@ -28,7 +28,7 @@ def is_int(val):
 
 def str_not_int(argument) -> typing.Optional[str]:
     if is_int(argument):
-        raise BadArgument("Passed argument is not int")
+        raise BadArgument('Passed argument is not int')
     return argument.replace('\'', '')
 
 
@@ -60,13 +60,13 @@ def parse_gimme(argument) -> typing.Optional[str]:
         'string', 'String Algorithms'
     ]
     if argument in keywords:
-        raise BadArgument("Argument is keyword")
+        raise BadArgument('Argument is keyword')
 
     try:
         print(point_range(argument))
     except BadArgument:
         return argument.replace('\'', '')
-    raise BadArgument("Argument is point range")
+    raise BadArgument('Argument is point range')
 
 
 def calculate_points(points, fully_solved):
@@ -124,12 +124,12 @@ async def gimme_common(username, points, types):
 
 
 async def scroll_message(ctx, bot, message, content):
-    PREV = "\u25C0"
-    NEXT = "\u25B6"
-    PREV2 = "\u23EA"
-    NEXT2 = "\u23E9"
-    FIRST = "\u23EE"
-    LAST = "\u23ED"
+    PREV = '\u25C0'
+    NEXT = '\u25B6'
+    PREV2 = '\u23EA'
+    NEXT2 = '\u23E9'
+    FIRST = '\u23EE'
+    LAST = '\u23ED'
     await message.add_reaction(FIRST)
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
@@ -143,7 +143,7 @@ async def scroll_message(ctx, bot, message, content):
             and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
+            reaction, user = await bot.wait_for('reaction_add', timeout=60, check=check)
 
             if str(reaction.emoji) == PREV:
                 page = max(0, min(len(content) - 1, page - 1))
@@ -164,12 +164,12 @@ async def scroll_message(ctx, bot, message, content):
 
 
 async def scroll_embed(ctx, bot, message, title, content):
-    PREV = "\u25C0"
-    NEXT = "\u25B6"
-    PREV2 = "\u23EA"
-    NEXT2 = "\u23E9"
-    FIRST = "\u23EE"
-    LAST = "\u23ED"
+    PREV = '\u25C0'
+    NEXT = '\u25B6'
+    PREV2 = '\u23EA'
+    NEXT2 = '\u23E9'
+    FIRST = '\u23EE'
+    LAST = '\u23ED'
     await message.add_reaction(FIRST)
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
@@ -183,7 +183,7 @@ async def scroll_embed(ctx, bot, message, title, content):
             and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
+            reaction, user = await bot.wait_for('reaction_add', timeout=60, check=check)
 
             if str(reaction.emoji) == PREV:
                 page = max(0, min(len(content) - 1, page - 1))

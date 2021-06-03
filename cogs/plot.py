@@ -23,7 +23,7 @@ class Plot(commands.Cog):
     @commands.group(brief='Graphs for analyzing DMOJ activity',
                     invoke_without_command=True)
     async def plot(self, ctx):
-        """Plot various graphs"""
+        '''Plot various graphs'''
         await ctx.send_help('plot')
 
     def graph_type(argument) -> typing.Optional[str]:
@@ -55,7 +55,7 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[usernames]')
     async def solved(self, ctx, *usernames):
-        """Plot problems solved over time"""
+        '''Plot problems solved over time'''
         usernames = list(usernames)
 
         query = Query()
@@ -76,7 +76,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
             q = session.query(func.min(Submission_DB.date))\
@@ -107,7 +107,7 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[usernames]')
     async def points(self, ctx, *usernames):
-        """Plot point progression"""
+        '''Plot point progression'''
         usernames = list(usernames)
 
         query = Query()
@@ -141,7 +141,7 @@ class Plot(commands.Cog):
 
             submissions = q.all()
             if len(submissions) == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
                 submissions = q.all()
             problems_ACed = dict()
@@ -186,7 +186,7 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[+peak] [usernames]')
     async def rating(self, ctx, peak: typing.Optional[plot_peak] = False, *usernames):
-        """Plot rating progression"""
+        '''Plot rating progression'''
         usernames = list(usernames)
 
         query = Query()
@@ -246,7 +246,7 @@ class Plot(commands.Cog):
                    as_percent: typing.Optional[as_percentage] = True,
                    graph: typing.Optional[graph_type] = 'radar',
                    *usernames):
-        """Graph problems solved by popular problem types"""
+        '''Graph problems solved by popular problem types'''
         # This is aids, pls fix
 
         usernames = list(usernames)
@@ -297,7 +297,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
         for i, types in enumerate(important_types):

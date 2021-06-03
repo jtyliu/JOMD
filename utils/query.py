@@ -17,9 +17,9 @@ from operator import itemgetter
 
 
 class Query:
-    """
+    '''
     Every object returned from this should be a DB object, not class object
-    """
+    '''
 
     def parse(self, key, val):
         cond = True
@@ -327,7 +327,7 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-        print("Done Api Call", time.time() - start)
+        print('Done Api Call', time.time() - start)
         start = time.time()
         q = session.query(Submission_DB)
         q = q.filter(Submission_DB._user == user)
