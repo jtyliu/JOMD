@@ -132,13 +132,6 @@ class Plot(commands.Cog):
                 .filter(User_DB.username == username)\
                 .order_by(Submission_DB.date)
 
-            def calculate_points(points, fully_solved):
-                b = 150 * (1 - 0.997**fully_solved)
-                p = 0
-                for i in range(min(100, len(points))):
-                    p += (0.95**i) * points[i]
-                return b + p
-
             submissions = q.all()
             if len(submissions) == 0:
                 await ctx.send(f'`{username}` does not have any cached submissions, caching now')
@@ -167,7 +160,7 @@ class Plot(commands.Cog):
                         points_arr.remove(code_to_points[code])
                         code_to_points[code] = points
                         bisect.insort(points_arr, points)
-                    cur_points = calculate_points(points_arr[::-1],
+                    cur_points = calculate_partial_points(points_arr[::-1],
                                                   len(problems_ACed))
                     data_to_plot[submission.date] = cur_points
             total_data[username] = data_to_plot
@@ -282,7 +275,7 @@ class Plot(commands.Cog):
         for username in usernames:
             data['group'].append(username)
 
-        def calculate_points(points: int):
+        def calculate_partial_points(points: int):
             p = 0
             for i in range(min(100, len(points))):
                 p += (0.95**i) * points[i]
@@ -304,7 +297,7 @@ class Plot(commands.Cog):
             total_problems = await query.get_problems(_type=types, cached=True)
             total_points = list(map(to_points, total_problems))
             total_points.sort(reverse=True)
-            total_points = calculate_points(total_points)
+            total_points = calculate_partial_points(total_points)
 
             for username in usernames:
                 problems = query.get_attempted_problems(username, types)
@@ -312,7 +305,7 @@ class Plot(commands.Cog):
                 points = list(map(to_points, problems))
                 points.sort(reverse=True)
 
-                points = calculate_points(points)
+                points = calculate_partial_points(points)
                 if as_percent:
                     percentage = 100 * points / total_points
                 else:

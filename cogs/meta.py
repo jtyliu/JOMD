@@ -3,6 +3,7 @@ from discord.ext import commands
 from utils.query import Query
 from utils.api import API
 from utils.db import session, Problem as Problem_DB, Submission as Submission_DB
+from utils.jomd_common import calculate_points
 import typing
 
 
@@ -79,13 +80,6 @@ class Meta(commands.Cog):
 
         def tuple_first(data):
             return data[0]
-
-        def calculate_points(points, fully_solved):
-            b = 150 * (1 - 0.997**fully_solved)
-            p = 0
-            for i in range(min(100, len(points))):
-                p += (0.95**i) * points[i]
-            return b + p
 
         problems = list(map(tuple_first, problems))
         total_problems = len(problems)
