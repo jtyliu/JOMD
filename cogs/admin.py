@@ -7,6 +7,8 @@ from utils.db import (session, Contest as Contest_DB,
 from utils.query import Query
 from operator import itemgetter
 import time
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Admin(commands.Cog):
@@ -15,6 +17,13 @@ class Admin(commands.Cog):
 
     async def cog_check(self, ctx):
         return await self.bot.is_owner(ctx.author)
+
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        server = ctx.guild.name
+        user = ctx.author
+        command = ctx.command
+        logger.info('+%s used by %s in %s', command, user, server)
 
     @commands.command()
     async def reload_all(self, ctx):
@@ -76,6 +85,7 @@ class Admin(commands.Cog):
         query = Query()
         await query.get_problems()
         return await msg.edit(content='Updated all problems')
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))
