@@ -175,7 +175,10 @@ class Handles(commands.Cog):
             elif arg == "points":
                 leaderboard.append([-user.performance_points, user.username])
             elif arg == "solved":
-                leaderboard.append([-user.problem_count, user.username])
+                if user.problem_count is None:
+                    leaderboard.append([1, user.username])
+                else:
+                    leaderboard.append([-user.problem_count, user.username])
         leaderboard.sort()
         content = []
         page = ""
