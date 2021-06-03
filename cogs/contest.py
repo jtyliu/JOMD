@@ -65,6 +65,7 @@ class Contest(commands.Cog):
         # The only way to calculate rating changes is by getting the volitility of all the users
         # that means 100+ seperate api calls
         # How does evan do it?
+        # TODO: Use the custom api on evan's site
         import requests
         r = requests.get(f'https://evanzhang.ca/rating/contest/{key}/api')
         if r:
@@ -106,6 +107,7 @@ class Contest(commands.Cog):
                                 rank_dict['rating_change'] = evan_ranking['rating_change']
                         else:
                             # User joined contest but was not rated
+                            # TODO: Placement does not match ranking
                             rank_dict = {
                                 'rank': len(rankings) + 1,
                                 'username': username + ':',

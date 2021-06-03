@@ -1,3 +1,4 @@
+from utils.api import ObjectNotFound
 import discord
 from discord.ext import commands
 import typing
@@ -65,8 +66,12 @@ class Plot(commands.Cog):
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -117,8 +122,12 @@ class Plot(commands.Cog):
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -189,8 +198,12 @@ class Plot(commands.Cog):
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -251,8 +264,12 @@ class Plot(commands.Cog):
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         for i in range(len(users)):
             if users[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')

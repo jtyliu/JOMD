@@ -5,8 +5,6 @@ import discord
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLE
-# import html
-# import random
 import typing
 import asyncio
 import hashlib
@@ -38,8 +36,10 @@ class Handles(commands.Cog):
             else:
                 await ctx.send(f'`{member.nick or member.name}` is not linked with any account here')
         else:
-            # wtf
-            pass
+            name = None
+            if member:
+                name = member.nick or member.name
+            await ctx.send(f'Nothing found on {handle or name}')
 
     @commands.command()
     async def unlink(self, ctx):
@@ -110,7 +110,6 @@ class Handles(commands.Cog):
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_role(ADMIN_ROLE)
     async def _set(self, ctx, member, username: str):
-
         '''Manually link two accounts together'''
         query = Query()
         member = await query.parseUser(ctx, member)

@@ -1,7 +1,6 @@
+from utils.api import ObjectNotFound
 from discord.ext import commands
 from pathlib import Path
-# from utils.api import problem_api
-# from utils.db import DbConn
 from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB, Submission as Submission_DB)
 from utils.query import Query
@@ -53,22 +52,29 @@ class Admin(commands.Cog):
                 q.delete()
                 session.commit()
             query = Query()
-            await query.get_contest(key)
+            try:
+                await query.get_contest(key)
+            except ObjectNotFound:
+                return await ctx.send('Contest not found')
             await ctx.send(f'Recached contest {key}')
         if _type.lower() == 'problem':
             q = session.query(Problem_DB).filter(Problem_DB.code == key)
             if q.count() == 0:
-                await ctx.send(f'There is no contests with the key {key} '
-                               f'cached. Will try fetching contest')
+                await ctx.send(f'There is no problems with the key {key} '
+                               f'cached. Will try fetching problem')
             else:
                 q.delete()
                 session.commit()
             query = Query()
-            await query.get_problem(key)
-            await ctx.send(f'Recached contest {key}')
+            try:
+                await query.get_problem(key)
+            except ObjectNotFound:
+                return await ctx.send('Problem not found')
+            await ctx.send(f'Recached problem {key}')
 
     @commands.command()
     async def cache_contests(self, ctx):
+        '''Individually caches every contest'''
         query = Query()
         msg = await ctx.send('Caching...')
         contests = await query.get_contests()

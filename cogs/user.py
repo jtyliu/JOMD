@@ -542,7 +542,6 @@ class User(commands.Cog):
         cnt = 0
         for sub in uniqueSubmissions:
             age = (datetime.now() - sub.date).days
-            # sub.problem[0].name is rly slow
             page += f'[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n'
             cnt += 1
             if cnt % 10 == 0:
