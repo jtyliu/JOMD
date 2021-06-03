@@ -256,9 +256,7 @@ class Contest:
         self.organizations = organization_qq.all()
 
         # perhaps I should check if it's the general or detailed version
-        def get_code(problem):
-            return problem['code']
-        self._problem_codes = list(map(get_code, self._problems))
+        self._problem_codes = list(map(itemgetter('code'), self._problems))
         problem_qq = session.query(Problem_DB).\
             filter(Problem_DB.code.in_(self._problem_codes))
         problem_q = session.query(Problem_DB.code).\
@@ -387,10 +385,7 @@ class User:
             if contest['rating']:
                 self.max_rating = max(self.max_rating or 0, contest['rating'])
 
-        def get_key(contest):
-            return contest['key']
-
-        self._contest_keys = list(map(get_key, self._contests))
+        self._contest_keys = list(map(itemgetter('key'), self._contests))
 
         contest_qq = session.query(Contest_DB).\
             filter(Contest_DB.key.in_(self._contest_keys))

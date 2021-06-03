@@ -13,7 +13,7 @@ from utils.db import (session, Problem as Problem_DB,
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
 
 class Query:
@@ -272,10 +272,7 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
-        def get_id(participation):
-            return participation.id
-
-        participation_id = list(map(get_id, a.data.objects))
+        participation_id = list(map(attrgetter('id'), a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(participation_id)).all()
         qq = list(map(itemgetter(0), qq))
@@ -302,7 +299,7 @@ class Query:
             to_gather.append(to_await)
         await asyncio.gather(*to_gather)
         for api in apis:
-            participation_id = list(map(get_id, api.data.objects))
+            participation_id = list(map(attrgetter('id'), api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(participation_id)).all()
             qq = list(map(itemgetter(0), qq))
@@ -349,10 +346,7 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
-        def get_id(submission):
-            return submission.id
-
-        submission_ids = list(map(get_id, a.data.objects))
+        submission_ids = list(map(attrgetter('id'), a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(submission_ids)).all()
         qq = list(map(itemgetter(0), qq))
@@ -376,7 +370,7 @@ class Query:
         for api in apis:
             if api.data.objects is None:
                 continue
-            submission_ids = list(map(get_id, api.data.objects))
+            submission_ids = list(map(attrgetter('id'), api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(submission_ids)).all()
             qq = list(map(itemgetter(0), qq))

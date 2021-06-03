@@ -10,7 +10,7 @@ from utils.db import (session, Contest as Contest_DB,
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
                          plot_points, plot_solved)
 from utils.jomd_common import calculate_points
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 from sqlalchemy import or_, orm, func
 import asyncio
 import io
@@ -282,9 +282,6 @@ class Plot(commands.Cog):
                 p += (0.95**i) * points[i]
             return p
 
-        def to_points(problem):
-            return problem.points
-
         max_percentage = 0
 
         for username in usernames:
@@ -296,14 +293,14 @@ class Plot(commands.Cog):
 
         for i, types in enumerate(important_types):
             total_problems = await query.get_problems(_type=types, cached=True)
-            total_points = list(map(to_points, total_problems))
+            total_points = list(map(attrgetter('points'), total_problems))
             total_points.sort(reverse=True)
             total_points = calculate_partial_points(total_points)
 
             for username in usernames:
                 problems = query.get_attempted_problems(username, types)
 
-                points = list(map(to_points, problems))
+                points = list(map(attrgetter('points'), problems))
                 points.sort(reverse=True)
 
                 points = calculate_partial_points(points)
