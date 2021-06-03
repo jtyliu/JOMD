@@ -1,7 +1,7 @@
 # from utils.submission import Submission
 # from utils.problem import Problem
 from bs4 import BeautifulSoup
-from utils.constants import SITE_URL, DEBUG_API, API_TOKEN
+from utils.constants import SITE_URL, API_TOKEN
 import urllib.parse
 import functools
 import aiohttp
@@ -19,6 +19,9 @@ from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
 from operator import itemgetter
 from contextlib import asynccontextmanager
 import typing
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
@@ -122,9 +125,8 @@ async def _query_api(url, resp_obj):
         rate_limiter = RateLimiter(rate_limit=1, concurrency_limit=3)
 
     async with rate_limiter.throttle():
-        if DEBUG_API:
-            start = time.time()
-            print('Calling', url)
+        start = time.time()
+        logger.info('Calling %s', url)
         if _session is None:
             if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
@@ -138,8 +140,7 @@ async def _query_api(url, resp_obj):
             # if 'error' in resp:  ApiError would interfere with some other stuff,
             # might just change to error trapping
             #     raise ApiError
-            if DEBUG_API:
-                print('Parsed data, returning... Time:', time.time() - start)
+        logger.info('Parsed data, returning... Time: %s', time.time() - start)
     return resp
 
 
@@ -626,7 +627,6 @@ class API:
         if 'error' in data:
             raise ObjectNotFound(data['error'])
         else:
-            # print((data['data'], _type))
             dat = self.Data()
             self.data = await dat.parse(data['data'], _type)
 
@@ -808,7 +808,6 @@ class API:
                 'score_denom': score_denom,
                 'problem_name': html.unescape(name),
             }
-            print(res)
             ret = Submission(res)
             return ret
         resp = await _query_api(SITE_URL +

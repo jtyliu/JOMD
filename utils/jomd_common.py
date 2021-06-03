@@ -63,7 +63,7 @@ def parse_gimme(argument) -> typing.Optional[str]:
         raise BadArgument('Argument is keyword')
 
     try:
-        print(point_range(argument))
+        point_range(argument)
     except BadArgument:
         return argument.replace('\'', '')
     raise BadArgument('Argument is point range')

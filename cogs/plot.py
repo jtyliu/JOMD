@@ -15,6 +15,8 @@ from sqlalchemy import or_, orm, func
 import asyncio
 import io
 import bisect
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Plot(commands.Cog):
@@ -311,7 +313,7 @@ class Plot(commands.Cog):
                 max_percentage = max(max_percentage, percentage)
                 data[labels[i]].append(percentage)
 
-        print(data)
+        logger.debug('plot type data: %s', data)
 
         if graph == 'radar':
             plot_type_radar(data, as_percent, max_percentage)

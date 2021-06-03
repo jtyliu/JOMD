@@ -16,7 +16,6 @@ def plot_solved(datas):
     for username, data in datas.items():
         df = pd.Series(data)
         solved_num = df.max()
-        print(type(solved_num))
         if isinstance(solved_num, float):
             solved_num = 0
         df.plot(label='%s (%d)' % (username, solved_num))

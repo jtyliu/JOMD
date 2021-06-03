@@ -5,6 +5,10 @@ import discord
 from utils.db import session, Problem as Problem_DB
 from utils.query import Query
 import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -13,7 +17,7 @@ def main():
     # Not needed for now, but will make use of it in the future
 
     if not BOT_TOKEN:
-        print('Missing bot token')
+        logger.critical('Missing bot token')
         return
 
     intents = discord.Intents.default()  # All but the two privileged ones
@@ -26,7 +30,7 @@ def main():
     cogs = [file.stem for file in Path('cogs').glob('*.py')]
     for extension in cogs:
         bot.load_extension(f'cogs.{extension}')
-    print(f'Cogs loaded: {", ".join(bot.cogs)}')
+    logger.debug('Cogs loaded: %s', ', '.join(bot.cogs))
 
     def no_dm_check(ctx):
         if ctx.guild is None:

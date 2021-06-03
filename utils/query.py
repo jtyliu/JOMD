@@ -14,6 +14,8 @@ from typing import List
 from sqlalchemy.sql import functions
 import asyncio
 from operator import attrgetter, itemgetter
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Query:
@@ -324,7 +326,8 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-        print('Done Api Call', time.time() - start)
+
+        logger.info("Got submissions for %s, time elasped %s", user, time.time() - start)
         start = time.time()
         q = session.query(Submission_DB)
         q = q.filter(Submission_DB._user == user)

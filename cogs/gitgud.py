@@ -154,7 +154,6 @@ class Gitgud(commands.Cog):
         paginator.add_reaction('⏩', 'next')
         paginator.add_reaction('⏭️', 'last')
         for solved in history:
-            # print(solved.problem_id)
             problem = await query.get_problem(solved.problem_id)
             days = (datetime.now() - solved.time).days
             if days == 0:
@@ -224,7 +223,7 @@ class Gitgud(commands.Cog):
             rating_point = RATING_TO_POINT[closest]
             point_diff = (POINT_VALUES.index(current.point) -
                           POINT_VALUES.index(rating_point))
-            print(point_diff)
+
             point = 10 + 2 * (point_diff)
             point = max(point, 0)
 

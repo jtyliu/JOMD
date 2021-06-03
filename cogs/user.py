@@ -498,7 +498,7 @@ class User(commands.Cog):
         # Get all problems that are unsolved by user and fits the filter and
         # point range
         result, problem = await gimme_common(username, points, filters)
-        # print(result)
+
         if result is None:
             return await ctx.send('No problem that satisfies the filter')
         return await ctx.send(embed=result)
