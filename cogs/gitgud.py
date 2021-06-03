@@ -26,7 +26,7 @@ class Gitgud(commands.Cog):
     async def gitgud(self, ctx, points: typing.Optional[point_range],
                      *filters):
         """
-          Recommend a problem and gain point upon completion
+        Recommend a problem and gain point upon completion
 
         SHORTHANDS:
         - adhoc
@@ -139,7 +139,7 @@ class Gitgud(commands.Cog):
         history = gitgud_util.get_all(username, ctx.guild.id)
 
         if len(history) == 0:
-            embed = discord.Embed(description="User have not completed any"
+            embed = discord.Embed(description="User have not completed any "
                                               "challenge")
             return await ctx.send(embed=embed)
         # paginate

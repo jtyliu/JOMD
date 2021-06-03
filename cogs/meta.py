@@ -30,17 +30,10 @@ class Meta(commands.Cog):
 
         username = user.username
 
-        try:
-            msg = await ctx.send(f'Caching {username}\'s submissions')
-        except Exception as e:
-            await msg.edit(content='An error has occured, ' +
-                                   'try caching again. Log: ' + e)
-            return
-
+        msg = await ctx.send(f'Caching {username}\'s submissions')
         await query.get_submissions(username)
-
         return await msg.edit(content=f'{username}\'s submissions ' +
-                                      'have been cached.')
+                                      'have been cached')
 
     @commands.command()
     async def check(self, ctx):
@@ -53,9 +46,9 @@ class Meta(commands.Cog):
                 await ctx.send('There is something wrong with the api, '
                                'please contact an admin')
             else:
-                await ctx.send('Api is all good, move along.')
+                await ctx.send('Api is all good, move along')
         except Exception as e:
-            await ctx.send('Seems like I\'m getting cloud flared, rip. ' +
+            await ctx.send('Seems like I\'m getting cloud flared, rip. Error: ' +
                            str(e))
 
     @commands.command()

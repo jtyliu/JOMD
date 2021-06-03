@@ -1,5 +1,5 @@
 from utils.jomd_common import scroll_message
-from utils.constants import SITE_URL, TZ
+from utils.constants import SITE_URL, TZ, ADMIN_ROLE
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -202,17 +202,17 @@ class Contest(commands.Cog):
                 output = outputBegin
         output += outputEnd
         content.append("```yaml\n" + output + "```")
-        await ctx.send("Results for " + contest.name + "(" + SITE_URL + "contest/" + key + "): ")
+        await ctx.send("Results for " + contest.name + " (" + SITE_URL + "contest/" + key + "): ")
         message = await ctx.send(content[0])
         await scroll_message(ctx, self.bot, message, content)
 
     @commands.command(aliases=['pc'], usage="[contest key]")
-    async def postcontest(self, ctx, key, option):
+    async def postcontest(self, ctx, key, option=''):
         """Updates post-contest role"""
 
         await ctx.message.delete()
 
-        role = get(ctx.guild.roles, name="Admin")
+        role = get(ctx.guild.roles, name=ADMIN_ROLE)
 
         update_all = option == '+all' and role in ctx.author.roles
 
@@ -256,7 +256,7 @@ class Contest(commands.Cog):
                     try:
                         await ctx.guild.get_member(user.id).add_roles(role)
                     except discord.Forbidden:
-                        return await ctx.send("No permission to assign the role.")
+                        return await ctx.send("No permission to assign the role")
             return await ctx.send("Updated post contest for " + key)
 
         for ranking in contest.rankings:
@@ -265,14 +265,14 @@ class Contest(commands.Cog):
 
             endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
             if endTime > datetime.now(timezone.utc).astimezone():
-                return await ctx.send("Your window is not done.")
+                return await ctx.send("Your window is not done")
             else:
                 try:
                     await ctx.author.add_roles(role)
                 except discord.Forbidden:
-                    return await ctx.send("No permission to assign the role.")
-                return await ctx.send("You've been added to post contest.")
-        return await ctx.send("You haven't joined the contest yet.")
+                    return await ctx.send("No permission to assign the role")
+                return await ctx.send("You've been added to post contest")
+        return await ctx.send("You haven't joined the contest yet")
 
 
 def setup(bot):

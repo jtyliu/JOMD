@@ -452,9 +452,9 @@ class User(commands.Cog):
     async def gimmie(self, ctx):
         return await ctx.send(':monkey:')
 
-    @commands.command(aliases=['gimme'], usage='username [points] [problem types]')
-    async def recommend(self, ctx, username: typing.Optional[parse_gimme] = None,
-                        points: typing.Optional[point_range] = [1, 50], *filters):
+    @commands.command(aliases=['recommend'], usage='username [points] [problem types]')
+    async def gimme(self, ctx, username: typing.Optional[parse_gimme] = None,
+                    points: typing.Optional[point_range] = [1, 50], *filters):
         """
         Recommend a problem
 

@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
-from utils.constants import RATING_TO_RANKS, RANKS
+from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLE
 # import html
 # import random
 import typing
@@ -84,7 +84,8 @@ class Handles(commands.Cog):
         description = await query.get_user_description(username)
         userKey = hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
         if userKey not in description:
-            await ctx.send('Put `' + userKey + '` in your DMOJ user description and run the command again.')
+            await ctx.send('Put `' + userKey + '` in your DMOJ user description (https://dmoj.ca/edit/profile/) '
+                           'and run the command again.')
             return
 
         handle = Handle_DB()
@@ -95,7 +96,7 @@ class Handles(commands.Cog):
         session.add(handle)
         session.commit()
         await ctx.send(
-            "%s, you now have linked your account to %s." %
+            "%s, you now have linked your account to %s" %
             (ctx.author.name, username)
         )
 
@@ -107,7 +108,7 @@ class Handles(commands.Cog):
             await ctx.send("You are missing the " + rank.name + " role")
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
-    @commands.has_role('Admin')
+    @commands.has_role(ADMIN_ROLE)
     async def _set(self, ctx, member, username: str):
 
         """Manually link two accounts together"""
@@ -149,7 +150,7 @@ class Handles(commands.Cog):
         handle.guild_id = ctx.guild.id
         session.add(handle)
         session.commit()
-        await ctx.send(f"Linked {member.name} with {username}.")
+        await ctx.send(f"Linked {member.name} with {username}")
 
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
         rank = self.rating_to_rank(user.rating)
@@ -214,7 +215,7 @@ class Handles(commands.Cog):
             await member.add_roles(rank, reason=reason)
 
     @commands.command()
-    @commands.has_role('Admin')
+    @commands.has_role(ADMIN_ROLE)
     async def update_roles(self, ctx):
         """Manually update roles"""
         # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
