@@ -1,3 +1,4 @@
+from utils.api import ObjectNotFound
 from utils.jomd_common import scroll_embed
 from operator import itemgetter
 from discord.ext import commands
@@ -17,29 +18,51 @@ class Handles(commands.Cog):
     @commands.command()
     async def whois(self, ctx, member: typing.Optional[discord.Member] = None,
                     handle: typing.Optional[str] = None):
-        # TODO: Use embeds and pfps
+
         query = Query()
+        username, linked_username, pfp = None, None, None
         if handle:
-            user = await query.get_user(handle)
-            handle = user.username
-            author_id = query.get_handle_user(handle, ctx.guild.id)
-            if author_id:
-                # member = await self.bot.fetch_user(author_id)
-                name = ctx.message.guild.get_member(author_id)
-                await ctx.send(f'`{handle}` is `{name.nick or name.name}`')
-            else:
-                await ctx.send(f'`{handle}` is not linked with any account here...')
+            user = None
+            try:
+                user = await query.get_user(handle)
+            except ObjectNotFound:
+                username = None
+            if user:
+                handle = user.username
+                author_id = query.get_handle_user(handle, ctx.guild.id)
+                username = handle
+                if author_id:
+                    member = ctx.message.guild.get_member(author_id)
+                    linked_username = member.nick or member.name
+                    pfp = member.avatar_url
         elif member:
             handle = query.get_handle(member.id, ctx.guild.id)
+            username = member.nick or member.name
             if handle:
-                await ctx.send(f'`{member.nick or member.name}` is `{handle}`')
-            else:
-                await ctx.send(f'`{member.nick or member.name}` is not linked with any account here')
+                linked_username = handle
+                pfp = await query.get_pfp(handle)
+        if linked_username:
+            embed = discord.Embed(
+                color=0xfcdb05,
+                title=f'{username} is {linked_username}',
+            )
+            embed.set_thumbnail(url=pfp)
+            await ctx.send(embed=embed)
+        elif username:
+            embed = discord.Embed(
+                title=f'{username} is not linked with any account here',
+                color=0xfcdb05,
+            )
+            await ctx.send(embed=embed)
         else:
             name = None
             if member:
                 name = member.nick or member.name
-            await ctx.send(f'Nothing found on {handle or name}')
+            embed = discord.Embed(
+                title=f'Nothing found on {handle or name}',
+                color=0xfcdb05,
+            )
+            await ctx.send(embed=embed)
 
     @commands.command()
     async def unlink(self, ctx):
