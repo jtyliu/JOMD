@@ -203,7 +203,7 @@ class Handles(commands.Cog):
         content = []
         page = ''
         for i, user in enumerate(leaderboard):
-            if (arg=='rating' or arg=='maxrating') and user[0]==9999:
+            if (arg == 'rating' or arg == 'maxrating') and user[0] == 9999:
                 page += f'{i+1} {user[1]} unrated\n'
             else:
                 page += f'{i+1} {user[1]} {-round(user[0],3)}\n'
