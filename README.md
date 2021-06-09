@@ -78,11 +78,26 @@ If you also want to add your DMOJ api token use
 export JOMD_TOKEN="INSERT DMOJ API TOKEN HERE"
 ```
 
+**JOMD also uses SQLAlchemy as a orm and Alembic as a migration tool. You need to make sure the database is upto date**
+
+**If you have cloned this repository before the addition of Alembic, find the corresponding hash in /alembic and run**
+
+```
+alembic stamp <HASH>
+```
+
+Then run
+
+```
+alembic upgrade head
+```
+
 Run the bot with
 
 ```
 python3.7 Main.py
 ```
+
 
 **Warning**: Many of the commands require multiple pieces of information to be fetched, so many initial commands will take several seconds to run but will speed up as more information is fetched and stored.
 

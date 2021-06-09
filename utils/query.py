@@ -13,13 +13,15 @@ from utils.db import (session, Problem as Problem_DB,
 from typing import List
 from sqlalchemy.sql import functions
 import asyncio
-from operator import itemgetter
+from operator import attrgetter, itemgetter
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Query:
-    """
+    '''
     Every object returned from this should be a DB object, not class object
-    """
+    '''
 
     def parse(self, key, val):
         cond = True
@@ -171,10 +173,10 @@ class Query:
         session.commit()
         return q.all()
 
-    async def get_contest(self, key: str) -> Contest_DB:
+    async def get_contest(self, key: str, cached: bool = True) -> Contest_DB:
         q = session.query(Contest_DB).\
             filter(Contest_DB.key == key)
-        if q.count():
+        if q.count() and cached:
             # is_rated checks if it has detailed rows
             if q.first().is_rated is not None:
                 return q.first()
@@ -272,10 +274,7 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
-        def get_id(participation):
-            return participation.id
-
-        participation_id = list(map(get_id, a.data.objects))
+        participation_id = list(map(attrgetter('id'), a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(participation_id)).all()
         qq = list(map(itemgetter(0), qq))
@@ -302,7 +301,7 @@ class Query:
             to_gather.append(to_await)
         await asyncio.gather(*to_gather)
         for api in apis:
-            participation_id = list(map(get_id, api.data.objects))
+            participation_id = list(map(attrgetter('id'), api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(participation_id)).all()
             qq = list(map(itemgetter(0), qq))
@@ -327,7 +326,8 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language,
                                 result=result, page=page)
-        print("Done Api Call", time.time() - start)
+
+        logger.info("Got submissions for %s, time elasped %s", user, time.time() - start)
         start = time.time()
         q = session.query(Submission_DB)
         q = q.filter(Submission_DB._user == user)
@@ -349,10 +349,7 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
-        def get_id(submission):
-            return submission.id
-
-        submission_ids = list(map(get_id, a.data.objects))
+        submission_ids = list(map(attrgetter('id'), a.data.objects))
         qq = session.query(Submission_DB.id).\
             filter(Submission_DB.id.in_(submission_ids)).all()
         qq = list(map(itemgetter(0), qq))
@@ -376,7 +373,7 @@ class Query:
         for api in apis:
             if api.data.objects is None:
                 continue
-            submission_ids = list(map(get_id, api.data.objects))
+            submission_ids = list(map(attrgetter('id'), api.data.objects))
             qq = session.query(Submission_DB.id).\
                 filter(Submission_DB.id.in_(submission_ids)).all()
             qq = list(map(itemgetter(0), qq))

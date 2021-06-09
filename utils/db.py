@@ -22,6 +22,7 @@ engine = create_engine(URI, echo=DEBUG_DB)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()
+# TODO: Remove all private attributes and learn how to use joins better
 
 
 class Json(TypeDecorator):
@@ -133,15 +134,15 @@ class Problem(Base):
     points = Column(Integer)
     partial = Column(Boolean)
     short_circuit = Column(Boolean)
-    languages = relationship("Language", secondary=language_problem,
+    languages = relationship('Language', secondary=language_problem,
                              back_populates='problems')
     is_organization_private = Column(Boolean)
-    organizations = relationship("Organization",
+    organizations = relationship('Organization',
                                  secondary=organization_problem,
                                  back_populates='problems')
     is_public = Column(Boolean)
 
-    contests = relationship("Contest", secondary=contest_problem,
+    contests = relationship('Contest', secondary=contest_problem,
                             back_populates='problems')
     solved_users = relationship('User', secondary=problem_user,
                                 back_populates='solved_problems')
@@ -296,6 +297,7 @@ class Submission(Base):
     __tablename__ = 'submission'
 
     id = Column(Integer, primary_key=True)
+    # TODO: Should only be a single foreign key
     problem = relationship('Problem', secondary=problem_submission,
                            back_populates='submissions')
     user = relationship('User', secondary=submission_user,
@@ -422,6 +424,7 @@ class Gitgud(Base):
     handle = Column(String)
     guild_id = Column(Integer)
     point = Column(Integer)
+    # TODO: make it a foreign key problem table
     problem_id = Column(String)
     time = Column(DateTime)
 
@@ -431,6 +434,7 @@ class CurrentGitgud(Base):
     _id = Column(Integer, primary_key=True)
     handle = Column(String)
     guild_id = Column(Integer)
+    # TODO: make it a foreign key problem table
     problem_id = Column(String)
     point = Column(Integer)
     time = Column(DateTime)

@@ -1,3 +1,4 @@
+from utils.api import ObjectNotFound
 import discord
 from discord.ext import commands
 import typing
@@ -9,11 +10,14 @@ from utils.db import (session, Contest as Contest_DB,
                       Problem as Problem_DB)
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
                          plot_points, plot_solved)
-from operator import itemgetter
+from utils.jomd_common import calculate_points
+from operator import attrgetter, itemgetter
 from sqlalchemy import or_, orm, func
 import asyncio
 import io
 import bisect
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Plot(commands.Cog):
@@ -23,7 +27,7 @@ class Plot(commands.Cog):
     @commands.group(brief='Graphs for analyzing DMOJ activity',
                     invoke_without_command=True)
     async def plot(self, ctx):
-        """Plot various graphs"""
+        '''Plot various graphs'''
         await ctx.send_help('plot')
 
     def graph_type(argument) -> typing.Optional[str]:
@@ -55,15 +59,19 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[usernames]')
     async def solved(self, ctx, *usernames):
-        """Plot problems solved over time"""
+        '''Plot problems solved over time'''
         usernames = list(usernames)
 
         query = Query()
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -76,7 +84,7 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
             q = session.query(func.min(Submission_DB.date))\
@@ -107,15 +115,19 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[usernames]')
     async def points(self, ctx, *usernames):
-        """Plot point progression"""
+        '''Plot point progression'''
         usernames = list(usernames)
 
         query = Query()
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -132,16 +144,9 @@ class Plot(commands.Cog):
                 .filter(User_DB.username == username)\
                 .order_by(Submission_DB.date)
 
-            def calculate_points(points, fully_solved):
-                b = 150 * (1 - 0.997**fully_solved)
-                p = 0
-                for i in range(min(100, len(points))):
-                    p += (0.95**i) * points[i]
-                return b + p
-
             submissions = q.all()
             if len(submissions) == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
                 submissions = q.all()
             problems_ACed = dict()
@@ -186,15 +191,19 @@ class Plot(commands.Cog):
 
     @plot.command(usage='[+peak] [usernames]')
     async def rating(self, ctx, peak: typing.Optional[plot_peak] = False, *usernames):
-        """Plot rating progression"""
+        '''Plot rating progression'''
         usernames = list(usernames)
 
         query = Query()
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         usernames = [user.username for user in users]
         for i in range(len(users)):
             if users[i] is None:
@@ -246,7 +255,7 @@ class Plot(commands.Cog):
                    as_percent: typing.Optional[as_percentage] = True,
                    graph: typing.Optional[graph_type] = 'radar',
                    *usernames):
-        """Graph problems solved by popular problem types"""
+        '''Graph problems solved by popular problem types'''
         # This is aids, pls fix
 
         usernames = list(usernames)
@@ -255,8 +264,12 @@ class Plot(commands.Cog):
         if usernames == []:
             usernames = [query.get_handle(ctx.author.id, ctx.guild.id)]
 
-        users = await asyncio.gather(*[query.get_user(username)
-                                     for username in usernames])
+        try:
+            users = await asyncio.gather(*[query.get_user(username)
+                                         for username in usernames])
+        except ObjectNotFound:
+            return await ctx.send('User not found')
+
         for i in range(len(users)):
             if users[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
@@ -282,14 +295,11 @@ class Plot(commands.Cog):
         for username in usernames:
             data['group'].append(username)
 
-        def calculate_points(points: int):
+        def calculate_partial_points(points: int):
             p = 0
             for i in range(min(100, len(points))):
                 p += (0.95**i) * points[i]
             return p
-
-        def to_points(problem):
-            return problem.points
 
         max_percentage = 0
 
@@ -297,22 +307,22 @@ class Plot(commands.Cog):
             q = session.query(Submission_DB)\
                 .filter(Submission_DB._user == username)
             if q.count() == 0:
-                await ctx.send(f"`{username}` does not have any cached submissions, caching now")
+                await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
         for i, types in enumerate(important_types):
             total_problems = await query.get_problems(_type=types, cached=True)
-            total_points = list(map(to_points, total_problems))
+            total_points = list(map(attrgetter('points'), total_problems))
             total_points.sort(reverse=True)
-            total_points = calculate_points(total_points)
+            total_points = calculate_partial_points(total_points)
 
             for username in usernames:
                 problems = query.get_attempted_problems(username, types)
 
-                points = list(map(to_points, problems))
+                points = list(map(attrgetter('points'), problems))
                 points.sort(reverse=True)
 
-                points = calculate_points(points)
+                points = calculate_partial_points(points)
                 if as_percent:
                     percentage = 100 * points / total_points
                 else:
@@ -320,7 +330,7 @@ class Plot(commands.Cog):
                 max_percentage = max(max_percentage, percentage)
                 data[labels[i]].append(percentage)
 
-        print(data)
+        logger.debug('plot type data: %s', data)
 
         if graph == 'radar':
             plot_type_radar(data, as_percent, max_percentage)
