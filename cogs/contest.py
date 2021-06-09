@@ -213,7 +213,7 @@ class Contest(commands.Cog):
         '''Updates post-contest role'''
         try:
             await ctx.message.delete()
-        except:
+        except discord.Forbidden:
             pass
 
         role = get(ctx.guild.roles, name=ADMIN_ROLE)
