@@ -168,19 +168,22 @@ class Handles(commands.Cog):
             .filter(Handle_DB.guild_id == ctx.guild.id)
         leaderboard = []
         for user in users:
-            if arg == "rating":
-                leaderboard.append([-user.rating, user.username])
-            elif arg == "maxrating":
-                leaderboard.append([-user.max_rating, user.username])
-            elif arg == "points":
+            if arg == 'rating':
+                leaderboard.append([-(user.rating or -9999), user.username])
+            elif arg == 'maxrating':
+                leaderboard.append([-(user.max_rating or -9999), user.username])
+            elif arg == 'points':
                 leaderboard.append([-user.performance_points, user.username])
-            elif arg == "solved":
-                leaderboard.append([-user.problem_count, user.username])
+            elif arg == 'solved':
+                leaderboard.append([-(user.problem_count or 0), user.username])
         leaderboard.sort()
         content = []
         page = ""
         for i, user in enumerate(leaderboard):
-            page += f"{i+1} {user[1]} {-round(user[0],3)}\n"
+            if (arg=='rating' or arg=='maxrating') and user[0]==9999:
+                page += f'{i+1} {user[1]} unrated\n'
+            else:
+                page += f'{i+1} {user[1]} {-round(user[0],3)}\n'
             if i % 10 == 9:
                 content.append(page)
                 page = ""
