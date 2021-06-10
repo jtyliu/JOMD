@@ -211,8 +211,10 @@ class Contest(commands.Cog):
     @commands.command(aliases=['pc'], usage='[contest key]')
     async def postcontest(self, ctx, key, option=''):
         '''Updates post-contest role'''
-
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            pass
 
         role = get(ctx.guild.roles, name=ADMIN_ROLE)
 
