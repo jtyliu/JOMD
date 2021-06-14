@@ -7,7 +7,7 @@ API_TOKEN = os.environ.get('JOMD_TOKEN', None)
 DB_DIR = 'utils/db/JOMD.db'
 SITE_URL = 'https://dmoj.ca/'
 DEBUG_DB = False
-ADMIN_ROLE = 'Admin'
+ADMIN_ROLES = ['Admin']
 # Time zone
 # why does it not work??? asdlsadkl
 TZ = pytz.timezone('America/New_York')

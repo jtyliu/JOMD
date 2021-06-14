@@ -5,7 +5,7 @@ from discord.ext import commands
 import discord
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
-from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLE
+from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
 import typing
 import asyncio
 import hashlib
@@ -131,7 +131,7 @@ class Handles(commands.Cog):
             await ctx.send('You are missing the ' + rank.name + ' role')
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
-    @commands.has_role(ADMIN_ROLE)
+    @commands.has_any_role(*ADMIN_ROLES)
     async def _set(self, ctx, member, username: str):
         '''Manually link two accounts together'''
         query = Query()
@@ -237,7 +237,7 @@ class Handles(commands.Cog):
             await member.add_roles(rank, reason=reason)
 
     @commands.command()
-    @commands.has_role(ADMIN_ROLE)
+    @commands.has_any_role(*ADMIN_ROLES)
     async def update_roles(self, ctx):
         '''Manually update roles'''
         # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
