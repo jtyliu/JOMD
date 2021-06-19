@@ -255,6 +255,9 @@ class Handles(commands.Cog):
             new_ratings[user] = None  # unrated
             for contest in contests:
                 found = False
+                if contest.rankings is None:
+                    continue
+
                 for participation in contest.rankings:
                     if participation['user'].lower() == user.handle.lower() and participation['new_rating'] is not None:
                         new_ratings[user] = participation['new_rating']
