@@ -26,3 +26,5 @@ typing-extensions==3.7.4.3
 yarl==1.6.3
 DiscordUtils>=1.2.4
 alembic==1.6.3
+pytest-asyncio
+pytest

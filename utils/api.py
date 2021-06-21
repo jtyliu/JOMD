@@ -24,6 +24,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+__all__ = [
+    'API',
+    'ObjectNotFound',
+    'Judge',
+    'Language',
+    'Organization',
+    'Submission',
+    'User',
+    'Participation',
+    'Contest',
+    'Problem',
+]
+
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
 class RateLimiter:
     def __init__(self,
@@ -327,7 +340,7 @@ class User:
         self.points = data['points']
         self.performance_points = data['performance_points']
         self.problem_count = data['problem_count']
-        self.rank = data['problem_count']
+        self.rank = data['rank']
         self.rating = data['rating']
         self.max_rating = data['rating']
         self.volatility = data['volatility']
