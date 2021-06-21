@@ -125,7 +125,10 @@ class Contest(commands.Cog):
                     for i in range(1, problems + 1):
                         solution = ranking['solutions'][i - 1]
                         if solution:
-                            rank_dict[str(i)] = int(solution['points'])
+                            if int(solution['points']) == solution['points']:
+                                rank_dict[str(i)] = int(solution['points'])
+                            else:
+                                rank_dict[str(i)] = round(solution['points'], 2)
                         else:
                             rank_dict[str(i)] = '-'
                     data.append(rank_dict)
