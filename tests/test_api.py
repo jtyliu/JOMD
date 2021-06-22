@@ -72,7 +72,6 @@ class TestAPI:
 
     @pytest.mark.asyncio
     async def test_parse_data(self):
-        api_data = self.api.Data
         self.api.Data = self.DataMock
         data = {
             "api_version": "v2",

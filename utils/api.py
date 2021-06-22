@@ -9,6 +9,7 @@ import asyncio
 import time
 import html
 import math
+import json
 from datetime import datetime
 from utils.db import session
 from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
@@ -36,6 +37,7 @@ __all__ = [
     'Contest',
     'Problem',
 ]
+
 
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
 class RateLimiter:
@@ -131,8 +133,14 @@ rate_limiter = None
 _session = None
 
 
-async def _query_api(url, resp_obj):
+async def _query_api(url, resp_obj, *, object_hook=None):
     global _session, rate_limiter
+
+    if object_hook is not None:
+        json_loads = functools.partial(json.loads, object_hook=object_hook)
+    else:
+        json_loads = json.loads()
+
     if rate_limiter is None:
         # Allow at most 3 concurrent requests tokens are emptied at 1 per second
         rate_limiter = RateLimiter(rate_limit=1, concurrency_limit=3)
@@ -149,7 +157,7 @@ async def _query_api(url, resp_obj):
             if resp_obj == 'text':
                 resp = await resp.text()
             if resp_obj == 'json':
-                resp = await resp.json()
+                resp = await resp.json(loads=json_loads)
             # if 'error' in resp:  ApiError would interfere with some other stuff,
             # might just change to error trapping
             #     raise ApiError
