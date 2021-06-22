@@ -1,0 +1,9 @@
+{
+    "id": 1,
+    "key": "PY2",
+    "short_name": "",
+    "common_name": "Python",
+    "ace_mode_name": "python",
+    "pygments_name": "python",
+    "code_template": ""
+}

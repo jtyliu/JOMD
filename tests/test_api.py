@@ -325,3 +325,30 @@ class TestAPIModels:
                     assert isinstance(case.memory, float)
                     assert isinstance(case.points, float)
                     assert isinstance(case.total, float)
+
+    def test_organization_model(self):
+        org = Organization(self.open_json('organization.json'))
+        assert org.id == 31
+        assert org.slug == "olympiads-school"
+        assert org.short_name == "Olympiads"
+        assert org.is_open is False
+        assert org.member_count == 818
+
+    def test_language_model(self):
+        language = Language(self.open_json('language.json'))
+        assert language.id == 1
+        assert language.key == "PY2"
+        assert language.short_name == ""
+        assert language.common_name == "Python"
+        assert language.ace_mode_name == "python"
+        assert language.pygments_name == "python"
+        assert language.code_template == ""
+
+    def test_judge_model(self):
+        judge = Judge(self.open_json('judge.json'))
+        assert judge.name == "Crwys"
+        assert judge.start_time == datetime.datetime(2021, 6, 18, 2, 47, 0, 872312, tzinfo=datetime.timezone.utc)
+        assert judge.ping == 61.1680348714193
+        assert judge.load == 0.035
+        assert isinstance(judge.languages, list)
+        assert all(isinstance(language, str) for language in judge.languages)
