@@ -235,6 +235,7 @@ class Contest:
         self.rating_floor = data.get('rating_floor')
         self.rating_ceiling = data.get('rating_ceiling')
         self.hidden_scoreboard = data.get('hidden_scoreboard')
+        self.scoreboard_visibility = data.get('scoreboard_visibility')
         self.is_organization_private = data.get('is_organization_private')
         self._organizations = data.get('organizations', [])
         self.organizations = []
@@ -303,6 +304,8 @@ class Participation:
         self.tiebreaker = data['tiebreaker']
         self.is_disqualified = data['is_disqualified']
         self.virtual_participation_number = data['virtual_participation_number']
+        self.start_time = datetime.fromisoformat(data.get('start_time'))
+        self.end_time = datetime.fromisoformat(data.get('end_time'))
 
     @staticmethod
     async def async_map(_type, objects):

@@ -1,0 +1,4506 @@
+{
+    "id": 2023196,
+    "problem": "boolean",
+    "user": "JoshuaL",
+    "date": "2020-04-09T22:33:25+00:00",
+    "time": 1.605702267,
+    "memory": 776.0,
+    "points": 3.0,
+    "language": "C",
+    "status": "D",
+    "result": "AC",
+    "case_points": 100.0,
+    "case_total": 100.0,
+    "cases": [
+        {
+            "type": "batch",
+            "batch_id": 1,
+            "cases": [
+                {
+                    "type": "case",
+                    "case_id": 1,
+                    "status": "AC",
+                    "time": 0.002594027,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 2,
+                    "status": "AC",
+                    "time": 0.002533346,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 3,
+                    "status": "AC",
+                    "time": 0.002357848,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 4,
+                    "status": "AC",
+                    "time": 0.00253308,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 5,
+                    "status": "AC",
+                    "time": 0.00373604,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 6,
+                    "status": "AC",
+                    "time": 0.003573666,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 7,
+                    "status": "AC",
+                    "time": 0.003678525,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 8,
+                    "status": "AC",
+                    "time": 0.003686351,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 9,
+                    "status": "AC",
+                    "time": 0.003657016,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 10,
+                    "status": "AC",
+                    "time": 0.002666981,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 11,
+                    "status": "AC",
+                    "time": 0.00241791,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 12,
+                    "status": "AC",
+                    "time": 0.003687434,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 13,
+                    "status": "AC",
+                    "time": 0.002640201,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 14,
+                    "status": "AC",
+                    "time": 0.002512978,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 15,
+                    "status": "AC",
+                    "time": 0.003735523,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 16,
+                    "status": "AC",
+                    "time": 0.003940601,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 17,
+                    "status": "AC",
+                    "time": 0.003800502,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 18,
+                    "status": "AC",
+                    "time": 0.003739011,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 19,
+                    "status": "AC",
+                    "time": 0.003167925,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 20,
+                    "status": "AC",
+                    "time": 0.003653176,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 21,
+                    "status": "AC",
+                    "time": 0.002894278,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 22,
+                    "status": "AC",
+                    "time": 0.003042536,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 23,
+                    "status": "AC",
+                    "time": 0.002576468,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 24,
+                    "status": "AC",
+                    "time": 0.003828616,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 25,
+                    "status": "AC",
+                    "time": 0.003816233,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 26,
+                    "status": "AC",
+                    "time": 0.00377097,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 27,
+                    "status": "AC",
+                    "time": 0.002331381,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 28,
+                    "status": "AC",
+                    "time": 0.003606689,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 29,
+                    "status": "AC",
+                    "time": 0.004024545,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 30,
+                    "status": "AC",
+                    "time": 0.003644162,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 31,
+                    "status": "AC",
+                    "time": 0.004555867,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 32,
+                    "status": "AC",
+                    "time": 0.003709645,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 33,
+                    "status": "AC",
+                    "time": 0.003875634,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 34,
+                    "status": "AC",
+                    "time": 0.002817303,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 35,
+                    "status": "AC",
+                    "time": 0.002435335,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 36,
+                    "status": "AC",
+                    "time": 0.003782789,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 37,
+                    "status": "AC",
+                    "time": 0.003828677,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 38,
+                    "status": "AC",
+                    "time": 0.003703913,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 39,
+                    "status": "AC",
+                    "time": 0.002808987,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 40,
+                    "status": "AC",
+                    "time": 0.003747729,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 41,
+                    "status": "AC",
+                    "time": 0.003758323,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 42,
+                    "status": "AC",
+                    "time": 0.003861311,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 43,
+                    "status": "AC",
+                    "time": 0.002581578,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 44,
+                    "status": "AC",
+                    "time": 0.002604493,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 45,
+                    "status": "AC",
+                    "time": 0.002576141,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 46,
+                    "status": "AC",
+                    "time": 0.002790885,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 47,
+                    "status": "AC",
+                    "time": 0.002868382,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 48,
+                    "status": "AC",
+                    "time": 0.003821926,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 49,
+                    "status": "AC",
+                    "time": 0.003938453,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 50,
+                    "status": "AC",
+                    "time": 0.00399496,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 51,
+                    "status": "AC",
+                    "time": 0.0032446,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 52,
+                    "status": "AC",
+                    "time": 0.002844185,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 53,
+                    "status": "AC",
+                    "time": 0.003818507,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 54,
+                    "status": "AC",
+                    "time": 0.004044976,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 55,
+                    "status": "AC",
+                    "time": 0.003848095,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 56,
+                    "status": "AC",
+                    "time": 0.002682903,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 57,
+                    "status": "AC",
+                    "time": 0.002624049,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 58,
+                    "status": "AC",
+                    "time": 0.004899482,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 59,
+                    "status": "AC",
+                    "time": 0.003222937,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 60,
+                    "status": "AC",
+                    "time": 0.00383526,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 61,
+                    "status": "AC",
+                    "time": 0.003876877,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 62,
+                    "status": "AC",
+                    "time": 0.003948162,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 63,
+                    "status": "AC",
+                    "time": 0.002790404,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 64,
+                    "status": "AC",
+                    "time": 0.00405417,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 65,
+                    "status": "AC",
+                    "time": 0.002567383,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 66,
+                    "status": "AC",
+                    "time": 0.004144501,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 67,
+                    "status": "AC",
+                    "time": 0.003370124,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 68,
+                    "status": "AC",
+                    "time": 0.003863321,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 69,
+                    "status": "AC",
+                    "time": 0.003864214,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 70,
+                    "status": "AC",
+                    "time": 0.002531111,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 71,
+                    "status": "AC",
+                    "time": 0.002649086,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 72,
+                    "status": "AC",
+                    "time": 0.002670267,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 73,
+                    "status": "AC",
+                    "time": 0.003857745,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 74,
+                    "status": "AC",
+                    "time": 0.003761401,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 75,
+                    "status": "AC",
+                    "time": 0.0024965,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 76,
+                    "status": "AC",
+                    "time": 0.004032934,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 77,
+                    "status": "AC",
+                    "time": 0.003821363,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 78,
+                    "status": "AC",
+                    "time": 0.003904168,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 79,
+                    "status": "AC",
+                    "time": 0.003599926,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 80,
+                    "status": "AC",
+                    "time": 0.003727749,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 81,
+                    "status": "AC",
+                    "time": 0.003770467,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 82,
+                    "status": "AC",
+                    "time": 0.003619693,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 83,
+                    "status": "AC",
+                    "time": 0.00298479,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 84,
+                    "status": "AC",
+                    "time": 0.00378861,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 85,
+                    "status": "AC",
+                    "time": 0.003873184,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 86,
+                    "status": "AC",
+                    "time": 0.002557796,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 87,
+                    "status": "AC",
+                    "time": 0.002542827,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 88,
+                    "status": "AC",
+                    "time": 0.002569528,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 89,
+                    "status": "AC",
+                    "time": 0.004310927,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 90,
+                    "status": "AC",
+                    "time": 0.002651883,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 91,
+                    "status": "AC",
+                    "time": 0.00241155,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 92,
+                    "status": "AC",
+                    "time": 0.004055998,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 93,
+                    "status": "AC",
+                    "time": 0.003839239,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 94,
+                    "status": "AC",
+                    "time": 0.003972667,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 95,
+                    "status": "AC",
+                    "time": 0.003744251,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 96,
+                    "status": "AC",
+                    "time": 0.003750161,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 97,
+                    "status": "AC",
+                    "time": 0.00414358,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 98,
+                    "status": "AC",
+                    "time": 0.002711485,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 99,
+                    "status": "AC",
+                    "time": 0.002404127,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 100,
+                    "status": "AC",
+                    "time": 0.003868693,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 101,
+                    "status": "AC",
+                    "time": 0.004230344,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 102,
+                    "status": "AC",
+                    "time": 0.003810824,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 103,
+                    "status": "AC",
+                    "time": 0.004368604,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 104,
+                    "status": "AC",
+                    "time": 0.002514676,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 105,
+                    "status": "AC",
+                    "time": 0.003871157,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 106,
+                    "status": "AC",
+                    "time": 0.003403659,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 107,
+                    "status": "AC",
+                    "time": 0.002541248,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 108,
+                    "status": "AC",
+                    "time": 0.003796583,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 109,
+                    "status": "AC",
+                    "time": 0.003837979,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 110,
+                    "status": "AC",
+                    "time": 0.002631835,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 111,
+                    "status": "AC",
+                    "time": 0.002596949,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 112,
+                    "status": "AC",
+                    "time": 0.00393616,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 113,
+                    "status": "AC",
+                    "time": 0.00326648,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 114,
+                    "status": "AC",
+                    "time": 0.003943519,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 115,
+                    "status": "AC",
+                    "time": 0.003238906,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 116,
+                    "status": "AC",
+                    "time": 0.003874613,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 117,
+                    "status": "AC",
+                    "time": 0.004004449,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 118,
+                    "status": "AC",
+                    "time": 0.003817637,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 119,
+                    "status": "AC",
+                    "time": 0.00290658,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 120,
+                    "status": "AC",
+                    "time": 0.002664535,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 121,
+                    "status": "AC",
+                    "time": 0.003794894,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 122,
+                    "status": "AC",
+                    "time": 0.002574939,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 123,
+                    "status": "AC",
+                    "time": 0.002422222,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 124,
+                    "status": "AC",
+                    "time": 0.002578103,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 125,
+                    "status": "AC",
+                    "time": 0.002582603,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 126,
+                    "status": "AC",
+                    "time": 0.002620834,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 127,
+                    "status": "AC",
+                    "time": 0.002617088,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 128,
+                    "status": "AC",
+                    "time": 0.003759638,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 129,
+                    "status": "AC",
+                    "time": 0.003890265,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 130,
+                    "status": "AC",
+                    "time": 0.004096722,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 131,
+                    "status": "AC",
+                    "time": 0.003222078,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 132,
+                    "status": "AC",
+                    "time": 0.003784112,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 133,
+                    "status": "AC",
+                    "time": 0.001982963,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 134,
+                    "status": "AC",
+                    "time": 0.003820883,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 135,
+                    "status": "AC",
+                    "time": 0.003847833,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 136,
+                    "status": "AC",
+                    "time": 0.003843416,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 137,
+                    "status": "AC",
+                    "time": 0.00257755,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 138,
+                    "status": "AC",
+                    "time": 0.003777963,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 139,
+                    "status": "AC",
+                    "time": 0.002417933,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 140,
+                    "status": "AC",
+                    "time": 0.002675887,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 141,
+                    "status": "AC",
+                    "time": 0.002592029,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 142,
+                    "status": "AC",
+                    "time": 0.003020968,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 143,
+                    "status": "AC",
+                    "time": 0.004419461,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 144,
+                    "status": "AC",
+                    "time": 0.00353315,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 145,
+                    "status": "AC",
+                    "time": 0.003726674,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 146,
+                    "status": "AC",
+                    "time": 0.002561013,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 147,
+                    "status": "AC",
+                    "time": 0.003295324,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 148,
+                    "status": "AC",
+                    "time": 0.003654451,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 149,
+                    "status": "AC",
+                    "time": 0.003916824,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 150,
+                    "status": "AC",
+                    "time": 0.003827156,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 151,
+                    "status": "AC",
+                    "time": 0.003942149,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 152,
+                    "status": "AC",
+                    "time": 0.002970674,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 153,
+                    "status": "AC",
+                    "time": 0.003381879,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 154,
+                    "status": "AC",
+                    "time": 0.003817426,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 155,
+                    "status": "AC",
+                    "time": 0.002480469,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 156,
+                    "status": "AC",
+                    "time": 0.004034935,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 157,
+                    "status": "AC",
+                    "time": 0.004405264,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 158,
+                    "status": "AC",
+                    "time": 0.003810623,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 159,
+                    "status": "AC",
+                    "time": 0.004279769,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 160,
+                    "status": "AC",
+                    "time": 0.003883843,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 161,
+                    "status": "AC",
+                    "time": 0.002893095,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 162,
+                    "status": "AC",
+                    "time": 0.002583103,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 163,
+                    "status": "AC",
+                    "time": 0.002851769,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 164,
+                    "status": "AC",
+                    "time": 0.002719862,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 165,
+                    "status": "AC",
+                    "time": 0.002690474,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 166,
+                    "status": "AC",
+                    "time": 0.00461676,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 167,
+                    "status": "AC",
+                    "time": 0.00427679,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 168,
+                    "status": "AC",
+                    "time": 0.003827205,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 169,
+                    "status": "AC",
+                    "time": 0.004047932,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 170,
+                    "status": "AC",
+                    "time": 0.00277749,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 171,
+                    "status": "AC",
+                    "time": 0.00284817,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 172,
+                    "status": "AC",
+                    "time": 0.003134422,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 173,
+                    "status": "AC",
+                    "time": 0.002799799,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 174,
+                    "status": "AC",
+                    "time": 0.003206408,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 175,
+                    "status": "AC",
+                    "time": 0.003857671,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 176,
+                    "status": "AC",
+                    "time": 0.004300594,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 177,
+                    "status": "AC",
+                    "time": 0.002657676,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 178,
+                    "status": "AC",
+                    "time": 0.002670969,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 179,
+                    "status": "AC",
+                    "time": 0.002527659,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 180,
+                    "status": "AC",
+                    "time": 0.002759155,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 181,
+                    "status": "AC",
+                    "time": 0.002604596,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 182,
+                    "status": "AC",
+                    "time": 0.004247154,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 183,
+                    "status": "AC",
+                    "time": 0.002558207,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 184,
+                    "status": "AC",
+                    "time": 0.002599695,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 185,
+                    "status": "AC",
+                    "time": 0.002657932,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 186,
+                    "status": "AC",
+                    "time": 0.002764764,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 187,
+                    "status": "AC",
+                    "time": 0.002609895,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 188,
+                    "status": "AC",
+                    "time": 0.002566822,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 189,
+                    "status": "AC",
+                    "time": 0.002604557,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 190,
+                    "status": "AC",
+                    "time": 0.002608402,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 191,
+                    "status": "AC",
+                    "time": 0.002575509,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 192,
+                    "status": "AC",
+                    "time": 0.002625345,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 193,
+                    "status": "AC",
+                    "time": 0.002540472,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 194,
+                    "status": "AC",
+                    "time": 0.003794814,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 195,
+                    "status": "AC",
+                    "time": 0.00303859,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 196,
+                    "status": "AC",
+                    "time": 0.002696388,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 197,
+                    "status": "AC",
+                    "time": 0.002576601,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 198,
+                    "status": "AC",
+                    "time": 0.00255595,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 199,
+                    "status": "AC",
+                    "time": 0.002970278,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 200,
+                    "status": "AC",
+                    "time": 0.002627779,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 201,
+                    "status": "AC",
+                    "time": 0.002913556,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 202,
+                    "status": "AC",
+                    "time": 0.002585649,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 203,
+                    "status": "AC",
+                    "time": 0.002419566,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 204,
+                    "status": "AC",
+                    "time": 0.002650258,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 205,
+                    "status": "AC",
+                    "time": 0.002706556,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 206,
+                    "status": "AC",
+                    "time": 0.002536242,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 207,
+                    "status": "AC",
+                    "time": 0.002627135,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 208,
+                    "status": "AC",
+                    "time": 0.002693129,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 209,
+                    "status": "AC",
+                    "time": 0.002589686,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 210,
+                    "status": "AC",
+                    "time": 0.002548228,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 211,
+                    "status": "AC",
+                    "time": 0.002462535,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 212,
+                    "status": "AC",
+                    "time": 0.002553248,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 213,
+                    "status": "AC",
+                    "time": 0.00260869,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 214,
+                    "status": "AC",
+                    "time": 0.002572636,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 215,
+                    "status": "AC",
+                    "time": 0.002664085,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 216,
+                    "status": "AC",
+                    "time": 0.002700344,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 217,
+                    "status": "AC",
+                    "time": 0.002812051,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 218,
+                    "status": "AC",
+                    "time": 0.002564406,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 219,
+                    "status": "AC",
+                    "time": 0.002457737,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 220,
+                    "status": "AC",
+                    "time": 0.003765288,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 221,
+                    "status": "AC",
+                    "time": 0.002681978,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 222,
+                    "status": "AC",
+                    "time": 0.002902124,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 223,
+                    "status": "AC",
+                    "time": 0.002960204,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 224,
+                    "status": "AC",
+                    "time": 0.003122615,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 225,
+                    "status": "AC",
+                    "time": 0.002575692,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 226,
+                    "status": "AC",
+                    "time": 0.002673913,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 227,
+                    "status": "AC",
+                    "time": 0.003323076,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 228,
+                    "status": "AC",
+                    "time": 0.00400103,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 229,
+                    "status": "AC",
+                    "time": 0.004210525,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 230,
+                    "status": "AC",
+                    "time": 0.004006863,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 231,
+                    "status": "AC",
+                    "time": 0.00399421,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 232,
+                    "status": "AC",
+                    "time": 0.002990683,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 233,
+                    "status": "AC",
+                    "time": 0.003414597,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 234,
+                    "status": "AC",
+                    "time": 0.004335861,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 235,
+                    "status": "AC",
+                    "time": 0.002438969,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 236,
+                    "status": "AC",
+                    "time": 0.002496711,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 237,
+                    "status": "AC",
+                    "time": 0.003849574,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 238,
+                    "status": "AC",
+                    "time": 0.002928141,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 239,
+                    "status": "AC",
+                    "time": 0.003422505,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 240,
+                    "status": "AC",
+                    "time": 0.003827602,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 241,
+                    "status": "AC",
+                    "time": 0.003654949,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 242,
+                    "status": "AC",
+                    "time": 0.003880946,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 243,
+                    "status": "AC",
+                    "time": 0.002560449,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 244,
+                    "status": "AC",
+                    "time": 0.00403076,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 245,
+                    "status": "AC",
+                    "time": 0.004155201,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 246,
+                    "status": "AC",
+                    "time": 0.003869717,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 247,
+                    "status": "AC",
+                    "time": 0.003896697,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 248,
+                    "status": "AC",
+                    "time": 0.004113002,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 249,
+                    "status": "AC",
+                    "time": 0.004046258,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 250,
+                    "status": "AC",
+                    "time": 0.00392589,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 251,
+                    "status": "AC",
+                    "time": 0.003211136,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 252,
+                    "status": "AC",
+                    "time": 0.002663447,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 253,
+                    "status": "AC",
+                    "time": 0.004007133,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 254,
+                    "status": "AC",
+                    "time": 0.003796887,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 255,
+                    "status": "AC",
+                    "time": 0.004178285,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 256,
+                    "status": "AC",
+                    "time": 0.002837068,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 257,
+                    "status": "AC",
+                    "time": 0.00254876,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 258,
+                    "status": "AC",
+                    "time": 0.003014435,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 259,
+                    "status": "AC",
+                    "time": 0.00274575,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 260,
+                    "status": "AC",
+                    "time": 0.003879032,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 261,
+                    "status": "AC",
+                    "time": 0.002710781,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 262,
+                    "status": "AC",
+                    "time": 0.002624777,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 263,
+                    "status": "AC",
+                    "time": 0.002583136,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 264,
+                    "status": "AC",
+                    "time": 0.00267123,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 265,
+                    "status": "AC",
+                    "time": 0.002597592,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 266,
+                    "status": "AC",
+                    "time": 0.002588541,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 267,
+                    "status": "AC",
+                    "time": 0.002416572,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 268,
+                    "status": "AC",
+                    "time": 0.002680187,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 269,
+                    "status": "AC",
+                    "time": 0.003897726,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 270,
+                    "status": "AC",
+                    "time": 0.003393818,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 271,
+                    "status": "AC",
+                    "time": 0.00262316,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 272,
+                    "status": "AC",
+                    "time": 0.002556094,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 273,
+                    "status": "AC",
+                    "time": 0.00277281,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 274,
+                    "status": "AC",
+                    "time": 0.004008778,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 275,
+                    "status": "AC",
+                    "time": 0.003329529,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 276,
+                    "status": "AC",
+                    "time": 0.003951358,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 277,
+                    "status": "AC",
+                    "time": 0.00403838,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 278,
+                    "status": "AC",
+                    "time": 0.002701918,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 279,
+                    "status": "AC",
+                    "time": 0.00384138,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 280,
+                    "status": "AC",
+                    "time": 0.004124926,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 281,
+                    "status": "AC",
+                    "time": 0.003976165,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 282,
+                    "status": "AC",
+                    "time": 0.003834419,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 283,
+                    "status": "AC",
+                    "time": 0.003350027,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 284,
+                    "status": "AC",
+                    "time": 0.00402558,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 285,
+                    "status": "AC",
+                    "time": 0.0040787,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 286,
+                    "status": "AC",
+                    "time": 0.002820058,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 287,
+                    "status": "AC",
+                    "time": 0.003319719,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 288,
+                    "status": "AC",
+                    "time": 0.004035449,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 289,
+                    "status": "AC",
+                    "time": 0.004015249,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 290,
+                    "status": "AC",
+                    "time": 0.003790557,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 291,
+                    "status": "AC",
+                    "time": 0.003501754,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 292,
+                    "status": "AC",
+                    "time": 0.003950707,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 293,
+                    "status": "AC",
+                    "time": 0.002685909,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 294,
+                    "status": "AC",
+                    "time": 0.002805561,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 295,
+                    "status": "AC",
+                    "time": 0.003804582,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 296,
+                    "status": "AC",
+                    "time": 0.003921571,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 297,
+                    "status": "AC",
+                    "time": 0.004099285,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 298,
+                    "status": "AC",
+                    "time": 0.00392213,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 299,
+                    "status": "AC",
+                    "time": 0.002434683,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 300,
+                    "status": "AC",
+                    "time": 0.002568013,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 301,
+                    "status": "AC",
+                    "time": 0.00264974,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 302,
+                    "status": "AC",
+                    "time": 0.002611516,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 303,
+                    "status": "AC",
+                    "time": 0.003026727,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 304,
+                    "status": "AC",
+                    "time": 0.003976568,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 305,
+                    "status": "AC",
+                    "time": 0.003975315,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 306,
+                    "status": "AC",
+                    "time": 0.003889782,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 307,
+                    "status": "AC",
+                    "time": 0.003631297,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 308,
+                    "status": "AC",
+                    "time": 0.003937012,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 309,
+                    "status": "AC",
+                    "time": 0.00403724,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 310,
+                    "status": "AC",
+                    "time": 0.004074881,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 311,
+                    "status": "AC",
+                    "time": 0.003940039,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 312,
+                    "status": "AC",
+                    "time": 0.004049816,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 313,
+                    "status": "AC",
+                    "time": 0.003966846,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 314,
+                    "status": "AC",
+                    "time": 0.00410249,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 315,
+                    "status": "AC",
+                    "time": 0.00269395,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 316,
+                    "status": "AC",
+                    "time": 0.00391927,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 317,
+                    "status": "AC",
+                    "time": 0.004014731,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 318,
+                    "status": "AC",
+                    "time": 0.004036329,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 319,
+                    "status": "AC",
+                    "time": 0.004116788,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 320,
+                    "status": "AC",
+                    "time": 0.003869283,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 321,
+                    "status": "AC",
+                    "time": 0.003928697,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 322,
+                    "status": "AC",
+                    "time": 0.003948703,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 323,
+                    "status": "AC",
+                    "time": 0.003520629,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 324,
+                    "status": "AC",
+                    "time": 0.003889173,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 325,
+                    "status": "AC",
+                    "time": 0.003531419,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 326,
+                    "status": "AC",
+                    "time": 0.002558185,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 327,
+                    "status": "AC",
+                    "time": 0.003932102,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 328,
+                    "status": "AC",
+                    "time": 0.002541063,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 329,
+                    "status": "AC",
+                    "time": 0.002578051,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 330,
+                    "status": "AC",
+                    "time": 0.002587272,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 331,
+                    "status": "AC",
+                    "time": 0.002635611,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 332,
+                    "status": "AC",
+                    "time": 0.002598102,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 333,
+                    "status": "AC",
+                    "time": 0.004011761,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 334,
+                    "status": "AC",
+                    "time": 0.002662441,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 335,
+                    "status": "AC",
+                    "time": 0.002676396,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 336,
+                    "status": "AC",
+                    "time": 0.002631904,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 337,
+                    "status": "AC",
+                    "time": 0.004051308,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 338,
+                    "status": "AC",
+                    "time": 0.003966067,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 339,
+                    "status": "AC",
+                    "time": 0.002528721,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 340,
+                    "status": "AC",
+                    "time": 0.003758103,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 341,
+                    "status": "AC",
+                    "time": 0.002634539,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 342,
+                    "status": "AC",
+                    "time": 0.002665018,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 343,
+                    "status": "AC",
+                    "time": 0.00258558,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 344,
+                    "status": "AC",
+                    "time": 0.002931753,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 345,
+                    "status": "AC",
+                    "time": 0.002583803,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 346,
+                    "status": "AC",
+                    "time": 0.002673813,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 347,
+                    "status": "AC",
+                    "time": 0.002446525,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 348,
+                    "status": "AC",
+                    "time": 0.002573957,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 349,
+                    "status": "AC",
+                    "time": 0.00261277,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 350,
+                    "status": "AC",
+                    "time": 0.002621702,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 351,
+                    "status": "AC",
+                    "time": 0.002667884,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 352,
+                    "status": "AC",
+                    "time": 0.002748951,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 353,
+                    "status": "AC",
+                    "time": 0.003294023,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 354,
+                    "status": "AC",
+                    "time": 0.00378176,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 355,
+                    "status": "AC",
+                    "time": 0.002645661,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 356,
+                    "status": "AC",
+                    "time": 0.003410589,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 357,
+                    "status": "AC",
+                    "time": 0.003306266,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 358,
+                    "status": "AC",
+                    "time": 0.004081093,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 359,
+                    "status": "AC",
+                    "time": 0.002766207,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 360,
+                    "status": "AC",
+                    "time": 0.003789304,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 361,
+                    "status": "AC",
+                    "time": 0.002652272,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 362,
+                    "status": "AC",
+                    "time": 0.004118003,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 363,
+                    "status": "AC",
+                    "time": 0.002565421,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 364,
+                    "status": "AC",
+                    "time": 0.002826122,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 365,
+                    "status": "AC",
+                    "time": 0.004218032,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 366,
+                    "status": "AC",
+                    "time": 0.002604882,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 367,
+                    "status": "AC",
+                    "time": 0.002598212,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 368,
+                    "status": "AC",
+                    "time": 0.002735641,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 369,
+                    "status": "AC",
+                    "time": 0.002603184,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 370,
+                    "status": "AC",
+                    "time": 0.002844925,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 371,
+                    "status": "AC",
+                    "time": 0.002658014,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 372,
+                    "status": "AC",
+                    "time": 0.002579184,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 373,
+                    "status": "AC",
+                    "time": 0.003255229,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 374,
+                    "status": "AC",
+                    "time": 0.002582873,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 375,
+                    "status": "AC",
+                    "time": 0.002584902,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 376,
+                    "status": "AC",
+                    "time": 0.002620985,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 377,
+                    "status": "AC",
+                    "time": 0.002648499,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 378,
+                    "status": "AC",
+                    "time": 0.00257601,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 379,
+                    "status": "AC",
+                    "time": 0.002444065,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 380,
+                    "status": "AC",
+                    "time": 0.002578326,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 381,
+                    "status": "AC",
+                    "time": 0.002683702,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 382,
+                    "status": "AC",
+                    "time": 0.00301273,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 383,
+                    "status": "AC",
+                    "time": 0.00276726,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 384,
+                    "status": "AC",
+                    "time": 0.002643547,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 385,
+                    "status": "AC",
+                    "time": 0.002562835,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 386,
+                    "status": "AC",
+                    "time": 0.002657483,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 387,
+                    "status": "AC",
+                    "time": 0.002959464,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 388,
+                    "status": "AC",
+                    "time": 0.002725318,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 389,
+                    "status": "AC",
+                    "time": 0.002702108,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 390,
+                    "status": "AC",
+                    "time": 0.003893541,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 391,
+                    "status": "AC",
+                    "time": 0.002574907,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 392,
+                    "status": "AC",
+                    "time": 0.003111112,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 393,
+                    "status": "AC",
+                    "time": 0.002584018,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 394,
+                    "status": "AC",
+                    "time": 0.002880714,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 395,
+                    "status": "AC",
+                    "time": 0.003160578,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 396,
+                    "status": "AC",
+                    "time": 0.003866787,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 397,
+                    "status": "AC",
+                    "time": 0.003893669,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 398,
+                    "status": "AC",
+                    "time": 0.002583133,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 399,
+                    "status": "AC",
+                    "time": 0.002688681,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 400,
+                    "status": "AC",
+                    "time": 0.003174896,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 401,
+                    "status": "AC",
+                    "time": 0.002722915,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 402,
+                    "status": "AC",
+                    "time": 0.004058971,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 403,
+                    "status": "AC",
+                    "time": 0.003322192,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 404,
+                    "status": "AC",
+                    "time": 0.003384461,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 405,
+                    "status": "AC",
+                    "time": 0.003841611,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 406,
+                    "status": "AC",
+                    "time": 0.003837144,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 407,
+                    "status": "AC",
+                    "time": 0.003901835,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 408,
+                    "status": "AC",
+                    "time": 0.004018006,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 409,
+                    "status": "AC",
+                    "time": 0.003407905,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 410,
+                    "status": "AC",
+                    "time": 0.003981145,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 411,
+                    "status": "AC",
+                    "time": 0.003323234,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 412,
+                    "status": "AC",
+                    "time": 0.00384667,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 413,
+                    "status": "AC",
+                    "time": 0.002607711,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 414,
+                    "status": "AC",
+                    "time": 0.002602643,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 415,
+                    "status": "AC",
+                    "time": 0.00262471,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 416,
+                    "status": "AC",
+                    "time": 0.002875883,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 417,
+                    "status": "AC",
+                    "time": 0.003776099,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 418,
+                    "status": "AC",
+                    "time": 0.003138991,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 419,
+                    "status": "AC",
+                    "time": 0.00336765,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 420,
+                    "status": "AC",
+                    "time": 0.003850187,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 421,
+                    "status": "AC",
+                    "time": 0.003986965,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 422,
+                    "status": "AC",
+                    "time": 0.00398917,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 423,
+                    "status": "AC",
+                    "time": 0.003957621,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 424,
+                    "status": "AC",
+                    "time": 0.002595194,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 425,
+                    "status": "AC",
+                    "time": 0.002540083,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 426,
+                    "status": "AC",
+                    "time": 0.00272326,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 427,
+                    "status": "AC",
+                    "time": 0.002504667,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 428,
+                    "status": "AC",
+                    "time": 0.002643575,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 429,
+                    "status": "AC",
+                    "time": 0.002590938,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 430,
+                    "status": "AC",
+                    "time": 0.00272437,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 431,
+                    "status": "AC",
+                    "time": 0.002673921,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 432,
+                    "status": "AC",
+                    "time": 0.002843985,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 433,
+                    "status": "AC",
+                    "time": 0.002669946,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 434,
+                    "status": "AC",
+                    "time": 0.002637045,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 435,
+                    "status": "AC",
+                    "time": 0.002430545,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 436,
+                    "status": "AC",
+                    "time": 0.002587516,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 437,
+                    "status": "AC",
+                    "time": 0.002632024,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 438,
+                    "status": "AC",
+                    "time": 0.003129721,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 439,
+                    "status": "AC",
+                    "time": 0.002582352,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 440,
+                    "status": "AC",
+                    "time": 0.002614611,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 441,
+                    "status": "AC",
+                    "time": 0.002791904,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 442,
+                    "status": "AC",
+                    "time": 0.002648532,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 443,
+                    "status": "AC",
+                    "time": 0.003324789,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 444,
+                    "status": "AC",
+                    "time": 0.00276734,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 445,
+                    "status": "AC",
+                    "time": 0.002680365,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 446,
+                    "status": "AC",
+                    "time": 0.00267575,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 447,
+                    "status": "AC",
+                    "time": 0.00270322,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 448,
+                    "status": "AC",
+                    "time": 0.002666177,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 449,
+                    "status": "AC",
+                    "time": 0.002631263,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 450,
+                    "status": "AC",
+                    "time": 0.003892148,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 451,
+                    "status": "AC",
+                    "time": 0.002501451,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 452,
+                    "status": "AC",
+                    "time": 0.004156648,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 453,
+                    "status": "AC",
+                    "time": 0.003621749,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 454,
+                    "status": "AC",
+                    "time": 0.003000829,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 455,
+                    "status": "AC",
+                    "time": 0.002699523,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 456,
+                    "status": "AC",
+                    "time": 0.002680687,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 457,
+                    "status": "AC",
+                    "time": 0.002637434,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 458,
+                    "status": "AC",
+                    "time": 0.002927232,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 459,
+                    "status": "AC",
+                    "time": 0.002502793,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 460,
+                    "status": "AC",
+                    "time": 0.00261924,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 461,
+                    "status": "AC",
+                    "time": 0.002639477,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 462,
+                    "status": "AC",
+                    "time": 0.002651072,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 463,
+                    "status": "AC",
+                    "time": 0.002662563,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 464,
+                    "status": "AC",
+                    "time": 0.002759386,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 465,
+                    "status": "AC",
+                    "time": 0.00267056,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 466,
+                    "status": "AC",
+                    "time": 0.002706136,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 467,
+                    "status": "AC",
+                    "time": 0.002417592,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 468,
+                    "status": "AC",
+                    "time": 0.003896899,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 469,
+                    "status": "AC",
+                    "time": 0.002675436,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 470,
+                    "status": "AC",
+                    "time": 0.002631746,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 471,
+                    "status": "AC",
+                    "time": 0.003793901,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 472,
+                    "status": "AC",
+                    "time": 0.00354778,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 473,
+                    "status": "AC",
+                    "time": 0.002959562,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 474,
+                    "status": "AC",
+                    "time": 0.003962731,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 475,
+                    "status": "AC",
+                    "time": 0.003298981,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 476,
+                    "status": "AC",
+                    "time": 0.00377704,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 477,
+                    "status": "AC",
+                    "time": 0.003777824,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 478,
+                    "status": "AC",
+                    "time": 0.003922246,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 479,
+                    "status": "AC",
+                    "time": 0.003643719,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 480,
+                    "status": "AC",
+                    "time": 0.003760147,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 481,
+                    "status": "AC",
+                    "time": 0.003428424,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 482,
+                    "status": "AC",
+                    "time": 0.004497226,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 483,
+                    "status": "AC",
+                    "time": 0.003192542,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 484,
+                    "status": "AC",
+                    "time": 0.003985192,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 485,
+                    "status": "AC",
+                    "time": 0.00388824,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 486,
+                    "status": "AC",
+                    "time": 0.003828004,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 487,
+                    "status": "AC",
+                    "time": 0.003825182,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 488,
+                    "status": "AC",
+                    "time": 0.003818949,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 489,
+                    "status": "AC",
+                    "time": 0.003362918,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 490,
+                    "status": "AC",
+                    "time": 0.002669376,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 491,
+                    "status": "AC",
+                    "time": 0.002644598,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 492,
+                    "status": "AC",
+                    "time": 0.00379849,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 493,
+                    "status": "AC",
+                    "time": 0.002621435,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 494,
+                    "status": "AC",
+                    "time": 0.002690345,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 495,
+                    "status": "AC",
+                    "time": 0.003144739,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 496,
+                    "status": "AC",
+                    "time": 0.002595827,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 497,
+                    "status": "AC",
+                    "time": 0.002640088,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                },
+                {
+                    "type": "case",
+                    "case_id": 498,
+                    "status": "AC",
+                    "time": 0.002637344,
+                    "memory": 776.0,
+                    "points": 100.0,
+                    "total": 100.0
+                }
+            ],
+            "points": 100.0,
+            "total": 100.0
+        }
+    ]
+}

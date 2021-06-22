@@ -1,0 +1,4560 @@
+{
+    "key": "dmopc20c7",
+    "name": "DMOPC '20 June Contest",
+    "start_time": "2021-06-19T04:00:00+00:00",
+    "end_time": "2021-06-21T04:00:00+00:00",
+    "time_limit": 10800.0,
+    "is_rated": true,
+    "rate_all": true,
+    "has_rating": true,
+    "rating_floor": null,
+    "rating_ceiling": null,
+    "hidden_scoreboard": true,
+    "scoreboard_visibility": "P",
+    "is_organization_private": false,
+    "organizations": [],
+    "is_private": false,
+    "tags": [
+        "dmopc"
+    ],
+    "format": {
+        "name": "atcoder",
+        "config": {
+            "penalty": 5
+        }
+    },
+    "problems": [
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "1",
+            "name": "DMOPC '20 Contest 7 P1 - Bob and Balance",
+            "code": "dmopc20c7p1"
+        },
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "2",
+            "name": "DMOPC '20 Contest 7 P2 - Alice and Tiles",
+            "code": "dmopc20c7p2"
+        },
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "3",
+            "name": "DMOPC '20 Contest 7 P3 - Senpai and Art",
+            "code": "dmopc20c7p3"
+        },
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "4",
+            "name": "DMOPC '20 Contest 7 P4 - Mimi and Carrots II",
+            "code": "dmopc20c7p4"
+        },
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "5",
+            "name": "DMOPC '20 Contest 7 P5 - Mayors and Tolls",
+            "code": "dmopc20c7p5"
+        },
+        {
+            "points": 100,
+            "partial": true,
+            "is_pretested": false,
+            "max_submissions": null,
+            "label": "6",
+            "name": "DMOPC '20 Contest 7 P6 - Maou and Division",
+            "code": "dmopc20c7p6"
+        }
+    ],
+    "rankings": [
+        {
+            "user": "ksun48",
+            "start_time": "2021-06-19T04:00:14+00:00",
+            "end_time": "2021-06-19T07:00:14+00:00",
+            "score": 600.0,
+            "cumulative_time": 10683,
+            "tiebreaker": 0.0,
+            "old_rating": 2961,
+            "new_rating": 3045,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 459.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 1089.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2642.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 3451.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4122.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 7083.0,
+                    "points": 100.0,
+                    "penalty": 9
+                }
+            ]
+        },
+        {
+            "user": "ecnerwal",
+            "start_time": "2021-06-20T01:23:30+00:00",
+            "end_time": "2021-06-20T04:23:30+00:00",
+            "score": 580.0,
+            "cumulative_time": 6910,
+            "tiebreaker": 0.0,
+            "old_rating": 3087,
+            "new_rating": 3121,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 154.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 3236.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2143.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4185.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4902.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6610.0,
+                    "points": 80.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "d",
+            "start_time": "2021-06-20T04:57:18+00:00",
+            "end_time": "2021-06-20T07:57:18+00:00",
+            "score": 510.0,
+            "cumulative_time": 13873,
+            "tiebreaker": 0.0,
+            "old_rating": 3095,
+            "new_rating": 3084,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 284.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2184.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 4711.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 7250.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 8499.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 10273.0,
+                    "points": 10.0,
+                    "penalty": 7
+                }
+            ]
+        },
+        {
+            "user": "ainta",
+            "start_time": "2021-06-20T09:15:14+00:00",
+            "end_time": "2021-06-20T12:15:14+00:00",
+            "score": 480.0,
+            "cumulative_time": 10752,
+            "tiebreaker": 0.0,
+            "old_rating": 2705,
+            "new_rating": 2795,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 295.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 1797.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6790.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                {
+                    "time": 2808.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8652.0,
+                    "points": 80.0,
+                    "penalty": 4
+                }
+            ]
+        },
+        {
+            "user": "tabr",
+            "start_time": "2021-06-19T04:08:40+00:00",
+            "end_time": "2021-06-19T07:08:40+00:00",
+            "score": 420.0,
+            "cumulative_time": 13661,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 2030,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 256.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8723.0,
+                    "points": 100.0,
+                    "penalty": 7
+                },
+                {
+                    "time": 3882.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 10361.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 5760.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null
+            ]
+        },
+        {
+            "user": "AQT",
+            "start_time": "2021-06-20T14:40:33+00:00",
+            "end_time": "2021-06-20T17:40:33+00:00",
+            "score": 410.0,
+            "cumulative_time": 8518,
+            "tiebreaker": 0.0,
+            "old_rating": 2463,
+            "new_rating": 2496,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 351.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 1588.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4286.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 5861.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                {
+                    "time": 6718.0,
+                    "points": 10.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "dalt",
+            "start_time": "2021-06-19T08:17:49+00:00",
+            "end_time": "2021-06-19T11:17:49+00:00",
+            "score": 400.0,
+            "cumulative_time": 8043,
+            "tiebreaker": 0.0,
+            "old_rating": 2597,
+            "new_rating": 2619,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1926.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 4723.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 6696.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 7143.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null
+            ]
+        },
+        {
+            "user": "wleung_bvg",
+            "start_time": "2021-06-19T21:14:59+00:00",
+            "end_time": "2021-06-20T00:14:59+00:00",
+            "score": 330.0,
+            "cumulative_time": 12693,
+            "tiebreaker": 0.0,
+            "old_rating": 2574,
+            "new_rating": 2576,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 6882.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 7784.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 9393.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 3340.0,
+                    "points": 100.0,
+                    "penalty": 5
+                },
+                null,
+                {
+                    "time": 6509.0,
+                    "points": 10.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "Bench0310",
+            "start_time": "2021-06-19T15:37:58+00:00",
+            "end_time": "2021-06-19T18:37:58+00:00",
+            "score": 320.0,
+            "cumulative_time": 8440,
+            "tiebreaker": 0.0,
+            "old_rating": 2183,
+            "new_rating": 2305,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 439.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2139.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 7840.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4438.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "w33z8kqrqk8zzzx33",
+            "start_time": "2021-06-20T02:46:48+00:00",
+            "end_time": "2021-06-20T05:46:48+00:00",
+            "score": 320.0,
+            "cumulative_time": 9807,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1901,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2875.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 1830.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 3090.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8307.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "csDude256",
+            "start_time": "2021-06-19T15:44:23+00:00",
+            "end_time": "2021-06-19T18:44:23+00:00",
+            "score": 320.0,
+            "cumulative_time": 10091,
+            "tiebreaker": 0.0,
+            "old_rating": 2228,
+            "new_rating": 2273,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 658.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2178.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 9491.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8933.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "explosion",
+            "start_time": "2021-06-19T19:05:24+00:00",
+            "end_time": "2021-06-19T22:05:24+00:00",
+            "score": 320.0,
+            "cumulative_time": 10609,
+            "tiebreaker": 0.0,
+            "old_rating": 2326,
+            "new_rating": 2347,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1657.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 8427.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 9409.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 5012.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ADMathNoob",
+            "start_time": "2021-06-19T18:18:09+00:00",
+            "end_time": "2021-06-19T21:18:09+00:00",
+            "score": 320.0,
+            "cumulative_time": 12380,
+            "tiebreaker": 0.0,
+            "old_rating": 2508,
+            "new_rating": 2492,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 162.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2332.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 10580.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 7600.0,
+                    "points": 100.0,
+                    "penalty": 6
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "skittles1412",
+            "start_time": "2021-06-19T15:49:36+00:00",
+            "end_time": "2021-06-19T18:49:36+00:00",
+            "score": 310.0,
+            "cumulative_time": 9847,
+            "tiebreaker": 0.0,
+            "old_rating": 1945,
+            "new_rating": 2066,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1560.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 5989.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 7427.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 5135.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 8647.0,
+                    "points": 10.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "caeious",
+            "start_time": "2021-06-20T02:24:50+00:00",
+            "end_time": "2021-06-20T05:24:50+00:00",
+            "score": 300.0,
+            "cumulative_time": 8295,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1819,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 445.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 3891.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                {
+                    "time": 7995.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null
+            ]
+        },
+        {
+            "user": "nskybytskyi",
+            "start_time": "2021-06-19T04:08:19+00:00",
+            "end_time": "2021-06-19T07:08:19+00:00",
+            "score": 240.0,
+            "cumulative_time": 11234,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1805,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1858.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 5914.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 7429.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8800.0,
+                    "points": 10.0,
+                    "penalty": 2
+                },
+                null,
+                {
+                    "time": 9734.0,
+                    "points": 10.0,
+                    "penalty": 0
+                }
+            ]
+        },
+        {
+            "user": "blin00",
+            "start_time": "2021-06-19T23:11:30+00:00",
+            "end_time": "2021-06-20T02:11:30+00:00",
+            "score": 230.0,
+            "cumulative_time": 7443,
+            "tiebreaker": 0.0,
+            "old_rating": 2225,
+            "new_rating": 2237,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 645.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 3227.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 5542.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6843.0,
+                    "points": 10.0,
+                    "penalty": 0
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "JimmyLiu",
+            "start_time": "2021-06-20T16:19:41+00:00",
+            "end_time": "2021-06-20T19:19:41+00:00",
+            "score": 230.0,
+            "cumulative_time": 10152,
+            "tiebreaker": 0.0,
+            "old_rating": 1759,
+            "new_rating": 1876,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 659.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 5075.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 7765.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 9552.0,
+                    "points": 10.0,
+                    "penalty": 0
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ronnith",
+            "start_time": "2021-06-20T05:21:46+00:00",
+            "end_time": "2021-06-20T08:21:46+00:00",
+            "score": 230.0,
+            "cumulative_time": 10768,
+            "tiebreaker": 0.0,
+            "old_rating": 2146,
+            "new_rating": 2172,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 762.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4829.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 6829.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 9868.0,
+                    "points": 10.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Dan13llljws",
+            "start_time": "2021-06-19T18:01:58+00:00",
+            "end_time": "2021-06-19T21:01:58+00:00",
+            "score": 230.0,
+            "cumulative_time": 11839,
+            "tiebreaker": 0.0,
+            "old_rating": 2079,
+            "new_rating": 2102,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2362.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 9139.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6596.0,
+                    "points": 20.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 6029.0,
+                    "points": 10.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Bob661161616",
+            "start_time": "2021-06-19T18:14:09+00:00",
+            "end_time": "2021-06-19T21:14:09+00:00",
+            "score": 220.0,
+            "cumulative_time": 7042,
+            "tiebreaker": 0.0,
+            "old_rating": 1594,
+            "new_rating": 1736,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 526.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6104.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6742.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "NewAccount",
+            "start_time": "2021-06-20T19:00:23+00:00",
+            "end_time": "2021-06-20T22:00:23+00:00",
+            "score": 220.0,
+            "cumulative_time": 8082,
+            "tiebreaker": 0.0,
+            "old_rating": 1637,
+            "new_rating": 1739,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 798.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 5416.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 7782.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 10620.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "crackersamdjam",
+            "start_time": "2021-06-20T18:00:17+00:00",
+            "end_time": "2021-06-20T21:00:17+00:00",
+            "score": 220.0,
+            "cumulative_time": 9539,
+            "tiebreaker": 0.0,
+            "old_rating": 2549,
+            "new_rating": null,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 734.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 6262.0,
+                    "points": 100.0,
+                    "penalty": 6
+                },
+                {
+                    "time": 7439.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4003.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Dingledooper",
+            "start_time": "2021-06-20T22:10:22+00:00",
+            "end_time": "2021-06-21T01:10:22+00:00",
+            "score": 220.0,
+            "cumulative_time": 11409,
+            "tiebreaker": 0.0,
+            "old_rating": 2056,
+            "new_rating": 2077,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3277.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 9208.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 9609.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jainbot27",
+            "start_time": "2021-06-20T03:40:53+00:00",
+            "end_time": "2021-06-20T06:40:53+00:00",
+            "score": 220.0,
+            "cumulative_time": 15091,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1713,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 805.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 9468.0,
+                    "points": 100.0,
+                    "penalty": 13
+                },
+                {
+                    "time": 10591.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Plasmatic",
+            "start_time": "2021-06-20T17:50:45+00:00",
+            "end_time": "2021-06-20T20:50:45+00:00",
+            "score": 210.0,
+            "cumulative_time": 9224,
+            "tiebreaker": 0.0,
+            "old_rating": 2627,
+            "new_rating": 2559,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 640.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 5680.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 7724.0,
+                    "points": 10.0,
+                    "penalty": 2
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ThingExplainer",
+            "start_time": "2021-06-20T14:15:05+00:00",
+            "end_time": "2021-06-20T17:15:05+00:00",
+            "score": 210.0,
+            "cumulative_time": 11059,
+            "tiebreaker": 0.0,
+            "old_rating": 1850,
+            "new_rating": 1904,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1124.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 9259.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                {
+                    "time": 7303.0,
+                    "points": 10.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 10589.0,
+                    "points": 0.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "yuyue",
+            "start_time": "2021-06-20T09:57:06+00:00",
+            "end_time": "2021-06-20T12:57:06+00:00",
+            "score": 200.0,
+            "cumulative_time": 3927,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1685,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1130.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 3927.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "not_xia",
+            "start_time": "2021-06-20T20:17:16+00:00",
+            "end_time": "2021-06-20T23:17:16+00:00",
+            "score": 200.0,
+            "cumulative_time": 3947,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1675,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 503.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 3647.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Drew_",
+            "start_time": "2021-06-19T08:46:03+00:00",
+            "end_time": "2021-06-19T11:46:03+00:00",
+            "score": 200.0,
+            "cumulative_time": 4209,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1667,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 642.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 8152.0,
+                    "points": 0.0,
+                    "penalty": 9
+                },
+                null,
+                null,
+                {
+                    "time": 3909.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null
+            ]
+        },
+        {
+            "user": "Jovan_b",
+            "start_time": "2021-06-20T19:41:08+00:00",
+            "end_time": "2021-06-20T22:41:08+00:00",
+            "score": 200.0,
+            "cumulative_time": 4996,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1658,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 661.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                {
+                    "time": 3496.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "insert_cool_handle",
+            "start_time": "2021-06-19T04:17:52+00:00",
+            "end_time": "2021-06-19T07:17:52+00:00",
+            "score": 200.0,
+            "cumulative_time": 10214,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1649,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1740.0,
+                    "points": 100.0,
+                    "penalty": 6
+                },
+                null,
+                null,
+                null,
+                {
+                    "time": 8114.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null
+            ]
+        },
+        {
+            "user": "andrewtam",
+            "start_time": "2021-06-20T13:58:01+00:00",
+            "end_time": "2021-06-20T16:58:01+00:00",
+            "score": 200.0,
+            "cumulative_time": 10948,
+            "tiebreaker": 0.0,
+            "old_rating": 1999,
+            "new_rating": 2025,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2882.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                {
+                    "time": 9148.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "noYou",
+            "start_time": "2021-06-19T20:39:56+00:00",
+            "end_time": "2021-06-19T23:39:56+00:00",
+            "score": 200.0,
+            "cumulative_time": 11436,
+            "tiebreaker": 0.0,
+            "old_rating": 1983,
+            "new_rating": 1986,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3046.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 10236.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ryanguorocket",
+            "start_time": "2021-06-19T15:55:32+00:00",
+            "end_time": "2021-06-19T18:55:32+00:00",
+            "score": 200.0,
+            "cumulative_time": 12410,
+            "tiebreaker": 0.0,
+            "old_rating": 2075,
+            "new_rating": 2069,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1477.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 10310.0,
+                    "points": 100.0,
+                    "penalty": 6
+                },
+                {
+                    "time": 10692.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "yzhao123",
+            "start_time": "2021-06-19T16:58:53+00:00",
+            "end_time": "2021-06-19T19:58:53+00:00",
+            "score": 200.0,
+            "cumulative_time": 12897,
+            "tiebreaker": 0.0,
+            "old_rating": 1695,
+            "new_rating": 1753,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2327.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 10497.0,
+                    "points": 100.0,
+                    "penalty": 7
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Rehim",
+            "start_time": "2021-06-19T14:53:59+00:00",
+            "end_time": "2021-06-19T17:53:59+00:00",
+            "score": 200.0,
+            "cumulative_time": 13558,
+            "tiebreaker": 0.0,
+            "old_rating": 2353,
+            "new_rating": 2288,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1053.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 6358.0,
+                    "points": 100.0,
+                    "penalty": 23
+                },
+                null,
+                {
+                    "time": 10618.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "marsxiang5902",
+            "start_time": "2021-06-20T18:36:36+00:00",
+            "end_time": "2021-06-20T21:36:36+00:00",
+            "score": 170.0,
+            "cumulative_time": 8499,
+            "tiebreaker": 0.0,
+            "old_rating": 2140,
+            "new_rating": 2104,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 575.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 6699.0,
+                    "points": 70.0,
+                    "penalty": 5
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "dawangk",
+            "start_time": "2021-06-20T18:13:06+00:00",
+            "end_time": "2021-06-20T21:13:06+00:00",
+            "score": 130.0,
+            "cumulative_time": 5735,
+            "tiebreaker": 0.0,
+            "old_rating": 1809,
+            "new_rating": 1830,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3293.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 4335.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 5435.0,
+                    "points": 10.0,
+                    "penalty": 0
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "julian33",
+            "start_time": "2021-06-19T21:29:05+00:00",
+            "end_time": "2021-06-20T00:29:05+00:00",
+            "score": 130.0,
+            "cumulative_time": 8272,
+            "tiebreaker": 0.0,
+            "old_rating": 2104,
+            "new_rating": 2074,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1331.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 4540.0,
+                    "points": 0.0,
+                    "penalty": 9
+                },
+                {
+                    "time": 6635.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 7372.0,
+                    "points": 10.0,
+                    "penalty": 2
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "turneja",
+            "start_time": "2021-06-21T00:56:00+00:00",
+            "end_time": "2021-06-21T03:56:00+00:00",
+            "score": 130.0,
+            "cumulative_time": 10948,
+            "tiebreaker": 0.0,
+            "old_rating": 2064,
+            "new_rating": 2045,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 5061.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 4046.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 5696.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 9148.0,
+                    "points": 10.0,
+                    "penalty": 2
+                },
+                null,
+                {
+                    "time": 9940.0,
+                    "points": 0.0,
+                    "penalty": 11
+                }
+            ]
+        },
+        {
+            "user": "tankibuds",
+            "start_time": "2021-06-20T16:05:35+00:00",
+            "end_time": "2021-06-20T19:05:35+00:00",
+            "score": 130.0,
+            "cumulative_time": 11919,
+            "tiebreaker": 0.0,
+            "old_rating": 2269,
+            "new_rating": 2216,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1997.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 3915.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 9415.0,
+                    "points": 20.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 10119.0,
+                    "points": 10.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "lemontreeunderthemoon",
+            "start_time": "2021-06-20T13:08:41+00:00",
+            "end_time": "2021-06-20T16:08:41+00:00",
+            "score": 120.0,
+            "cumulative_time": 5202,
+            "tiebreaker": 0.0,
+            "old_rating": 1925,
+            "new_rating": 1917,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2649.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                null,
+                {
+                    "time": 3402.0,
+                    "points": 20.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "varunragu23",
+            "start_time": "2021-06-19T23:24:05+00:00",
+            "end_time": "2021-06-20T02:24:05+00:00",
+            "score": 120.0,
+            "cumulative_time": 6200,
+            "tiebreaker": 0.0,
+            "old_rating": 2102,
+            "new_rating": 2071,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 177.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2298.0,
+                    "points": 0.0,
+                    "penalty": 5
+                },
+                {
+                    "time": 6200.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "andy_zhu23",
+            "start_time": "2021-06-19T20:53:32+00:00",
+            "end_time": "2021-06-19T23:53:32+00:00",
+            "score": 120.0,
+            "cumulative_time": 9577,
+            "tiebreaker": 0.0,
+            "old_rating": 1638,
+            "new_rating": 1689,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 701.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 5316.0,
+                    "points": 0.0,
+                    "penalty": 11
+                },
+                {
+                    "time": 8377.0,
+                    "points": 20.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Computer_Genius",
+            "start_time": "2021-06-20T02:00:30+00:00",
+            "end_time": "2021-06-20T05:00:30+00:00",
+            "score": 120.0,
+            "cumulative_time": 10980,
+            "tiebreaker": 0.0,
+            "old_rating": 1545,
+            "new_rating": null,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3914.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                null,
+                {
+                    "time": 9780.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                {
+                    "time": 7038.0,
+                    "points": 0.0,
+                    "penalty": 7
+                }
+            ]
+        },
+        {
+            "user": "wilkymaster44",
+            "start_time": "2021-06-20T12:40:17+00:00",
+            "end_time": "2021-06-20T15:40:17+00:00",
+            "score": 120.0,
+            "cumulative_time": 12079,
+            "tiebreaker": 0.0,
+            "old_rating": 1220,
+            "new_rating": 1376,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1209.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                {
+                    "time": 10579.0,
+                    "points": 20.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "X_Ray",
+            "start_time": "2021-06-19T13:41:34+00:00",
+            "end_time": "2021-06-19T16:41:34+00:00",
+            "score": 120.0,
+            "cumulative_time": 13202,
+            "tiebreaker": 0.0,
+            "old_rating": 1720,
+            "new_rating": 1749,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4303.0,
+                    "points": 20.0,
+                    "penalty": 7
+                },
+                {
+                    "time": 9602.0,
+                    "points": 100.0,
+                    "penalty": 5
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "HediChehaidar",
+            "start_time": "2021-06-20T20:36:50+00:00",
+            "end_time": "2021-06-20T23:36:50+00:00",
+            "score": 110.0,
+            "cumulative_time": 2567,
+            "tiebreaker": 0.0,
+            "old_rating": 1464,
+            "new_rating": 1549,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 558.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 8275.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 2267.0,
+                    "points": 10.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2979.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null
+            ]
+        },
+        {
+            "user": "danielz1000",
+            "start_time": "2021-06-19T15:42:54+00:00",
+            "end_time": "2021-06-19T18:42:54+00:00",
+            "score": 110.0,
+            "cumulative_time": 11175,
+            "tiebreaker": 0.0,
+            "old_rating": 1751,
+            "new_rating": 1764,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2268.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                {
+                    "time": 10275.0,
+                    "points": 10.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "luctivud",
+            "start_time": "2021-06-19T04:04:19+00:00",
+            "end_time": "2021-06-19T07:04:19+00:00",
+            "score": 100.0,
+            "cumulative_time": 353,
+            "tiebreaker": 0.0,
+            "old_rating": 1266,
+            "new_rating": 1425,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 353.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Jetman",
+            "start_time": "2021-06-20T07:14:09+00:00",
+            "end_time": "2021-06-20T10:14:09+00:00",
+            "score": 100.0,
+            "cumulative_time": 830,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1512,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 830.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "bleh05",
+            "start_time": "2021-06-20T02:39:32+00:00",
+            "end_time": "2021-06-20T05:39:32+00:00",
+            "score": 100.0,
+            "cumulative_time": 892,
+            "tiebreaker": 0.0,
+            "old_rating": 1550,
+            "new_rating": 1638,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 892.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 2841.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "RichardLi88",
+            "start_time": "2021-06-20T16:19:28+00:00",
+            "end_time": "2021-06-20T19:19:28+00:00",
+            "score": 100.0,
+            "cumulative_time": 950,
+            "tiebreaker": 0.0,
+            "old_rating": 1556,
+            "new_rating": 1601,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 950.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6381.0,
+                    "points": 0.0,
+                    "penalty": 6
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Mip182",
+            "start_time": "2021-06-20T15:56:41+00:00",
+            "end_time": "2021-06-20T18:56:41+00:00",
+            "score": 100.0,
+            "cumulative_time": 986,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1493,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 686.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "idontreallyknow",
+            "start_time": "2021-06-20T01:06:22+00:00",
+            "end_time": "2021-06-20T04:06:22+00:00",
+            "score": 100.0,
+            "cumulative_time": 1107,
+            "tiebreaker": 0.0,
+            "old_rating": 2120,
+            "new_rating": 2041,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1107.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 8555.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "aybas",
+            "start_time": "2021-06-19T07:11:49+00:00",
+            "end_time": "2021-06-19T10:11:49+00:00",
+            "score": 100.0,
+            "cumulative_time": 1137,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1481,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 837.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "31501357",
+            "start_time": "2021-06-20T18:01:50+00:00",
+            "end_time": "2021-06-20T21:01:50+00:00",
+            "score": 100.0,
+            "cumulative_time": 1991,
+            "tiebreaker": 0.0,
+            "old_rating": 1603,
+            "new_rating": 1629,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1991.0,
+                    "points": 100.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                {
+                    "time": 6839.0,
+                    "points": 0.0,
+                    "penalty": 6
+                },
+                null
+            ]
+        },
+        {
+            "user": "AnishN07",
+            "start_time": "2021-06-20T13:16:59+00:00",
+            "end_time": "2021-06-20T16:16:59+00:00",
+            "score": 100.0,
+            "cumulative_time": 2118,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1469,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1818.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "balathegreat999",
+            "start_time": "2021-06-20T13:02:02+00:00",
+            "end_time": "2021-06-20T16:02:02+00:00",
+            "score": 100.0,
+            "cumulative_time": 2232,
+            "tiebreaker": 0.0,
+            "old_rating": 844,
+            "new_rating": 1027,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1932.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 6214.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "mortal007",
+            "start_time": "2021-06-19T09:48:12+00:00",
+            "end_time": "2021-06-19T12:48:12+00:00",
+            "score": 100.0,
+            "cumulative_time": 2282,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1457,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1982.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "linyirun",
+            "start_time": "2021-06-20T20:04:25+00:00",
+            "end_time": "2021-06-20T23:04:25+00:00",
+            "score": 100.0,
+            "cumulative_time": 2669,
+            "tiebreaker": 0.0,
+            "old_rating": 1896,
+            "new_rating": 1852,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1769.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "davidlu647",
+            "start_time": "2021-06-19T14:18:44+00:00",
+            "end_time": "2021-06-19T17:18:44+00:00",
+            "score": 100.0,
+            "cumulative_time": 2701,
+            "tiebreaker": 0.0,
+            "old_rating": 1247,
+            "new_rating": 1397,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1801.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "d3story",
+            "start_time": "2021-06-19T23:17:27+00:00",
+            "end_time": "2021-06-20T02:17:27+00:00",
+            "score": 100.0,
+            "cumulative_time": 2703,
+            "tiebreaker": 0.0,
+            "old_rating": 1342,
+            "new_rating": 1437,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2403.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Genius1506",
+            "start_time": "2021-06-20T16:45:36+00:00",
+            "end_time": "2021-06-20T19:45:36+00:00",
+            "score": 100.0,
+            "cumulative_time": 3217,
+            "tiebreaker": 0.0,
+            "old_rating": 1659,
+            "new_rating": 1656,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2917.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 5964.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Victor_Chan",
+            "start_time": "2021-06-19T23:25:49+00:00",
+            "end_time": "2021-06-20T02:25:49+00:00",
+            "score": 100.0,
+            "cumulative_time": 3236,
+            "tiebreaker": 0.0,
+            "old_rating": 1303,
+            "new_rating": 1372,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2336.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                {
+                    "time": 10339.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "an0nym0use",
+            "start_time": "2021-06-19T13:04:55+00:00",
+            "end_time": "2021-06-19T16:04:55+00:00",
+            "score": 100.0,
+            "cumulative_time": 3723,
+            "tiebreaker": 0.0,
+            "old_rating": 1354,
+            "new_rating": 1420,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                {
+                    "time": 3423.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 3378.0,
+                    "points": 0.0,
+                    "penalty": 1
+                }
+            ]
+        },
+        {
+            "user": "HyperGraphJ",
+            "start_time": "2021-06-20T17:02:30+00:00",
+            "end_time": "2021-06-20T20:02:30+00:00",
+            "score": 100.0,
+            "cumulative_time": 3729,
+            "tiebreaker": 0.0,
+            "old_rating": 1794,
+            "new_rating": 1758,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3429.0,
+                    "points": 100.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 10736.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Badmode",
+            "start_time": "2021-06-19T16:49:45+00:00",
+            "end_time": "2021-06-19T19:49:45+00:00",
+            "score": 100.0,
+            "cumulative_time": 3813,
+            "tiebreaker": 0.0,
+            "old_rating": 1304,
+            "new_rating": 1368,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3213.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Apass_test",
+            "start_time": "2021-06-21T01:48:13+00:00",
+            "end_time": "2021-06-21T04:00:00+00:00",
+            "score": 100.0,
+            "cumulative_time": 4094,
+            "tiebreaker": 0.0,
+            "old_rating": 1578,
+            "new_rating": 1582,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3194.0,
+                    "points": 100.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jeffreykaili",
+            "start_time": "2021-06-20T14:58:27+00:00",
+            "end_time": "2021-06-20T17:58:27+00:00",
+            "score": 100.0,
+            "cumulative_time": 4297,
+            "tiebreaker": 0.0,
+            "old_rating": 1719,
+            "new_rating": 1689,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3697.0,
+                    "points": 100.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 8058.0,
+                    "points": 0.0,
+                    "penalty": 5
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Joelfu",
+            "start_time": "2021-06-20T17:58:29+00:00",
+            "end_time": "2021-06-20T20:58:29+00:00",
+            "score": 100.0,
+            "cumulative_time": 4745,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1393,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3545.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "justin_g_20",
+            "start_time": "2021-06-20T01:50:34+00:00",
+            "end_time": "2021-06-20T04:50:34+00:00",
+            "score": 100.0,
+            "cumulative_time": 7076,
+            "tiebreaker": 0.0,
+            "old_rating": 1182,
+            "new_rating": 1268,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4676.0,
+                    "points": 100.0,
+                    "penalty": 8
+                },
+                null,
+                {
+                    "time": 5863.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                {
+                    "time": 9514.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "DM__Oscar",
+            "start_time": "2021-06-20T13:02:32+00:00",
+            "end_time": "2021-06-20T16:02:32+00:00",
+            "score": 100.0,
+            "cumulative_time": 8376,
+            "tiebreaker": 0.0,
+            "old_rating": 2002,
+            "new_rating": 1914,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 7176.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 4920.0,
+                    "points": 0.0,
+                    "penalty": 9
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "r",
+            "start_time": "2021-06-20T23:32:53+00:00",
+            "end_time": "2021-06-21T02:32:53+00:00",
+            "score": 100.0,
+            "cumulative_time": 8561,
+            "tiebreaker": 0.0,
+            "old_rating": 1709,
+            "new_rating": 1682,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 7361.0,
+                    "points": 100.0,
+                    "penalty": 4
+                },
+                {
+                    "time": 9541.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "azeng",
+            "start_time": "2021-06-19T20:59:11+00:00",
+            "end_time": "2021-06-19T23:59:11+00:00",
+            "score": 100.0,
+            "cumulative_time": 8610,
+            "tiebreaker": 0.0,
+            "old_rating": 2000,
+            "new_rating": 1909,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 5610.0,
+                    "points": 100.0,
+                    "penalty": 10
+                },
+                {
+                    "time": 8197.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "KoreaFriedChips",
+            "start_time": "2021-06-20T23:00:04+00:00",
+            "end_time": "2021-06-21T02:00:04+00:00",
+            "score": 100.0,
+            "cumulative_time": 11048,
+            "tiebreaker": 0.0,
+            "old_rating": 1134,
+            "new_rating": 1220,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 9248.0,
+                    "points": 100.0,
+                    "penalty": 6
+                },
+                null,
+                {
+                    "time": 10446.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "HyperNeutrino",
+            "start_time": "2021-06-19T17:19:10+00:00",
+            "end_time": "2021-06-19T20:19:10+00:00",
+            "score": 90.0,
+            "cumulative_time": 2911,
+            "tiebreaker": 0.0,
+            "old_rating": 1467,
+            "new_rating": 1479,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 465.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 2611.0,
+                    "points": 70.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "tiasmondal",
+            "start_time": "2021-06-19T06:23:34+00:00",
+            "end_time": "2021-06-19T09:23:34+00:00",
+            "score": 70.0,
+            "cumulative_time": 5772,
+            "tiebreaker": 0.0,
+            "old_rating": 1630,
+            "new_rating": 1593,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3235.0,
+                    "points": 50.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 5472.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "sylvus",
+            "start_time": "2021-06-19T17:00:29+00:00",
+            "end_time": "2021-06-19T20:00:29+00:00",
+            "score": 50.0,
+            "cumulative_time": 3021,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1348,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3021.0,
+                    "points": 50.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "CatGirl",
+            "start_time": "2021-06-19T18:04:12+00:00",
+            "end_time": "2021-06-19T21:04:12+00:00",
+            "score": 50.0,
+            "cumulative_time": 6069,
+            "tiebreaker": 0.0,
+            "old_rating": 1952,
+            "new_rating": 1862,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4569.0,
+                    "points": 50.0,
+                    "penalty": 5
+                },
+                {
+                    "time": 7796.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "JoshuaL",
+            "start_time": "2021-06-20T18:57:49+00:00",
+            "end_time": "2021-06-20T21:57:49+00:00",
+            "score": 40.0,
+            "cumulative_time": 4084,
+            "tiebreaker": 0.0,
+            "old_rating": 1948,
+            "new_rating": 1857,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 235.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 3484.0,
+                    "points": 20.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "tortle",
+            "start_time": "2021-06-19T23:26:51+00:00",
+            "end_time": "2021-06-20T02:26:51+00:00",
+            "score": 30.0,
+            "cumulative_time": 7195,
+            "tiebreaker": 0.0,
+            "old_rating": 1289,
+            "new_rating": 1342,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 777.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                {
+                    "time": 7195.0,
+                    "points": 10.0,
+                    "penalty": 0
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "RandomLB",
+            "start_time": "2021-06-20T00:10:38+00:00",
+            "end_time": "2021-06-20T03:10:38+00:00",
+            "score": 20.0,
+            "cumulative_time": 318,
+            "tiebreaker": 0.0,
+            "old_rating": 1647,
+            "new_rating": 1606,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 318.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "NoOneofConsequence",
+            "start_time": "2021-06-20T14:44:41+00:00",
+            "end_time": "2021-06-20T17:44:41+00:00",
+            "score": 20.0,
+            "cumulative_time": 413,
+            "tiebreaker": 0.0,
+            "old_rating": 1157,
+            "new_rating": 1236,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 413.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 8201.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "tanvirdeol2003",
+            "start_time": "2021-06-19T22:41:09+00:00",
+            "end_time": "2021-06-20T01:41:09+00:00",
+            "score": 20.0,
+            "cumulative_time": 497,
+            "tiebreaker": 0.0,
+            "old_rating": 1598,
+            "new_rating": 1567,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 497.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 9533.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "AmirArbi",
+            "start_time": "2021-06-20T17:09:04+00:00",
+            "end_time": "2021-06-20T20:09:04+00:00",
+            "score": 20.0,
+            "cumulative_time": 536,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1310,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 536.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 6190.0,
+                    "points": 0.0,
+                    "penalty": 8
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ignaciocanta",
+            "start_time": "2021-06-20T23:02:01+00:00",
+            "end_time": "2021-06-21T02:02:01+00:00",
+            "score": 20.0,
+            "cumulative_time": 539,
+            "tiebreaker": 0.0,
+            "old_rating": 1411,
+            "new_rating": 1414,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 539.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "RAiNcalleER",
+            "start_time": "2021-06-19T19:13:32+00:00",
+            "end_time": "2021-06-19T22:13:32+00:00",
+            "score": 20.0,
+            "cumulative_time": 682,
+            "tiebreaker": 0.0,
+            "old_rating": 1134,
+            "new_rating": 1228,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 682.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                {
+                    "time": 4408.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "AZron",
+            "start_time": "2021-06-20T13:01:45+00:00",
+            "end_time": "2021-06-20T16:01:45+00:00",
+            "score": 20.0,
+            "cumulative_time": 763,
+            "tiebreaker": 0.0,
+            "old_rating": 1596,
+            "new_rating": 1556,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 763.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Awesomethan",
+            "start_time": "2021-06-20T20:47:42+00:00",
+            "end_time": "2021-06-20T23:47:42+00:00",
+            "score": 20.0,
+            "cumulative_time": 789,
+            "tiebreaker": 0.0,
+            "old_rating": 1350,
+            "new_rating": 1358,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 789.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                {
+                    "time": 6340.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "SC_30",
+            "start_time": "2021-06-20T14:50:26+00:00",
+            "end_time": "2021-06-20T17:50:26+00:00",
+            "score": 20.0,
+            "cumulative_time": 972,
+            "tiebreaker": 0.0,
+            "old_rating": 865,
+            "new_rating": 998,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 972.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Nils_Emmenegger",
+            "start_time": "2021-06-20T20:01:20+00:00",
+            "end_time": "2021-06-20T23:01:20+00:00",
+            "score": 20.0,
+            "cumulative_time": 980,
+            "tiebreaker": 0.0,
+            "old_rating": 1649,
+            "new_rating": 1588,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 980.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "luismo",
+            "start_time": "2021-06-20T22:34:41+00:00",
+            "end_time": "2021-06-21T01:34:41+00:00",
+            "score": 20.0,
+            "cumulative_time": 1110,
+            "tiebreaker": 0.0,
+            "old_rating": 1415,
+            "new_rating": 1405,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1110.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "MarsFlat",
+            "start_time": "2021-06-19T13:26:30+00:00",
+            "end_time": "2021-06-19T16:26:30+00:00",
+            "score": 20.0,
+            "cumulative_time": 1197,
+            "tiebreaker": 0.0,
+            "old_rating": 1352,
+            "new_rating": 1352,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 897.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 8789.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Mrs_Clean",
+            "start_time": "2021-06-20T02:18:48+00:00",
+            "end_time": "2021-06-20T05:18:48+00:00",
+            "score": 20.0,
+            "cumulative_time": 1617,
+            "tiebreaker": 0.0,
+            "old_rating": 1523,
+            "new_rating": 1487,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1617.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jerrych2006",
+            "start_time": "2021-06-19T22:11:53+00:00",
+            "end_time": "2021-06-20T01:11:53+00:00",
+            "score": 20.0,
+            "cumulative_time": 1626,
+            "tiebreaker": 0.0,
+            "old_rating": 867,
+            "new_rating": 1026,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1626.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "satya753",
+            "start_time": "2021-06-19T04:00:15+00:00",
+            "end_time": "2021-06-19T07:00:15+00:00",
+            "score": 20.0,
+            "cumulative_time": 1716,
+            "tiebreaker": 0.0,
+            "old_rating": 789,
+            "new_rating": 971,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1416.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ShlokG",
+            "start_time": "2021-06-20T04:55:58+00:00",
+            "end_time": "2021-06-20T07:55:58+00:00",
+            "score": 20.0,
+            "cumulative_time": 1797,
+            "tiebreaker": 0.0,
+            "old_rating": 903,
+            "new_rating": 1042,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1497.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "suguruchhaya",
+            "start_time": "2021-06-19T14:12:51+00:00",
+            "end_time": "2021-06-19T17:12:51+00:00",
+            "score": 20.0,
+            "cumulative_time": 2426,
+            "tiebreaker": 0.0,
+            "old_rating": 1139,
+            "new_rating": 1182,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2426.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "hackerbhaiya",
+            "start_time": "2021-06-20T17:31:28+00:00",
+            "end_time": "2021-06-20T20:31:28+00:00",
+            "score": 20.0,
+            "cumulative_time": 2578,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 1232,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1678.0,
+                    "points": 20.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "AlanLN",
+            "start_time": "2021-06-20T23:02:49+00:00",
+            "end_time": "2021-06-21T02:02:49+00:00",
+            "score": 20.0,
+            "cumulative_time": 2665,
+            "tiebreaker": 0.0,
+            "old_rating": 1008,
+            "new_rating": 1084,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2065.0,
+                    "points": 20.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "minhuet2002",
+            "start_time": "2021-06-19T04:00:12+00:00",
+            "end_time": "2021-06-19T07:00:12+00:00",
+            "score": 20.0,
+            "cumulative_time": 2744,
+            "tiebreaker": 0.0,
+            "old_rating": 813,
+            "new_rating": 951,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2444.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "KhalilTlili",
+            "start_time": "2021-06-19T09:56:36+00:00",
+            "end_time": "2021-06-19T12:56:36+00:00",
+            "score": 20.0,
+            "cumulative_time": 3020,
+            "tiebreaker": 0.0,
+            "old_rating": 1160,
+            "new_rating": 1183,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2720.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                {
+                    "time": 5928.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "YidiChen",
+            "start_time": "2021-06-20T17:12:20+00:00",
+            "end_time": "2021-06-20T20:12:20+00:00",
+            "score": 20.0,
+            "cumulative_time": 3128,
+            "tiebreaker": 0.0,
+            "old_rating": 1798,
+            "new_rating": 1667,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2828.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "klewin",
+            "start_time": "2021-06-20T00:49:27+00:00",
+            "end_time": "2021-06-20T03:49:27+00:00",
+            "score": 20.0,
+            "cumulative_time": 3218,
+            "tiebreaker": 0.0,
+            "old_rating": 1253,
+            "new_rating": 1251,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2918.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "SuperClash",
+            "start_time": "2021-06-19T15:34:31+00:00",
+            "end_time": "2021-06-19T18:34:31+00:00",
+            "score": 20.0,
+            "cumulative_time": 3267,
+            "tiebreaker": 0.0,
+            "old_rating": 1551,
+            "new_rating": 1487,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2967.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                {
+                    "time": 9355.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jiaola",
+            "start_time": "2021-06-20T14:15:08+00:00",
+            "end_time": "2021-06-20T17:15:08+00:00",
+            "score": 20.0,
+            "cumulative_time": 3363,
+            "tiebreaker": 0.0,
+            "old_rating": 1038,
+            "new_rating": 1077,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3363.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "kaar07",
+            "start_time": "2021-06-20T01:06:33+00:00",
+            "end_time": "2021-06-20T04:06:33+00:00",
+            "score": 20.0,
+            "cumulative_time": 3515,
+            "tiebreaker": 0.0,
+            "old_rating": 997,
+            "new_rating": 1051,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3515.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "wozhenshuai",
+            "start_time": "2021-06-21T01:04:12+00:00",
+            "end_time": "2021-06-21T04:00:00+00:00",
+            "score": 20.0,
+            "cumulative_time": 3719,
+            "tiebreaker": 0.0,
+            "old_rating": 1397,
+            "new_rating": 1356,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3719.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                {
+                    "time": 6459.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "MohamedAliSaidane",
+            "start_time": "2021-06-20T09:02:10+00:00",
+            "end_time": "2021-06-20T12:02:10+00:00",
+            "score": 20.0,
+            "cumulative_time": 4420,
+            "tiebreaker": 0.0,
+            "old_rating": 1368,
+            "new_rating": 1326,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4420.0,
+                    "points": 20.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                {
+                    "time": 7898.0,
+                    "points": 0.0,
+                    "penalty": 5
+                },
+                null,
+                null
+            ]
+        },
+        {
+            "user": "slower",
+            "start_time": "2021-06-19T14:14:54+00:00",
+            "end_time": "2021-06-19T17:14:54+00:00",
+            "score": 20.0,
+            "cumulative_time": 4867,
+            "tiebreaker": 0.0,
+            "old_rating": 915,
+            "new_rating": 1001,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4567.0,
+                    "points": 20.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "cabbagecabbagecabbage",
+            "start_time": "2021-06-20T00:40:59+00:00",
+            "end_time": "2021-06-20T03:40:59+00:00",
+            "score": 20.0,
+            "cumulative_time": 9216,
+            "tiebreaker": 0.0,
+            "old_rating": 1693,
+            "new_rating": 1582,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 7116.0,
+                    "points": 20.0,
+                    "penalty": 7
+                },
+                null,
+                {
+                    "time": 8248.0,
+                    "points": 0.0,
+                    "penalty": 5
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "vishnus",
+            "start_time": "2021-06-19T17:25:02+00:00",
+            "end_time": "2021-06-19T20:25:02+00:00",
+            "score": 20.0,
+            "cumulative_time": 10697,
+            "tiebreaker": 0.0,
+            "old_rating": 1250,
+            "new_rating": 1225,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 7097.0,
+                    "points": 20.0,
+                    "penalty": 12
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Averesoft",
+            "start_time": "2021-06-20T22:58:54+00:00",
+            "end_time": "2021-06-21T01:58:54+00:00",
+            "score": 20.0,
+            "cumulative_time": 12637,
+            "tiebreaker": 0.0,
+            "old_rating": 1484,
+            "new_rating": 1417,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 8437.0,
+                    "points": 20.0,
+                    "penalty": 14
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "harryc",
+            "start_time": "2021-06-19T22:52:50+00:00",
+            "end_time": "2021-06-20T01:52:50+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1268,
+            "new_rating": 1122,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4928.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                {
+                    "time": 3630.0,
+                    "points": 0.0,
+                    "penalty": 3
+                }
+            ]
+        },
+        {
+            "user": "Excuse",
+            "start_time": "2021-06-20T00:24:02+00:00",
+            "end_time": "2021-06-20T03:24:02+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "\u6e23\u6e23",
+            "start_time": "2021-06-20T01:28:46+00:00",
+            "end_time": "2021-06-20T04:28:46+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Marshmellon",
+            "start_time": "2021-06-20T02:19:07+00:00",
+            "end_time": "2021-06-20T05:19:07+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1033,
+            "new_rating": 955,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 5676.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "wlxsq",
+            "start_time": "2021-06-20T03:54:48+00:00",
+            "end_time": "2021-06-20T06:54:48+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 708,
+            "new_rating": 720,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "amongus332",
+            "start_time": "2021-06-20T04:37:03+00:00",
+            "end_time": "2021-06-20T07:37:03+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "sachinagon",
+            "start_time": "2021-06-20T06:32:31+00:00",
+            "end_time": "2021-06-20T09:32:31+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "gaurav_pw",
+            "start_time": "2021-06-20T10:00:31+00:00",
+            "end_time": "2021-06-20T13:00:31+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "sanjeevvardaan22",
+            "start_time": "2021-06-20T10:00:38+00:00",
+            "end_time": "2021-06-20T13:00:38+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                {
+                    "time": 3324.0,
+                    "points": 0.0,
+                    "penalty": 0
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Kaka",
+            "start_time": "2021-06-20T10:12:26+00:00",
+            "end_time": "2021-06-20T13:12:26+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ashuilubajaj01",
+            "start_time": "2021-06-20T11:17:15+00:00",
+            "end_time": "2021-06-20T14:17:15+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Goldengold",
+            "start_time": "2021-06-20T13:03:48+00:00",
+            "end_time": "2021-06-20T16:03:48+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 832,
+            "new_rating": 824,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ajiao",
+            "start_time": "2021-06-20T14:15:08+00:00",
+            "end_time": "2021-06-20T17:15:08+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3173.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Maxp070704",
+            "start_time": "2021-06-20T16:23:45+00:00",
+            "end_time": "2021-06-20T19:23:45+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1089,
+            "new_rating": 994,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1914.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Pendy",
+            "start_time": "2021-06-20T16:47:15+00:00",
+            "end_time": "2021-06-20T19:47:15+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4148.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Brian_Li23",
+            "start_time": "2021-06-20T17:14:44+00:00",
+            "end_time": "2021-06-20T20:14:44+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1117,
+            "new_rating": 1043,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "timg8710",
+            "start_time": "2021-06-20T17:50:45+00:00",
+            "end_time": "2021-06-20T20:50:45+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1070.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "kresteodymium",
+            "start_time": "2021-06-20T18:19:19+00:00",
+            "end_time": "2021-06-20T21:19:19+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "izxlabx",
+            "start_time": "2021-06-20T18:36:30+00:00",
+            "end_time": "2021-06-20T21:36:30+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1786.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "MohamedFaresNebili",
+            "start_time": "2021-06-20T18:39:37+00:00",
+            "end_time": "2021-06-20T21:39:37+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1411,
+            "new_rating": 1223,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1505.0,
+                    "points": 0.0,
+                    "penalty": 11
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Jeremy3333",
+            "start_time": "2021-06-20T19:06:08+00:00",
+            "end_time": "2021-06-20T22:06:08+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 895,
+            "new_rating": 844,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1048.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "P191134",
+            "start_time": "2021-06-20T19:45:41+00:00",
+            "end_time": "2021-06-20T22:45:41+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "D3structor",
+            "start_time": "2021-06-20T20:00:09+00:00",
+            "end_time": "2021-06-20T23:00:09+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jerrywujerrywujerrywu",
+            "start_time": "2021-06-20T21:08:02+00:00",
+            "end_time": "2021-06-21T00:08:02+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2905.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "showme",
+            "start_time": "2021-06-20T21:19:32+00:00",
+            "end_time": "2021-06-21T00:19:32+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 793,
+            "new_rating": 802,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "pomsux",
+            "start_time": "2021-06-20T22:46:36+00:00",
+            "end_time": "2021-06-21T01:46:36+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "theMang",
+            "start_time": "2021-06-20T23:14:03+00:00",
+            "end_time": "2021-06-21T02:14:03+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1040,
+            "new_rating": 981,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 3737.0,
+                    "points": 0.0,
+                    "penalty": 7
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "justadeveloper",
+            "start_time": "2021-06-20T23:58:27+00:00",
+            "end_time": "2021-06-21T02:58:27+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "hellobye65536",
+            "start_time": "2021-06-20T23:58:43+00:00",
+            "end_time": "2021-06-21T02:58:43+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1390,
+            "new_rating": 1169,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                {
+                    "time": 3730.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "dutinmeow",
+            "start_time": "2021-06-21T00:17:19+00:00",
+            "end_time": "2021-06-21T03:17:19+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Benny",
+            "start_time": "2021-06-21T00:21:56+00:00",
+            "end_time": "2021-06-21T03:21:56+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1219,
+            "new_rating": 1111,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 4312.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "anonymous_0001",
+            "start_time": "2021-06-21T03:26:05+00:00",
+            "end_time": "2021-06-21T04:00:00+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "infyy",
+            "start_time": "2021-06-19T04:00:14+00:00",
+            "end_time": "2021-06-19T07:00:14+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1182,
+            "new_rating": 1085,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 566.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Chetan1805",
+            "start_time": "2021-06-19T04:07:25+00:00",
+            "end_time": "2021-06-19T07:07:25+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Aomine",
+            "start_time": "2021-06-19T04:53:48+00:00",
+            "end_time": "2021-06-19T07:53:48+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 957,
+            "new_rating": 908,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 319.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "jatingargcse19",
+            "start_time": "2021-06-19T04:56:38+00:00",
+            "end_time": "2021-06-19T07:56:38+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "AnasBenMoussa",
+            "start_time": "2021-06-19T07:02:07+00:00",
+            "end_time": "2021-06-19T10:02:07+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 691,
+            "new_rating": 725,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Rahul9",
+            "start_time": "2021-06-19T08:02:54+00:00",
+            "end_time": "2021-06-19T11:02:54+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1409,
+            "new_rating": 1181,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Dragonado",
+            "start_time": "2021-06-19T10:50:10+00:00",
+            "end_time": "2021-06-19T13:50:10+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "abcddabc",
+            "start_time": "2021-06-19T10:57:37+00:00",
+            "end_time": "2021-06-19T13:57:37+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "asifalim",
+            "start_time": "2021-06-19T11:57:38+00:00",
+            "end_time": "2021-06-19T14:57:38+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "siongang",
+            "start_time": "2021-06-19T12:51:52+00:00",
+            "end_time": "2021-06-19T15:51:52+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 915,
+            "new_rating": 857,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 8276.0,
+                    "points": 0.0,
+                    "penalty": 4
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "liuhans731",
+            "start_time": "2021-06-19T13:02:29+00:00",
+            "end_time": "2021-06-19T16:02:29+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 999,
+            "new_rating": 937,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1962.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "tqang",
+            "start_time": "2021-06-19T13:27:59+00:00",
+            "end_time": "2021-06-19T16:27:59+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 529.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "Miran12",
+            "start_time": "2021-06-19T13:43:27+00:00",
+            "end_time": "2021-06-19T16:43:27+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "DNKYrr",
+            "start_time": "2021-06-19T14:14:45+00:00",
+            "end_time": "2021-06-19T17:14:45+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 726.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ag1123",
+            "start_time": "2021-06-19T14:35:56+00:00",
+            "end_time": "2021-06-19T17:35:56+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 915,
+            "new_rating": 857,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "karthickshiva",
+            "start_time": "2021-06-19T14:46:45+00:00",
+            "end_time": "2021-06-19T17:46:45+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1368,
+            "new_rating": 1154,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "EEEEEE_URRRRR",
+            "start_time": "2021-06-19T15:26:24+00:00",
+            "end_time": "2021-06-19T18:26:24+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "sam_t_03",
+            "start_time": "2021-06-19T16:02:23+00:00",
+            "end_time": "2021-06-19T19:02:23+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                {
+                    "time": 658.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "ayay9",
+            "start_time": "2021-06-19T16:12:29+00:00",
+            "end_time": "2021-06-19T19:12:29+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 879,
+            "new_rating": 858,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2424.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "21underscore3",
+            "start_time": "2021-06-19T16:21:10+00:00",
+            "end_time": "2021-06-19T19:21:10+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 805,
+            "new_rating": 811,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2990.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "rednovember",
+            "start_time": "2021-06-19T17:59:20+00:00",
+            "end_time": "2021-06-19T20:59:20+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 982,
+            "new_rating": 917,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "JY900",
+            "start_time": "2021-06-19T18:14:28+00:00",
+            "end_time": "2021-06-19T21:14:28+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1425,
+            "new_rating": 1275,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 2372.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                {
+                    "time": 9550.0,
+                    "points": 0.0,
+                    "penalty": 2
+                },
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "yak_fumblepack",
+            "start_time": "2021-06-19T19:54:52+00:00",
+            "end_time": "2021-06-19T22:54:52+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 520,
+            "new_rating": 595,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1425.0,
+                    "points": 0.0,
+                    "penalty": 3
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "oqueen123",
+            "start_time": "2021-06-19T20:52:31+00:00",
+            "end_time": "2021-06-19T23:52:31+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": null,
+            "new_rating": 947,
+            "is_disqualified": false,
+            "solutions": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        },
+        {
+            "user": "henrybaolol9",
+            "start_time": "2021-06-19T21:42:12+00:00",
+            "end_time": "2021-06-20T00:42:12+00:00",
+            "score": 0.0,
+            "cumulative_time": 0,
+            "tiebreaker": 0.0,
+            "old_rating": 1002,
+            "new_rating": 946,
+            "is_disqualified": false,
+            "solutions": [
+                {
+                    "time": 1590.0,
+                    "points": 0.0,
+                    "penalty": 1
+                },
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        }
+    ]
+}
