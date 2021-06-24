@@ -21,6 +21,7 @@ from operator import itemgetter
 from contextlib import asynccontextmanager
 import typing
 import logging
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
@@ -165,67 +166,80 @@ async def _query_api(url, resp_obj, *, object_hook=None):
     return resp
 
 
-class Problem:
-    def __init__(self, data):
-        self.code = data['code']
-        self.name = data['name']
-        self.types = data['types']
-        self.group = data['group']
-        self.points = data['points']
-        self.partial = data['partial']
-        self.authors = data.get('authors')
-        self.time_limit = data.get('time_limit')
-        self.memory_limit = data.get('memory_limit')
-        self.language_resource_limits = data.get('language_resource_limits')
-        self.short_circuit = data.get('short_circuit')
-        self._languages = data.get('languages', [])
-        self.languages = []
-        self.is_organization_private = data.get('is_organization_private')
-        self._organizations = data.get('organizations', [])
-        self.organizations = []
+class APIResponse:
 
-        self.is_public = data.get('is_public')
+    # TODO: Use a config which describes the attributes and types of the entire relevant json
+
+    # def __getattr__(self, name):
+    #     '''Used to figure out when some attributes are missing or wrong'''
+    #     return getattr(self, name)
+
+    @classmethod
+    def from_dict(cls, j):
+        obj = cls()
+        for k, v in j.items():
+            try:
+                j[k] = datetime.fromisoformat(v)
+            except Exception:
+                pass
+        obj.__dict__.update(j)
+        return obj
+
+
+class ParseProblem:
+
+    config = {
+        'code': str,
+        'name': str,
+        'authors': [str],
+        'types': [str],
+        'group': str,
+        'time_limit': float,
+        'memory_limit': int,
+        'language_resource_limits': [{
+            'language': str,
+            'time_limit': float,
+            'memory_limit': int,
+        }],
+        'points': float,
+        'partial': bool,
+        'short_circuit': bool,
+        'languages': [str],
+        'is_organization_private': bool,
+        'organizations': [int],
+        'is_public': bool,
+    }
 
     @staticmethod
-    async def async_map(_type, objects):
-        to_gather = []
-        for obj in objects:
-            to_gather.append(obj.async_init())
-        await asyncio.gather(*to_gather)
+    async def init(obj):
+        # Language, Organization
+        languages = session.query(Language.key, Language).all()
+        languages = {k: v for k, v in languages}
+        if any(lang_key not in languages for lang_key in obj.languages):
+            api = API()
+            await api.get_languages()
+            for lang in api.data.objects:
+                if lang.key not in languages:
+                    languages[lang.key] = Language(lang)
+                    session.add(languages[lang.key])
+            session.commit()
+        obj.languages = [languages[lang_key] for lang_key in obj.languages]
 
-    async def async_init(self):
-        language_qq = session.query(Language_DB).\
-            filter(Language_DB.key.in_(self._languages))
-        language_q = session.query(Language_DB.key).\
-            filter(Language_DB.key.in_(self._languages)).all()
-        language_q = list(map(itemgetter(0), language_q))
-        for language_key in self._languages:
-            if language_key not in language_q:
-                api = API()
-                await api.get_languages()
-                for language in api.data.objects:
-                    if language.key not in language_q:
-                        session.add(Language_DB(language))
-                        session.commit()
-                break
-        self.languages = language_qq.all()
+        organizations = session.query(Organization.id, Organization).all()
+        organizations = {k: v for k, v in organizations}
+        if any(org_id not in organizations for org_id in obj.organizations):
+            api = API()
+            await api.get_organizations()
+            for org in api.data.objects:
+                if org.id not in organizations:
+                    organizations[org.id] = Organization(org)
+                    session.add(organizations[org.id])
+            session.commit()
+        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
 
-        organization_qq = session.query(Organization_DB).\
-            filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).\
-            filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(itemgetter(0), organization_q))
-        for organization_id in self._organizations:
-            if organization_id not in organization_q:
-                api = API()
-                await api.get_organizations()
-                for organization in api.data.objects:
-                    if (organization.id not in organization_q and
-                            organization.id in self._organizations):
-                        session.add(Organization_DB(organization))
-                        session.commit()
-                break
-        self.organizations = organization_qq.all()
+    @staticmethod
+    async def inits(objs):
+        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
 
 
 class Contest:
