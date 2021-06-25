@@ -12,11 +12,11 @@ import math
 import json
 from datetime import datetime
 from utils.db import session
-from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
-                      Participation as Participation_DB,
-                      User as User_DB, Submission as Submission_DB,
-                      Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB)
+from utils.db import (Problem, Contest,
+                      Participation,
+                      User, Submission,
+                      Organization,
+                      Language, Judge)
 from operator import itemgetter
 from contextlib import asynccontextmanager
 import typing
@@ -191,7 +191,7 @@ class ParseProblem:
     config = {
         'code': str,
         'name': str,
-        'authors': [str],
+        'authors': [str],  # TODO: [User]?
         'types': [str],
         'group': str,
         'time_limit': float,
@@ -204,9 +204,9 @@ class ParseProblem:
         'points': float,
         'partial': bool,
         'short_circuit': bool,
-        'languages': [str],
+        'languages': [Language],
         'is_organization_private': bool,
-        'organizations': [int],
+        'organizations': [Organization],
         'is_public': bool,
     }
 
@@ -242,149 +242,170 @@ class ParseProblem:
         await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
 
 
-class Contest:
+class ParseContest:
 
-    def __init__(self, data):
-        self.key = data['key']
-        self.name = data['name']
-        self.start_time = datetime.fromisoformat(data['start_time'])
-        self.end_time = datetime.fromisoformat(data['end_time'])
-        self.time_limit = data['time_limit']
-        self.tags = data['tags']
-        self.is_rated = data.get('is_rated')
-        self.rate_all = data.get('rate_all')
-        self.has_rating = data.get('has_rating')
-        self.rating_floor = data.get('rating_floor')
-        self.rating_ceiling = data.get('rating_ceiling')
-        self.hidden_scoreboard = data.get('hidden_scoreboard')
-        self.scoreboard_visibility = data.get('scoreboard_visibility')
-        self.is_organization_private = data.get('is_organization_private')
-        self._organizations = data.get('organizations', [])
-        self.organizations = []
-        self.is_private = data.get('is_private')
-        self.format = data.get('format')
-        self.rankings = data.get('rankings')
-        self._problems = data.get('problems', [])
-        self.problems = []
+    config = {
+        'key': str,
+        'name': str,
+        'start_time': datetime,
+        'end_time': datetime,
+        'time_limit': float,
+        'is_rated': bool,
+        'rate_all': bool,
+        'has_rating': bool,
+        'rating_floor': int,
+        'rating_ceiling': int,
+        'hidden_scoreboard': bool,
+        'scoreboard_visibility': str,
+        'is_organization_private': bool,
+        'organizations': [Organization],
+        'is_private': bool,
+        'tags': [str],
+        'format': {
+            'name': str,
+            'config': {
+                'cumtime': bool,
+                'first_ac_bonus': int,
+                'time_bonus': int,
+            },
+        },
+        'problems': [
+            {
+                'points': int,
+                'partial': bool,
+                'is_pretested': bool,
+                'max_submissions': int,
+                'label': str,  # TODO: move the label outside of 'problems' so it's a list of Problem type
+                'name': str,
+                'code': str,
+            }
+        ],
+        'label': [str],  # TODO: Perhaps an alternative to the above?
+        'rankings': [  # TODO: change to list of Participation objects
+            {
+                'user': User,
+                'start_time': datetime,
+                'end_time': datetime,
+                'score': float,
+                'cumulative_time': int,
+                'tiebreaker': float,
+                'old_rating': int,
+                'new_rating': int,
+                'is_disqualified': bool,
+                'solutions': [
+                    {
+                        'points': float,
+                        'time': float,
+                    }
+                ]
+            },
+        ],
+    }
 
     @staticmethod
-    async def async_map(_type, objects):
-        to_gather = []
-        for obj in objects:
-            to_gather.append(obj.async_init())
-        await asyncio.gather(*to_gather)
+    async def async_init(obj):
+        # Move label outside of problems
+        obj.label = [problem.label for problem in obj.problems]
 
-    async def async_init(self):
-        organization_qq = session.query(Organization_DB).\
-            filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).\
-            filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(itemgetter(0), organization_q))
-        for organization_id in self._organizations:
-            if organization_id not in organization_q:
-                api = API()
-                await api.get_organizations()
-                for organization in api.data.objects:
-                    if (organization.id not in organization_q and
-                            organization.id in self._organizations):
-                        session.add(Organization_DB(organization))
-                        session.commit()
-                break
-        self.organizations = organization_qq.all()
+        # TODO: Replace rankings (THIS IS NOT RIGHT)
+        # NOTE: virtual_participation_number attribute is automatically 0
+        obj.rankings = [Participation(ranking) for ranking in obj.rankings]
 
-        # perhaps I should check if it's the general or detailed version
-        self._problem_codes = list(map(itemgetter('code'), self._problems))
-        problem_qq = session.query(Problem_DB).\
-            filter(Problem_DB.code.in_(self._problem_codes))
-        problem_q = session.query(Problem_DB.code).\
-            filter(Problem_DB.code.in_(self._problem_codes)).all()
-        problem_q = list(map(itemgetter(0), problem_q))
-        for problem_dict in self._problems:
-            problem_code = problem_dict['code']
-            try:
-                if problem_code not in problem_q:
+        organizations = session.query(Organization.id, Organization).all()
+        organizations = {k: v for k, v in organizations}
+        if any(org_id not in organizations for org_id in obj.organizations):
+            api = API()
+            await api.get_organizations()
+            for org in api.data.objects:
+                if org.id not in organizations:
+                    organizations[org.id] = Organization(org)
+                    session.add(organizations[org.id])
+            session.commit()
+        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+
+        problems = session.query(Problem.code, Problem).all()
+        problems = {k: v for k, v in problems}
+        if any(problem_code not in problems for problem_code in obj.problems):
+            for problem in obj.problems:
+                code = problem.code
+                if code not in problems:
                     api = API()
-                    await api.get_problem(problem_code)
-                    session.add(Problem_DB(api.data.object))
-                    session.commit()
-            except ObjectNotFound:
-                pass
-        self.problems = problem_qq.all()
-
-
-class Participation:
-
-    def __init__(self, data):
-        self.id = data['user'] + '&' + data['contest'] + '&' \
-                               + str(data['virtual_participation_number'])
-        self._user = data['user']
-        self.user = None
-        self._contest = data['contest']
-        self.contest = None
-        self.score = data['score']
-        self.cumulative_time = data['cumulative_time']
-        self.tiebreaker = data['tiebreaker']
-        self.is_disqualified = data['is_disqualified']
-        self.virtual_participation_number = data['virtual_participation_number']
-        self.start_time = datetime.fromisoformat(data.get('start_time'))
-        self.end_time = datetime.fromisoformat(data.get('end_time'))
+                    await api.get_problem(code)
+                    # TODO: pass in global dict to remove the below query
+                    if session.query(Problem).filter(Problem.code == code).count():
+                        continue
+                    problems[code] = Problem(api.data.objects)
+                    session.add(problems[code])
+            session.commit()
+        obj.problems = [problems[problem.code] for problem in obj.problems]
 
     @staticmethod
-    async def async_map(_type, objects):
-        to_gather = []
-        for obj in objects:
-            to_gather.append(obj.async_init())
-        await asyncio.gather(*to_gather)
+    async def inits(objs):
+        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
 
-    async def async_init(self):
-        user = session.query(User_DB).\
-            filter(User_DB.username == self._user)
 
+class ParseParticipation:
+
+    config = {
+        "user": User,
+        "contest": Contest,
+        "start_time": datetime,
+        "end_time": datetime,
+        "score": float,
+        "cumulative_time": int,
+        "tiebreaker": float,
+        "old_rating": int,
+        "new_rating": int,
+        "is_disqualified": bool,
+        "solutions": [{
+            'points': float,
+            'time': float,
+        }],
+        "virtual_participation_number": int,
+    }
+
+    @staticmethod
+    async def init(obj):
+        user = session.query(User).filter(User.username == obj.user)
         if user.count() == 0:
             api = API()
-            await api.get_user(self._user)
-            session.add(api.data.object)
+            await api.get_user(obj.user)
+            # NOTE: Possible chance of db error
+            session.add(User(api.data.object))
             session.commit()
-        self.user = user.first()
+        obj.user = user.first()
 
-        contest = session.query(Contest_DB).\
-            filter(Contest_DB.key == self._contest)
-
+        contest = session.query(Contest).filter(Contest.key == obj.contest)
         if contest.count() == 0:
             api = API()
-            await api.get_contest(self._contest)
-            session.add(api.data.object)
+            await api.get_contest(obj.contest)
+            # NOTE: Possible chance of db error
+            session.add(Contest(api.data.object))
             session.commit()
-        self.contest = contest.first()
-
-
-class User:
-    def __init__(self, data):
-        self.id = data['id']
-        self.username = data['username']
-        self.points = data['points']
-        self.performance_points = data['performance_points']
-        self.problem_count = data['problem_count']
-        self.rank = data['rank']
-        self.rating = data['rating']
-        self.max_rating = data['rating']
-        self.volatility = data['volatility']
-        self._solved_problems = data.get('solved_problems', [])
-        self.solved_problems = []
-        self._organizations = data.get('organizations', [])
-        self.organizations = []
-        self._contests = data.get('contests', [])
-        self.contests = []
+        obj.contest = contest.first()
 
     @staticmethod
-    async def async_map(_type, objects):
-        to_gather = []
-        for obj in objects:
-            # I think there's an issue similar to LN 376
-            # If multiple users are fetched after a contest, it crashes the db
-            # The solution should be the same, an async lock table
-            to_gather.append(obj.async_init())
-        await asyncio.gather(*to_gather)
+    async def inits(objs):
+        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
+
+
+class ParseUser:
+
+    config = {
+        "id": int,
+        "username": str,
+        "points": float,
+        "performance_points": float,
+        "problem_count": int,
+        "solved_problems": [Problem],
+        "rank": str,
+        "rating": int,
+        "volatility": int,
+        "organizations": [Organization],
+        "contests": [Participation],  # NOTE: There is a very limited amount of info here,
+                                      # perhaps take advantage of the `user` filter in /participations
+        "volatilities": [int],
+    }
 
     async def async_init(self):
         problem_qq = session.query(Problem_DB).\
@@ -445,6 +466,10 @@ class User:
             except ObjectNotFound:
                 pass
         self.contests = contest_qq.all()
+
+    @staticmethod
+    async def inits(objs):
+        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
 
 
 class Submission:
