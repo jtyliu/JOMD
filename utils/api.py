@@ -29,14 +29,14 @@ logger = logging.getLogger(__name__)
 __all__ = [
     'API',
     'ObjectNotFound',
-    'Judge',
-    'Language',
-    'Organization',
-    'Submission',
-    'User',
-    'Participation',
-    'Contest',
-    'Problem',
+    'ParseJudge',
+    'ParseLanguage',
+    'ParseOrganization',
+    'ParseSubmission',
+    'ParseUser',
+    'ParseParticipation',
+    'ParseContest',
+    'ParseProblem',
 ]
 
 
@@ -164,26 +164,6 @@ async def _query_api(url, resp_obj, *, object_hook=None):
             #     raise ApiError
         logger.info('Parsed data, returning... Time: %s', time.time() - start)
     return resp
-
-
-class APIResponse:
-
-    # TODO: Use a config which describes the attributes and types of the entire relevant json
-
-    # def __getattr__(self, name):
-    #     '''Used to figure out when some attributes are missing or wrong'''
-    #     return getattr(self, name)
-
-    @classmethod
-    def from_dict(cls, j):
-        obj = cls()
-        for k, v in j.items():
-            try:
-                j[k] = datetime.fromisoformat(v)
-            except Exception:
-                pass
-        obj.__dict__.update(j)
-        return obj
 
 
 class ParseProblem:
@@ -341,7 +321,7 @@ class ParseContest:
 
     @staticmethod
     async def inits(objs):
-        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
+        await asyncio.gather(*[ParseContest.init(obj) for obj in objs])
 
 
 class ParseParticipation:
@@ -386,7 +366,7 @@ class ParseParticipation:
 
     @staticmethod
     async def inits(objs):
-        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
+        await asyncio.gather(*[ParseParticipation.init(obj) for obj in objs])
 
 
 class ParseUser:
@@ -407,268 +387,252 @@ class ParseUser:
         "volatilities": [int],
     }
 
-    async def async_init(self):
-        problem_qq = session.query(Problem_DB).\
-            filter(Problem_DB.code.in_(self._solved_problems))
-        problem_q = session.query(Problem_DB.code).\
-            filter(Problem_DB.code.in_(self._solved_problems)).all()
-        problem_q = list(map(itemgetter(0), problem_q))
-        for problem_code in self._solved_problems:
-            try:
-                if problem_code not in problem_q:
-                    api = API()
-                    await api.get_problem(problem_code)
-                    session.add(Problem_DB(api.data.object))
-                    session.commit()
-            except ObjectNotFound:
-                pass
-        self.solved_problems = problem_qq.all()
+    @staticmethod
+    async def init(obj):
+        # problem, organization, contest
+        problems = session.query(Problem.code, Problem).all()
+        problems = {k: v for k, v in problems}
+        for code in obj.solved_problems:
+            api = API()
+            if code not in problems:
+                await api.get_problem(code)
+                problems[code] = Problem(api.data.object)
+                session.add(problems[code])
+        session.commit()
+        obj.solved_problems = [problems[code] for code in obj.solved_problems]
 
-        organization_qq = session.query(Organization_DB).\
-            filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).\
-            filter(Organization_DB.id.in_(self._organizations)).all()
-        organization_q = list(map(itemgetter(0), organization_q))
-        for organization_id in self._organizations:
-            if organization_id not in organization_q:
-                api = API()
-                await api.get_organizations()
-                for organization in api.data.objects:
-                    if (organization.id not in organization_q and
-                            organization.id in self._organizations):
-                        session.add(Organization_DB(organization))
-                        session.commit()
-                break
-        self.organizations = organization_qq.all()
+        organizations = session.query(Organization.id, Organization).all()
+        organizations = {k: v for k, v in organizations}
+        if any(org_id not in organizations for org_id in obj.organizations):
+            api = API()
+            await api.get_organizations()
+            for org in api.data.objects:
+                if org.id not in organizations:
+                    organizations[org.id] = Organization(org)
+                    session.add(organizations[org.id])
+            session.commit()
+        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
 
-        for contest in self._contests:
-            if contest['rating']:
-                self.max_rating = max(self.max_rating or 0, contest['rating'])
+        # TODO: rewrite/remove entirely
+        # for contest in self._contests:
+        #     if contest['rating']:
+        #         self.max_rating = max(self.max_rating or 0, contest['rating'])
 
-        self._contest_keys = list(map(itemgetter('key'), self._contests))
-
-        contest_qq = session.query(Contest_DB).\
-            filter(Contest_DB.key.in_(self._contest_keys))
-        contest_q = session.query(Contest_DB.key).\
-            filter(Contest_DB.key.in_(self._contest_keys)).all()
-        contest_q = list(map(itemgetter(0), contest_q))
-        for contest_key in self._contest_keys:
-            try:
-                if contest_key not in contest_q:
-                    api = API()
-                    await api.get_contest(contest_key)
-                    # This causes db errors, and in the case the above doesn't catch it.
-                    # This will be a last ditch effort
-                    if session.query(Contest_DB).filter(Contest_DB.key == contest_key).count():
-                        continue
-                    session.add(Contest_DB(api.data.object))
-                    session.commit()
-            except ObjectNotFound:
-                pass
-        self.contests = contest_qq.all()
+        contests = session.query(Contest.key, Contest).all()
+        contests = {k: v for k, v in contests}
+        for key in obj.contests:
+            api = API()
+            if key not in contests:
+                await api.get_contest(key)
+                contests[key] = Contest(api.data.object)
+                session.add(contests[key])
+        session.commit()
+        obj.contests = [contests[key] for key in obj.contests]
 
     @staticmethod
     async def inits(objs):
         await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
 
 
-class Submission:
-    def __init__(self, data):
-        self.id = data['id']
-        self._problem = data['problem']
-        # self.problem = []
-        self._user = data['user']
-        # self.user = []
-        self.date = datetime.fromisoformat(data['date'])
-        self._language = data['language']
-        # self.language = []
-        self.time = data['time']
-        self.memory = data['memory']
-        self.points = data['points']
-        self.result = data['result']
-        self.status = data.get('status')
-        self.case_points = data.get('case_points')
-        self.case_total = data.get('case_total')
-        self.cases = data.get('cases')
-        self.score_num = data.get('score_num')
-        self.score_denom = data.get('score_denom')
-        self.problem = None
-        self.user = None
-        self.language = None
+class ParseSubmission:
 
-    @property
-    def memory_str(self):
-        if self.memory is None or self.memory == 0:
-            return '---'
-        if self.memory < 1024:
-            return '%.1f KB' % (self.memory)
-        elif self.memory < 1024**2:
-            return '%.1f MB' % (self.memory / 1024)
-        else:
-            return '%.1f GB' % (self.memory / 1024 / 1024)
+    config = {
+        "id": int,
+        "problem": Problem,
+        "user": User,
+        "date": datetime,
+        "time": float,
+        "memory": float,
+        "points": float,
+        "language": Language,
+        "status": str,
+        "result": str,
+        "case_points": float,
+        "case_total": float,
+        "cases": [{
+            "type": str,
+            "case_id": int,
+            "status": str,
+            "time": float,
+            "memory": float,
+            "points": float,
+            "total": float,
+        }],
+    }
 
     @staticmethod
-    async def async_map(_type, objects):
-        problems = session.query(Problem_DB.code, Problem_DB).all()
-        problems = {k: v for k, v in problems}
-        users = session.query(User_DB.username, User_DB).all()
-        users = {k: v for k, v in users}
-        languages = session.query(Language_DB.key, Language_DB).all()
-        languages = {k: v for k, v in languages}
-        to_gather = []
-        lock_table = {}
-        for obj in objects:
-            # If a user attempts to cache submissions after the latest release of a contest, there is a chance it will
-            # cause a db error
-            # this is because any submissions which are not in the db will be called by the api and stored into the db
-            # but in between that moment of calling the api and storing into the db, another process will call the api
-            # for the same problem
-            # because it is technically not in memory yet
-            # This fix to this is two global tables and a lock
-            to_gather.append(
-                obj.async_init(problems, users, languages, lock_table)
-            )
-        await asyncio.gather(*to_gather)
-        session.commit()
+    async def init(obj, *, problems=None, users=None, languages=None, lock={}):
+        if problems is None:
+            problems = session.query(Problem.code, Problem).all()
+            problems = {k: v for k, v in problems}
+        if users is None:
+            users = session.query(User.username, User).all()
+            users = {k: v for k, v in users}
+        if languages is None:
+            languages = session.query(Language.key, Language).all()
+            languages = {k: v for k, v in languages}
 
-    async def async_init(self, problem_q, user_q, language_q, lock_table):
-        if self._problem not in problem_q and self._problem not in lock_table:
-            lock_table[self._problem] = asyncio.Lock()
-            async with lock_table[self._problem]:
+        if obj.problem not in problems and obj.problem not in lock:
+            lock[obj.problem] = asyncio.Lock()
+            async with lock[obj.problem]:
                 api = API()
-                await api.get_problem(self._problem)
-                problem = Problem_DB(api.data.object)
+                await api.get_problem(obj.problem)
+                problem = Problem(api.data.object)
                 session.add(problem)
-                problem_q[self._problem] = problem
-        if self._problem in problem_q:
-            self.problem = [problem_q[self._problem]]
+                problems[obj.problem] = problem
+        if obj.problem in problems:
+            obj.problem = problems[obj.problem]
 
-        if self._user not in user_q and self._user not in lock_table:
-            lock_table[self._user] = asyncio.Lock()
-            async with lock_table[self._user]:
+        if obj.user not in users and obj.user not in lock:
+            lock[obj.user] = asyncio.Lock()
+            async with lock[obj.user]:
                 api = API()
-                await api.get_user(self._user)
-                user = User_DB(api.data.object)
+                await api.get_user(obj.user)
+                user = User(api.data.object)
                 session.add(user)
-                user_q[self._user] = user
-        if self._user in user_q:
-            self.user = [user_q[self._user]]
+                users[obj.user] = user
+        if obj.user in users:
+            obj.user = users[obj.user]
 
-        if self._language not in language_q and 'language' not in lock_table:
-            lock_table['language'] = asyncio.Lock()
-            async with lock_table['language']:
+        if obj.language not in languages and 'language' not in lock:
+            lock['language'] = asyncio.Lock()
+            async with lock['language']:
                 api = API()
                 await api.get_languages()
                 for language in api.data.objects:
-                    if language.key not in language_q:
-                        lang = Language_DB(language)
+                    if language.key not in languages:
+                        lang = Language(language)
                         session.add(lang)
-                        language_q[language.key] = lang
-        if self._language in language_q:
-            self.language = [language_q[self._language]]
+                        languages[language.key] = lang
+        if obj.language in languages:
+            obj.language = languages[obj.language]
 
-        if self.problem is None:
-            async with lock_table[self._problem]:
-                self.problem = [problem_q[self._problem]]
+        if obj.problem is None:
+            async with lock[obj._problem]:
+                obj.problem = problems[obj._problem]
 
-        if self.user is None:
-            async with lock_table[self._user]:
-                self.user = [user_q[self._user]]
+        if obj.user is None:
+            async with lock[obj._user]:
+                obj.user = users[obj._user]
 
-        if self.language is None:
-            async with lock_table['language']:
-                self.language = [language_q[self._language]]
-
-
-class Organization:
-    def __init__(self, data):
-        self.id = data['id']
-        self.slug = data['slug']
-        self.short_name = data['short_name']
-        self.is_open = data['is_open']
-        self.member_count = data['member_count']
+        if obj.language is None:
+            async with lock['language']:
+                obj.language = languages[obj.language]
 
     @staticmethod
-    async def async_map(_type, objects):
-        pass
+    async def inits(objs):
+        problems = session.query(Problem.code, Problem).all()
+        problems = {k: v for k, v in problems}
+        users = session.query(User.username, User).all()
+        users = {k: v for k, v in users}
+        languages = session.query(Language.key, Language).all()
+        languages = {k: v for k, v in languages}
+        tasks = []
+        lock = {}
+        for obj in objs:
+            tasks.append(
+                ParseSubmission.init(
+                    obj,
+                    problems=problems,
+                    users=users,
+                    languages=languages,
+                    lock=lock
+                )
+            )
+        await asyncio.gather(*tasks)
 
-    async def async_init(self):
-        pass
 
+class ParseOrganization:
 
-class Language:
-    def __init__(self, data):
-        self.id = data['id']
-        self.key = data['key']
-        self.short_name = data['short_name']
-        self.common_name = data['common_name']
-        self.ace_mode_name = data['ace_mode_name']
-        self.pygments_name = data['pygments_name']
-        self.code_template = data['code_template']
+    config = {
+        "id": int,
+        "slug": str,
+        "short_name": str,
+        "is_open": bool,
+        "member_count": int,
+    }
 
     @staticmethod
-    async def async_map(_type, objects):
+    async def inits(objs):
         pass
-
-    async def async_init(self):
-        pass
-
-
-class Judge:
-    def __init__(self, data):
-        self.name = data['name']
-        self.start_time = datetime.fromisoformat(data['start_time'])
-        self.ping = data['ping']
-        self.load = data['load']
-        self.languages = data['languages']
 
     @staticmethod
-    async def async_map(_type, objects):
+    async def init(obj):
         pass
 
-    async def async_init(self):
+
+class ParseLanguage:
+
+    config = {
+        "id": int,
+        "key": str,
+        "short_name": str,
+        "common_name": str,
+        "ace_mode_name": str,
+        "pygments_name": str,
+        "code_template": str,
+    }
+
+    @staticmethod
+    async def inits(objs):
         pass
+
+    @staticmethod
+    async def init(obj):
+        pass
+
+
+class ParseJudge:
+
+    config = {
+        "name": str,
+        "start_time": datetime,
+        "ping": float,
+        "load": float,
+        "languages": [Language],
+    }
+
+    @staticmethod
+    async def inits(objs):
+        await asyncio.gather(*[ParseJudge.init(obj) for obj in objs])
+
+    @staticmethod
+    async def init(obj):
+        languages = session.query(Language.key, Language).all()
+        languages = {k: v for k, v in languages}
+        if any(lang_key not in languages for lang_key in obj.languages):
+            api = API()
+            await api.get_languages()
+            for lang in api.data.objects:
+                if lang.key not in languages:
+                    languages[lang.key] = Language(lang)
+                    session.add(languages[lang.key])
+            session.commit()
+        obj.languages = [languages[lang_key] for lang_key in obj.languages]
 
 
 class ObjectNotFound(Exception):
     def __init__(self, data):
-        self.code = data['code']
-        self.message = data['message']
+        self.code = data.code
+        self.message = data.message
         super().__init__(self.message)
 
 
 class API:
 
-    class Data:
-        def __init__(self):
-            pass
-
-        def async_map(self, _type, data):
-            ret = []
-            for obj in self.objects:
-                ret.append(obj.async_init())
-            return ret
-
-        async def parse(self, data, _type):
-            if 'object' in data:
-                self.object = _type(data['object'])
-                self._object = await self.object.async_init()
-                self.objects = None
-            else:
-                self.current_object_count = data['current_object_count']
-                self.objects_per_page = data['objects_per_page']
-                self.page_index = data['page_index']
-                self.has_more = data['has_more']
-                self.total_pages = data['total_pages']
-                self.total_objects = data['total_objects']
-
-                self.objects = list(map(_type, data['objects']))
-                await _type.async_map(_type, self.objects)
-                self.object = None
-            return self
-
     def __init__(self):
         pass
+
+    @classmethod
+    def from_dict(cls, j):
+        obj = cls()
+        for k, v in j.items():
+            try:
+                j[k] = datetime.fromisoformat(v)
+            except Exception:
+                pass
+        obj.__dict__.update(j)
+        return obj
 
     def url_encode(self, params):
         # Should cast to string just in case
@@ -683,15 +647,13 @@ class API:
                 query_args.append((k, str(v)))
         return '?' + urllib.parse.urlencode(query_args)
 
-    async def parse(self, data, _type):
-        self.api_version = data['api_version']
-        self.method = data['method']
-        self.fetched = data['fetched']
-        if 'error' in data:
-            raise ObjectNotFound(data['error'])
+    async def parse(self, parse_obj):
+        if hasattr(self, 'error'):
+            raise ObjectNotFound(self.error)
+        if hasattr(self.data, 'object'):
+            await parse_obj.init(self.data.object)
         else:
-            dat = self.Data()
-            self.data = await dat.parse(data['data'], _type)
+            await parse_obj.inits(self.data.object)
 
     async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
@@ -699,14 +661,14 @@ class API:
             'organization': organization,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/contests' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Contest)
+        await _query_api(SITE_URL + 'api/v2/contests' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseContest)
 
     async def get_contest(self, contest_key: str) -> None:
-        resp = await _query_api(SITE_URL + 'api/v2/contest/' +
-                                contest_key, 'json')
-        await self.parse(resp, Contest)
+        await _query_api(SITE_URL + 'api/v2/contest/' +
+                         contest_key, 'json', self.from_dict)
+        await self.parse(ParseContest)
 
     async def get_participations(self, contest: str = None, user: str = None,
                                  is_disqualified: bool = None,
@@ -718,9 +680,9 @@ class API:
             'virtual_participation_number': virtual_participation_number,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/participations' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Participation)
+        await _query_api(SITE_URL + 'api/v2/participations' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseParticipation)
 
     async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
                            organization: str = None, search: str = None, page: int = None) -> None:
@@ -732,28 +694,28 @@ class API:
             'search': search,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/problems' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Problem)
+        await _query_api(SITE_URL + 'api/v2/problems' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseProblem)
 
     async def get_problem(self, code: str) -> None:
-        resp = await _query_api(SITE_URL + 'api/v2/problem/' +
-                                code, 'json')
-        await self.parse(resp, Problem)
+        await _query_api(SITE_URL + 'api/v2/problem/' +
+                         code, 'json', self.from_dict)
+        await self.parse(ParseProblem)
 
     async def get_users(self, organization: str = None, page: int = None) -> None:
         params = {
             'organization': organization,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/users' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, User)
+        await _query_api(SITE_URL + 'api/v2/users' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseUser)
 
     async def get_user(self, username: str) -> None:
-        resp = await _query_api(SITE_URL + 'api/v2/user/' +
-                                username, 'json')
-        await self.parse(resp, User)
+        await _query_api(SITE_URL + 'api/v2/user/' +
+                         username, 'json', self.from_dict)
+        await self.parse(ParseUser)
 
     async def get_submissions(self, user: str = None, problem: str = None,
                               language: str = None, result: str = None, page: int = None) -> None:
@@ -764,42 +726,42 @@ class API:
             'result': result,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/submissions' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Submission)
+        await _query_api(SITE_URL + 'api/v2/submissions' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseSubmission)
 
     async def get_submission(self, submission_id: typing.Union[int, str]) -> None:
         # Should only accept a string, perhaps I should do something
         # if it were an int
-        resp = await _query_api(SITE_URL + 'api/v2/submission/' +
-                                str(submission_id), 'json')
-        await self.parse(resp, Submission)
+        await _query_api(SITE_URL + 'api/v2/submission/' +
+                         str(submission_id), 'json', self.from_dict)
+        await self.parse(ParseSubmission)
 
     async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
         params = {
             'is_open': is_open,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/organizations' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Organization)
+        await _query_api(SITE_URL + 'api/v2/organizations' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseOrganization)
 
     async def get_languages(self, common_name: str = None, page: int = None) -> None:
         params = {
             'common_name': common_name,
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/languages' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Language)
+        await _query_api(SITE_URL + 'api/v2/languages' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseLanguage)
 
     async def get_judges(self, page: int = None) -> None:
         params = {
             'page': page,
         }
-        resp = await _query_api(SITE_URL + 'api/v2/judges' +
-                                self.url_encode(params), 'json')
-        await self.parse(resp, Judge)
+        await _query_api(SITE_URL + 'api/v2/judges' +
+                         self.url_encode(params), 'json', self.from_dict)
+        await self.parse(ParseJudge)
 
     async def get_pfp(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')
@@ -828,8 +790,8 @@ class API:
                 points = 0
             lang = soup.find(class_='language').text
 
-            q = session.query(Language_DB).\
-                filter(Language_DB.short_name == lang)
+            q = session.query(Language).\
+                filter(Language.short_name == lang)
             if q.count():
                 lang = q.first().key
             # if not as short_name it'll be key, why? idk

@@ -334,6 +334,17 @@ class Submission(Base):
         self.case_total = submission.case_total
         self.cases = submission.cases
 
+    @property
+    def memory_str(self):
+        if self.memory is None or self.memory == 0:
+            return '---'
+        if self.memory < 1024:
+            return '%.1f KB' % (self.memory)
+        elif self.memory < 1024**2:
+            return '%.1f MB' % (self.memory / 1024)
+        else:
+            return '%.1f GB' % (self.memory / 1024 / 1024)
+
 
 class Organization(Base):
     __tablename__ = 'organization'
