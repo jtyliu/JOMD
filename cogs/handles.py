@@ -57,15 +57,14 @@ class Handles(commands.Cog):
                 return await ctx.send(embed=embed)
         except Exception:
             pass
-        finally:
-            name = None
-            if member:
-                name = member.nick or member.name
-            embed = discord.Embed(
-                title=escape_markdown(f'Nothing found on {handle or name}'),
-                color=0xfcdb05,
-            )
-            await ctx.send(embed=embed)
+        name = None
+        if member:
+            name = member.nick or member.name
+        embed = discord.Embed(
+            title=escape_markdown(f'Nothing found on {handle or name}'),
+            color=0xfcdb05,
+        )
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def unlink(self, ctx):
