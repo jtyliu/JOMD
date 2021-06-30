@@ -439,14 +439,14 @@ class Query:
 
     def get_attempted_problems(self, username: str, types: List[str]) -> Problem_DB:
         conds = [Problem_DB.types.contains(_type) for _type in types]
-        sub_q = session.query(Submission_DB, func.max(Submission_DB.points))\
+        sub_q = session.query(Problem_DB)\
+            .filter(or_(*conds)).subquery()
+        q = session.query(func.max(Submission_DB.points))\
+            .join(sub_q, Submission_DB._code == sub_q.c.code)\
             .filter(Submission_DB._user == username)\
-            .group_by(Submission_DB._code).subquery()
-        q = session.query(Problem_DB)\
-            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
-            .filter(func.ifnull(sub_q.c.points, 0) != 0)\
-            .filter(or_(*conds))
-        return q.all()
+            .filter(func.ifnull(Submission_DB.points, 0) != 0)\
+            .group_by(Submission_DB._code)
+        return [point for (point,) in q.all()]
 
     def get_member_named(self, guild, name):
         result = None

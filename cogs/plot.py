@@ -317,9 +317,8 @@ class Plot(commands.Cog):
             total_points = calculate_partial_points(total_points)
 
             for username in usernames:
-                problems = query.get_attempted_problems(username, types)
+                points = query.get_attempted_problems(username, types)
 
-                points = list(map(attrgetter('points'), problems))
                 points.sort(reverse=True)
 
                 points = calculate_partial_points(points)
