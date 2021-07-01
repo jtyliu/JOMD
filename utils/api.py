@@ -1,5 +1,3 @@
-# from utils.submission import Submission
-# from utils.problem import Problem
 from bs4 import BeautifulSoup
 from utils.constants import SITE_URL, API_TOKEN
 import urllib.parse
@@ -11,12 +9,7 @@ import html
 import math
 import json
 from datetime import datetime
-from utils.db import session
-from utils.db import (Problem, Contest,
-                      Participation,
-                      User, Submission,
-                      Organization,
-                      Language, Judge)
+from utils.models import *
 from operator import itemgetter
 from contextlib import asynccontextmanager
 import typing
@@ -171,7 +164,7 @@ class ParseProblem:
     config = {
         'code': str,
         'name': str,
-        'authors': [str],  # TODO: [User]?
+        'authors': [User],  # TODO: [User]?
         'types': [str],
         'group': str,
         'time_limit': float,
@@ -377,7 +370,7 @@ class ParseUser:
         "points": float,
         "performance_points": float,
         "problem_count": int,
-        "solved_problems": [Problem],  # Hybrid attribute TODO: Remove from cfg
+        # "solved_problems": [Problem],  # Hybrid attribute TODO: Remove from cfg
         "rank": str,
         "rating": int,
         "volatility": int,
@@ -391,46 +384,57 @@ class ParseUser:
     }
 
     @staticmethod
-    async def init(obj):
-        # problem, organization, contest
-        problems = session.query(Problem.code, Problem).all()
-        problems = {k: v for k, v in problems}
-        for code in obj.solved_problems:
-            api = API()
-            if code not in problems:
-                await api.get_problem(code)
-                problems[code] = Problem(api.data.object)
-                session.add(problems[code])
-        session.commit()
-        obj.solved_problems = [problems[code] for code in obj.solved_problems]
+    async def init(obj, *, organizations=None, problems=None, lock={}):
+        if problems is None and hasattr(obj, 'solved_problems'):
+            problems = session.query(Problem.code, Problem).all()
+            problems = {k: v for k, v in problems}
+        if organizations is None and hasattr(obj, 'organizations'):
+            organizations = session.query(Organization.id, Organization).all()
+            organizations = {k: v for k, v in organizations}
 
-        organizations = session.query(Organization.id, Organization).all()
-        organizations = {k: v for k, v in organizations}
-        if any(org_id not in organizations for org_id in obj.organizations):
-            api = API()
-            await api.get_organizations()
-            for org in api.data.objects:
-                if org.id not in organizations:
-                    organizations[org.id] = Organization(org)
-                    session.add(organizations[org.id])
-            session.commit()
-        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+        if hasattr(obj, 'organizations'):
+            if any(org_id not in organizations for org_id in obj.organizations) and \
+                    'organization' not in lock:
+                lock['organization'] = asyncio.Lock()
+                async with lock['organization']:
+                    api = API()
+                    await api.get_organizations()
+                    for org in api.data.objects:
+                        if org.id not in organizations:
+                            organizations[org.id] = Organization(org)
+                            session.add(organizations[org.id])
+                    session.commit()
 
-        # TODO: rewrite/remove entirely
-        # for contest in self._contests:
-        #     if contest['rating']:
-        #         self.max_rating = max(self.max_rating or 0, contest['rating'])
+            if any(org_id not in organizations for org_id in obj.organizations):
+                async with lock['organization']:
+                    obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+            else:
+                obj.organizations = [organizations[org_id] for org_id in obj.organizations]
 
-        contests = session.query(Contest.key, Contest).all()
-        contests = {k: v for k, v in contests}
-        for key in obj.contests:
-            api = API()
-            if key not in contests:
-                await api.get_contest(key)
-                contests[key] = Contest(api.data.object)
-                session.add(contests[key])
-        session.commit()
-        obj.contests = [contests[key] for key in obj.contests]
+        obj.volatilities = [contest.volatility for contest in obj.contests]
+
+        if hasattr(obj, 'contests'):
+            del obj.contests
+            pass
+            # NOTE: This is not fetched from API, so .config needs to be added
+            # FIXME: Creates a cycle
+            # FIX: Make it a hybridproperty?
+            # for contest in obj.contests:
+            #     contest.config = ParseParticipation.config
+            #     contest.virtual_participation_number = 0
+            # obj.contests = [Participation(contest) for contest in obj.contests]
+            # for contest in obj.contests:
+            #     session.add(contest)
+            # session.commit()
+
+        if hasattr(obj, 'solved_problems'):
+            del obj.solved_problems
+            pass
+            # FIXME: This creates a cycle w/ authors
+            # 1. Perhaps we could take advantage of the fact that /problems is called on startup
+            # 2. Perhaps remove this entirely and keep authors, add a hybrid property and this will only work if submissions are cached
+            # NOTE: Using #2. requires a little note, but is more reliable.
+
 
     @staticmethod
     async def inits(objs):
@@ -464,16 +468,16 @@ class ParseSubmission:
     }
 
     @staticmethod
-    async def init(obj, *, problems=None, users=None, languages=None, lock={}):
+    async def init(obj, *, languages=None, problems=None, users=None, lock={}):
+        if languages is None:
+            languages = session.query(Language.key, Language).all()
+            languages = {k: v for k, v in languages}
         if problems is None:
             problems = session.query(Problem.code, Problem).all()
             problems = {k: v for k, v in problems}
         if users is None:
             users = session.query(User.username, User).all()
             users = {k: v for k, v in users}
-        if languages is None:
-            languages = session.query(Language.key, Language).all()
-            languages = {k: v for k, v in languages}
 
         if obj.problem not in problems and obj.problem not in lock:
             lock[obj.problem] = asyncio.Lock()
@@ -510,6 +514,10 @@ class ParseSubmission:
         if obj.language in languages:
             obj.language = languages[obj.language]
 
+        if obj.language is None:
+            async with lock['language']:
+                obj.language = languages[obj.language]
+
         if obj.problem is None:
             async with lock[obj._problem]:
                 obj.problem = problems[obj._problem]
@@ -518,9 +526,6 @@ class ParseSubmission:
             async with lock[obj._user]:
                 obj.user = users[obj._user]
 
-        if obj.language is None:
-            async with lock['language']:
-                obj.language = languages[obj.language]
 
     @staticmethod
     async def inits(objs):
@@ -536,9 +541,9 @@ class ParseSubmission:
             tasks.append(
                 ParseSubmission.init(
                     obj,
+                    languages=languages,
                     problems=problems,
                     users=users,
-                    languages=languages,
                     lock=lock
                 )
             )
@@ -596,22 +601,47 @@ class ParseJudge:
     }
 
     @staticmethod
-    async def inits(objs):
-        await asyncio.gather(*[ParseJudge.init(obj) for obj in objs])
+    async def init(obj, *, languages=None, lock={}):
+        if languages is None:
+            languages = session.query(Language.key, Language).all()
+            languages = {k: v for k, v in languages}
+
+        if any(lang_key not in languages for lang_key in obj.languages) and \
+                'language' not in lock:
+            # NOTE: The way this is designed is to allow one process to go through this
+            # and the rest to wait at the `async with lock`
+            lock['language'] = asyncio.Lock()
+            async with lock['language']:
+                api = API()
+                await api.get_languages()
+                for lang in api.data.objects:
+                    if lang.key not in languages:
+                        languages[lang.key] = Language(lang)
+                        session.add(languages[lang.key])
+                session.commit()
+
+        if any(lang_key not in languages for lang_key in obj.languages):
+            async with lock['language']:
+                obj.languages = [languages[lang_key] for lang_key in obj.languages]
+        else:
+            # NOTE: This is just if everything is found inside db already
+            obj.languages = [languages[lang_key] for lang_key in obj.languages]
 
     @staticmethod
-    async def init(obj):
+    async def inits(objs):
         languages = session.query(Language.key, Language).all()
         languages = {k: v for k, v in languages}
-        if any(lang_key not in languages for lang_key in obj.languages):
-            api = API()
-            await api.get_languages()
-            for lang in api.data.objects:
-                if lang.key not in languages:
-                    languages[lang.key] = Language(lang)
-                    session.add(languages[lang.key])
-            session.commit()
-        obj.languages = [languages[lang_key] for lang_key in obj.languages]
+        tasks = []
+        lock = {}
+        for obj in objs:
+            tasks.append(
+                ParseJudge.init(
+                    obj,
+                    languages=languages,
+                    lock=lock
+                )
+            )
+        await asyncio.gather(*tasks)
 
 
 class ObjectNotFound(Exception):
@@ -650,17 +680,20 @@ class API:
                 query_args.append((k, str(v)))
         return '?' + urllib.parse.urlencode(query_args)
 
-    async def parse(self, parse_obj):
+    async def parse(self, resp, parse_obj):
+        self.__dict__.update(resp.__dict__)
+
         if hasattr(self, 'error'):
             raise ObjectNotFound(self.error)
         if hasattr(self.data, 'object'):
             await parse_obj.init(self.data.object)
             self.data.object.config = parse_obj.config
+            self.data.objects = None
         else:
             await parse_obj.inits(self.data.objects)
             for obj in self.data.objects:
                 obj.config = parse_obj.config
-
+            self.data.object = None
 
     async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
@@ -668,14 +701,14 @@ class API:
             'organization': organization,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/contests' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseContest)
+        resp = await _query_api(SITE_URL + 'api/v2/contests' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseContest)
 
     async def get_contest(self, contest_key: str) -> None:
-        await _query_api(SITE_URL + 'api/v2/contest/' +
-                         contest_key, 'json', self.from_dict)
-        await self.parse(ParseContest)
+        resp = await _query_api(SITE_URL + 'api/v2/contest/' +
+                                contest_key, 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseContest)
 
     async def get_participations(self, contest: str = None, user: str = None,
                                  is_disqualified: bool = None,
@@ -687,9 +720,9 @@ class API:
             'virtual_participation_number': virtual_participation_number,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/participations' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseParticipation)
+        resp = await _query_api(SITE_URL + 'api/v2/participations' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseParticipation)
 
     async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
                            organization: str = None, search: str = None, page: int = None) -> None:
@@ -701,28 +734,28 @@ class API:
             'search': search,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/problems' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseProblem)
+        resp = await _query_api(SITE_URL + 'api/v2/problems' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseProblem)
 
     async def get_problem(self, code: str) -> None:
-        await _query_api(SITE_URL + 'api/v2/problem/' +
-                         code, 'json', self.from_dict)
-        await self.parse(ParseProblem)
+        resp = await _query_api(SITE_URL + 'api/v2/problem/' +
+                                code, 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseProblem)
 
     async def get_users(self, organization: str = None, page: int = None) -> None:
         params = {
             'organization': organization,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/users' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseUser)
+        resp = await _query_api(SITE_URL + 'api/v2/users' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseUser)
 
     async def get_user(self, username: str) -> None:
-        await _query_api(SITE_URL + 'api/v2/user/' +
-                         username, 'json', self.from_dict)
-        await self.parse(ParseUser)
+        resp = await _query_api(SITE_URL + 'api/v2/user/' +
+                                username, 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseUser)
 
     async def get_submissions(self, user: str = None, problem: str = None,
                               language: str = None, result: str = None, page: int = None) -> None:
@@ -733,42 +766,42 @@ class API:
             'result': result,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/submissions' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseSubmission)
+        resp = await _query_api(SITE_URL + 'api/v2/submissions' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseSubmission)
 
     async def get_submission(self, submission_id: typing.Union[int, str]) -> None:
         # Should only accept a string, perhaps I should do something
         # if it were an int
-        await _query_api(SITE_URL + 'api/v2/submission/' +
-                         str(submission_id), 'json', self.from_dict)
-        await self.parse(ParseSubmission)
+        resp = await _query_api(SITE_URL + 'api/v2/submission/' +
+                                str(submission_id), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseSubmission)
 
     async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
         params = {
             'is_open': is_open,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/organizations' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseOrganization)
+        resp = await _query_api(SITE_URL + 'api/v2/organizations' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseOrganization)
 
     async def get_languages(self, common_name: str = None, page: int = None) -> None:
         params = {
             'common_name': common_name,
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/languages' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseLanguage)
+        resp = await _query_api(SITE_URL + 'api/v2/languages' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseLanguage)
 
     async def get_judges(self, page: int = None) -> None:
         params = {
             'page': page,
         }
-        await _query_api(SITE_URL + 'api/v2/judges' +
-                         self.url_encode(params), 'json', self.from_dict)
-        await self.parse(ParseJudge)
+        resp = await _query_api(SITE_URL + 'api/v2/judges' +
+                                self.url_encode(params), 'json', object_hook=self.from_dict)
+        await self.parse(resp, ParseJudge)
 
     async def get_pfp(self, username: str) -> str:
         resp = await _query_api(SITE_URL + 'user/' + username, 'text')

@@ -4,15 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column, String, Integer, DateTime, Float, Boolean, Table, ForeignKey, Text)
 from sqlalchemy.ext.associationproxy import association_proxy
-# Topologogical order
-# Submission
-# Participation
-# Contest
-# Problem
-# User
-# Judge
-# Language
-# Organization
+from sqlalchemy.ext.hybrid import hybrid_property
 
 __all__ = [
     'SubmissionCase',
@@ -30,7 +22,21 @@ __all__ = [
     'Judge',
     'Language',
     'Organization',
+    'Handle',
+    'Gitgud',
+    'CurrentGitgud',
+    'session',
 ]
+
+# Topologogical order
+# Submission
+# Participation
+# Contest
+# Problem
+# User
+# Judge
+# Language
+# Organization
 
 URI = 'sqlite:///utils/db/JOMD1.db'
 
@@ -59,11 +65,12 @@ class AttrMixin:
                 if type(cfg[key]) is dict:
                     init(getattr(obj, key), cfg[key], add_attr(attr, key))
                 else:
-                    setattr(self, add_attr(attr, key), getattr(obj, key))
+                    if hasattr(obj, key):
+                        # TODO: Logging
+                        setattr(self, add_attr(attr, key), getattr(obj, key))
         init(obj, self.cfg, '')
 
     def __getattr__(self, key):
-        print("__getattr__", key)
         if not hasattr(self, 'cfg') or key not in self.cfg:
             return super().__getattr_(key)
         if self.attr != '':
@@ -174,6 +181,9 @@ class ContestTag(Base):
     contest_id = Column(String, ForeignKey('contest.key'))
     contest = relationship('Contest', back_populates='_tags')
 
+    def __init__(self, tag):
+        self.tag = tag
+
 
 class Contest(Base, AttrMixin):
     __tablename__ = 'contest'
@@ -199,7 +209,7 @@ class Contest(Base, AttrMixin):
 
     problems = relationship('ContestProblem', back_populates='contest',
                             cascade='all, delete-orphan')
-    _tags = relationship('ContestTags', back_populates='contest',
+    _tags = relationship('ContestTag', back_populates='contest',
                          cascade='all, delete-orphan')
     tags = association_proxy('_tags', 'tag')
     organizations = relationship('Organization', secondary=lambda: contest_organization,
@@ -218,6 +228,9 @@ class ProblemType(Base):
     type = Column(Integer, index=True)
     problem_id = Column(String, ForeignKey('problem.code'))
     problem = relationship('Problem', back_populates='_types')
+
+    def __init__(self, type):
+        self.type = type
 
 
 class ProblemLanguageLimit(Base):
@@ -272,6 +285,9 @@ class UserVolatility(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', back_populates='vols')
 
+    def __init__(self, volatility):
+        self.volatility = volatility
+
 
 class User(Base, AttrMixin):
     __tablename__ = 'user'
@@ -297,6 +313,11 @@ class User(Base, AttrMixin):
     def __init__(self, obj):
         # https://stackoverflow.com/questions/19780178/sqlalchemy-hybrid-expression-with-relationship
         AttrMixin.__init__(self, obj)
+
+    @hybrid_property
+    def solved_problems(self):
+        # TODO: Implement me
+        return self.problem_count
 
 
 class Judge(Base, AttrMixin):
@@ -348,7 +369,7 @@ class Organization(Base, AttrMixin):
     problems = relationship('Problem', secondary=lambda: organization_problem,
                             back_populates='organizations')
     contests = relationship('Contest', secondary=lambda: contest_organization,
-                                 back_populates='organizations')
+                            back_populates='organizations')
 
     def __init__(self, obj):
         AttrMixin.__init__(self, obj)
@@ -423,6 +444,8 @@ organization_user = Table(
 
 participation_user = Table(
     'participation_user', Base.metadata,
-    Column('participation_id', Integer, ForeignKey('participation.key'), primary_key=True),
+    Column('participation_id', Integer, ForeignKey('participation.id'), primary_key=True),
     Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
 )
+
+Base.metadata.create_all(engine)
