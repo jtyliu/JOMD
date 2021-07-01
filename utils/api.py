@@ -249,7 +249,7 @@ class ParseContest:
                 'time_bonus': int,
             },
         },
-        'problems': [
+        'problems': [  # TODO: Change to [Problem]
             {
                 'points': int,
                 'partial': bool,
@@ -377,13 +377,16 @@ class ParseUser:
         "points": float,
         "performance_points": float,
         "problem_count": int,
-        "solved_problems": [Problem],
+        "solved_problems": [Problem],  # Hybrid attribute TODO: Remove from cfg
         "rank": str,
         "rating": int,
         "volatility": int,
         "organizations": [Organization],
         "contests": [Participation],  # NOTE: There is a very limited amount of info here,
                                       # perhaps take advantage of the `user` filter in /participations
+                                      # also it's kinda counterintuative for contests to be a list of
+                                      # participation object
+                                      # Hybrid attribute TODO: remove from cfg
         "volatilities": [int],
     }
 
@@ -652,8 +655,12 @@ class API:
             raise ObjectNotFound(self.error)
         if hasattr(self.data, 'object'):
             await parse_obj.init(self.data.object)
+            self.data.object.config = parse_obj.config
         else:
-            await parse_obj.inits(self.data.object)
+            await parse_obj.inits(self.data.objects)
+            for obj in self.data.objects:
+                obj.config = parse_obj.config
+
 
     async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
@@ -829,8 +836,8 @@ class API:
                 'memory': memory,
                 'points': points,
                 'result': result,
-                'score_num': score_num,
-                'score_denom': score_denom,
+                'score_num': score_num,  # TODO: Replace this
+                'score_denom': score_denom,  # TODO: Replace this
                 'problem_name': html.unescape(name),
             }
             ret = Submission(res)
@@ -841,6 +848,7 @@ class API:
         ret = []
         for sub in soup.find_all('div', class_='submission-row')[:num]:
             ret.append(soup_parse(sub))
+        # TODO: Do something about this
         await Submission.async_map(Submission, ret)
         return ret
 
