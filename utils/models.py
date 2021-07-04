@@ -1,5 +1,5 @@
 from operator import add
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import relation, sessionmaker, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column, String, Integer, DateTime, Float, Boolean, Table, ForeignKey, Text)
@@ -33,7 +33,6 @@ __all__ = [
 # Participation
 # Contest
 # Problem
-# User
 # Judge
 # Language
 # Organization
@@ -67,6 +66,7 @@ class AttrMixin:
                 else:
                     if hasattr(obj, key):
                         # TODO: Logging
+                        # print(add_attr(attr, key), getattr(obj, key))
                         setattr(self, add_attr(attr, key), getattr(obj, key))
         init(obj, self.cfg, '')
 
@@ -135,6 +135,9 @@ class ParticipationSolution(Base):
     participation_id = Column(Integer, ForeignKey('participation.id'))
     participation = relationship('Participation', back_populates='solutions')
 
+    def __init__(self, obj):
+        AttrMixin.__init__(self, obj)
+
 
 class Participation(Base, AttrMixin):
     __tablename__ = 'participation'
@@ -160,7 +163,7 @@ class Participation(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class ContestProblem(Base):
+class ContestProblem(Base, AttrMixin):
     __tablename__ = 'contest_problem'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -171,6 +174,9 @@ class ContestProblem(Base):
     problem = relationship('Problem')
     contest_id = Column(String, ForeignKey('contest.key'))
     contest = relationship('Contest', back_populates='problems')
+
+    def __init__(self, obj):
+        AttrMixin.__init__(self, obj)
 
 
 class ContestTag(Base):
@@ -233,7 +239,7 @@ class ProblemType(Base):
         self.type = type
 
 
-class ProblemLanguageLimit(Base):
+class ProblemLanguageLimit(Base, AttrMixin):
     __tablename__ = 'problem_language_limit'
     id = Column(Integer, primary_key=True, autoincrement=True)
     type = Column(Integer, index=True)
@@ -243,6 +249,9 @@ class ProblemLanguageLimit(Base):
     memory_limit = Column(Integer)
     problem_id = Column(String, ForeignKey('problem.code'))
     problem = relationship('Problem', back_populates='language_resource_limits')
+
+    def __init__(self, obj):
+        AttrMixin.__init__(self, obj)
 
 
 class Problem(Base, AttrMixin):
@@ -269,8 +278,8 @@ class Problem(Base, AttrMixin):
     language_resource_limits = relationship('ProblemLanguageLimit', back_populates='problem',
                                             cascade='all, delete-orphan')
     submissions = relationship('Submission', back_populates='problem')
-
-    # authors = Column(User)
+    authors = relationship('User', secondary=lambda: problem_user,
+                           back_populates='problems_authored')
 
     def __init__(self, obj):
         AttrMixin.__init__(self, obj)
@@ -308,6 +317,8 @@ class User(Base, AttrMixin):
     volatilities = association_proxy('vols', 'volatility')
     contests = relationship('Participation', back_populates='user')
     submissions = relationship('Submission', back_populates='user')
+    problems_authored = relationship('Problem', secondary=lambda: problem_user,
+                                     back_populates='authors')
     # solved_problems = [Problem]
 
     def __init__(self, obj):
@@ -448,4 +459,9 @@ participation_user = Table(
     Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
 )
 
+problem_user = Table(
+    'problem_user', Base.metadata,
+    Column('problem_code', String, ForeignKey('problem.code'), primary_key=True),
+    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
+)
 Base.metadata.create_all(engine)

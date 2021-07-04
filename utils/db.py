@@ -63,18 +63,6 @@ problem_user = Table(
     Column('user_id', Integer, ForeignKey('user.id')),
 )
 
-language_problem = Table(
-    'language_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code')),
-    Column('language_id', Integer, ForeignKey('language.id')),
-)
-
-organization_problem = Table(
-    'organization_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code')),
-    Column('organization_id', Integer, ForeignKey('organization.id')),
-)
-
 contest_organization = Table(
     'contest_organization', Base.metadata,
     Column('contest_id', String, ForeignKey('contest.key')),

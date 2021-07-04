@@ -164,13 +164,13 @@ class ParseProblem:
     config = {
         'code': str,
         'name': str,
-        'authors': [User],  # TODO: [User]?
+        'authors': [User],
         'types': [str],
         'group': str,
         'time_limit': float,
         'memory_limit': int,
         'language_resource_limits': [{
-            'language': str,
+            'language': Language,
             'time_limit': float,
             'memory_limit': int,
         }],
@@ -184,31 +184,95 @@ class ParseProblem:
     }
 
     @staticmethod
-    async def init(obj):
-        # Language, Organization
-        languages = session.query(Language.key, Language).all()
-        languages = {k: v for k, v in languages}
-        if any(lang_key not in languages for lang_key in obj.languages):
-            api = API()
-            await api.get_languages()
-            for lang in api.data.objects:
-                if lang.key not in languages:
-                    languages[lang.key] = Language(lang)
-                    session.add(languages[lang.key])
-            session.commit()
-        obj.languages = [languages[lang_key] for lang_key in obj.languages]
+    async def init(obj, *, languages={}, organizations={}, users={}, lock={}):
+        if not languages and hasattr(obj, 'languages'):
+            languages_new = session.query(Language.key, Language).all()
+            languages.update({k: v for k, v in languages_new})
+        if not organizations and hasattr(obj, 'organizations'):
+            organizations_new = session.query(Organization.id, Organization).all()
+            organizations.update({k: v for k, v in organizations_new})
+        if not users and hasattr(obj, 'authors'):
+            users_new = session.query(User.username, User).all()
+            users.update({k: v for k, v in users_new})
 
-        organizations = session.query(Organization.id, Organization).all()
-        organizations = {k: v for k, v in organizations}
-        if any(org_id not in organizations for org_id in obj.organizations):
-            api = API()
-            await api.get_organizations()
-            for org in api.data.objects:
-                if org.id not in organizations:
-                    organizations[org.id] = Organization(org)
-                    session.add(organizations[org.id])
-            session.commit()
-        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+        if hasattr(obj, 'languages'):
+            if any(lang_key not in languages for lang_key in obj.languages) and \
+                    'language' not in lock:
+                lock['language'] = asyncio.Lock()
+                async with lock['language']:
+                    api = API()
+                    await api.get_languages()
+                    # languages_new = session.query(Language.key, Language).all()
+                    # languages.update({k: v for k, v in languages_new})
+                    print(languages)
+                    for lang in api.data.objects:
+                        if lang.key not in languages:
+                            print(lang.key)
+                            languages[lang.key] = Language(lang)
+                            session.add(languages[lang.key])
+                    session.commit()
+
+            if any(lang_key not in languages for lang_key in obj.languages):
+                async with lock['language']:
+                    obj.languages = [languages[lang_key] for lang_key in obj.languages]
+            else:
+                obj.languages = [languages[lang_key] for lang_key in obj.languages]
+
+        if hasattr(obj, 'organizations'):
+            if any(org_id not in organizations for org_id in obj.organizations) and \
+                    'organization' not in lock:
+                lock['organization'] = asyncio.Lock()
+                async with lock['organization']:
+                    api = API()
+                    await api.get_organizations()
+                    # organizations_new = session.query(Organization.id, Organization).all()
+                    # organizations.update({k: v for k, v in organizations_new})
+                    for org in api.data.objects:
+                        if org.id not in organizations:
+                            organizations[org.id] = Organization(org)
+                            session.add(organizations[org.id])
+                    session.commit()
+
+            if any(org_id not in organizations for org_id in obj.organizations):
+                async with lock['organization']:
+                    obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+            else:
+                obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+
+        if hasattr(obj, 'authors'):
+            for username in obj.authors:
+                if username not in users and username not in lock:
+                    lock[username] = asyncio.Lock()
+                    async with lock[username]:
+                        api = API()
+                        await api.get_user(username)
+                        # users_new = session.query(User.username, User)\
+                        #     .filter(User.username == username).all()
+                        # users.update({k: v for k, v in users_new})
+                        # if username not in users:
+                        users[username] = User(api.data.object)
+                        session.add(users[username])
+                        session.commit()
+
+            authors = []
+            for username in obj.authors:
+                if username in lock:
+                    async with lock[username]:
+                        authors.append(users[username])
+                else:
+                    authors.append(users[username])
+            obj.authors = authors
+
+        if hasattr(obj, 'language_resource_limits'):
+            for limit in obj.language_resource_limits:
+                if limit.language not in languages:
+                    async with lock['organization']:
+                        limit.language = languages[limit.language]
+                else:
+                    limit.language = languages[limit.language]
+                limit.config = ParseProblem.config['language_resource_limits'][0]
+
+            obj.language_resource_limits = [ProblemLanguageLimit(limit) for limit in obj.language_resource_limits]
 
     @staticmethod
     async def inits(objs):
@@ -242,18 +306,14 @@ class ParseContest:
                 'time_bonus': int,
             },
         },
-        'problems': [  # TODO: Change to [Problem]
+        'problems': [
             {
-                'points': int,
-                'partial': bool,
                 'is_pretested': bool,
                 'max_submissions': int,
-                'label': str,  # TODO: move the label outside of 'problems' so it's a list of Problem type
-                'name': str,
-                'code': str,
+                'label': str,
+                'problem': Problem,
             }
         ],
-        'label': [str],  # TODO: Perhaps an alternative to the above?
         'rankings': [  # TODO: change to list of Participation objects
             {
                 'user': User,
@@ -270,51 +330,108 @@ class ParseContest:
                         'points': float,
                         'time': float,
                     }
-                ]
+                ],
+                'virtual_participation_number': int,
             },
         ],
     }
 
     @staticmethod
-    async def async_init(obj):
-        # Move label outside of problems
-        obj.label = [problem.label for problem in obj.problems]
+    async def init(obj, *, organizations={}, problems={}, users={}, lock={}):
+        # TODO: Check if attr exists for optimization
+        if not organizations:
+            organizations_new = session.query(Organization.id, Organization).all()
+            organizations.update({k: v for k, v in organizations_new})
+        if not problems:
+            problems_new = session.query(Problem.code, Problem).all()
+            problems.update({k: v for k, v in problems_new})
+        if not users:
+            users_new = session.query(User.username, User).all()
+            users.update({k: v for k, v in users_new})
 
-        # TODO: Replace rankings (THIS IS NOT RIGHT)
-        # NOTE: virtual_participation_number attribute is automatically 0
-        obj.rankings = [Participation(ranking) for ranking in obj.rankings]
-
-        organizations = session.query(Organization.id, Organization).all()
-        organizations = {k: v for k, v in organizations}
-        if any(org_id not in organizations for org_id in obj.organizations):
-            api = API()
-            await api.get_organizations()
-            for org in api.data.objects:
-                if org.id not in organizations:
-                    organizations[org.id] = Organization(org)
-                    session.add(organizations[org.id])
-            session.commit()
-        obj.organizations = [organizations[org_id] for org_id in obj.organizations]
-
-        problems = session.query(Problem.code, Problem).all()
-        problems = {k: v for k, v in problems}
-        if any(problem_code not in problems for problem_code in obj.problems):
-            for problem in obj.problems:
-                code = problem.code
-                if code not in problems:
+        if hasattr(obj, 'organizations'):
+            if any(org_id not in organizations for org_id in obj.organizations) and \
+                    'organization' not in lock:
+                lock['organization'] = asyncio.Lock()
+                async with lock['organization']:
                     api = API()
-                    await api.get_problem(code)
-                    # TODO: pass in global dict to remove the below query
-                    if session.query(Problem).filter(Problem.code == code).count():
-                        continue
-                    problems[code] = Problem(api.data.objects)
-                    session.add(problems[code])
+                    await api.get_organizations()
+                    # organizations_new = session.query(Organization.id, Organization).all()
+                    # organizations.update({k: v for k, v in organizations_new})
+                    for org in api.data.objects:
+                        if org.id not in organizations:
+                            organizations[org.id] = Organization(org)
+                            session.add(organizations[org.id])
+                    session.commit()
+            if any(org_id not in organizations for org_id in obj.organizations):
+                async with lock['organization']:
+                    obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+            else:
+                obj.organizations = [organizations[org_id] for org_id in obj.organizations]
+
+        if hasattr(obj, 'problems'):
+            if all(hasattr(problem, 'code') for problem in obj.problems):
+                for problem in obj.problems:
+                    code = problem.code
+                    if code not in problems and code not in lock:
+                        lock[code] = asyncio.Lock()
+                        async with lock[code]:
+                            api = API()
+                            await api.get_problem(code)
+                            # problems_new = session.query(Problem.code, Problem)\
+                            #     .filter(Problem.code == code).all()
+                            # problems.update({k: v for k, v in problems_new})
+                            # if code not in problems:
+                            problems[code] = Problem(api.data.object)
+                            session.add(problems[code])
+                            session.commit()
+
+            for problem in obj.problems:
+                if problem.code in lock:
+                    async with lock[problem.code]:
+                        problem.problem = problems[problem.code]
+                else:
+                    problem.problem = problems[problem.code]
+
+        if hasattr(obj, 'problems'):
+            for problem in obj.problems:
+                problem.config = ParseContest.config['problems'][0]
+            obj.problems = [ContestProblem(problem) for problem in obj.problems]
+
+        if hasattr(obj, 'rankings'):
+            # NOTE: Delegate parsing to ParseParticipation? It should work
+            tasks = []
+            for ranking in obj.rankings:
+                ranking.virtual_participation_number = 0
+                ranking.config = ParseParticipation.config
+                tasks.append(ParseParticipation.init(ranking, users=users))
+            await asyncio.gather(*tasks)
+            obj.rankings = [Participation(ranking) for ranking in obj.rankings]
+            for ranking in obj.rankings:
+                session.add(ranking)
             session.commit()
-        obj.problems = [problems[problem.code] for problem in obj.problems]
 
     @staticmethod
     async def inits(objs):
-        await asyncio.gather(*[ParseContest.init(obj) for obj in objs])
+        organizations = session.query(Organization.id, Organization).all()
+        organizations = {k: v for k, v in organizations}
+        problems = session.query(Problem.code, Problem).all()
+        problems = {k: v for k, v in problems}
+        users = session.query(User.username, User).all()
+        users = {k: v for k, v in users}
+        tasks = []
+        lock = {}
+        for obj in objs:
+            tasks.append(
+                ParseContest.init(
+                    obj,
+                    organizations=organizations,
+                    problems=problems,
+                    users=users,
+                    lock=lock,
+                )
+            )
+        await asyncio.gather(*tasks)
 
 
 class ParseParticipation:
@@ -338,28 +455,81 @@ class ParseParticipation:
     }
 
     @staticmethod
-    async def init(obj):
-        user = session.query(User).filter(User.username == obj.user)
-        if user.count() == 0:
-            api = API()
-            await api.get_user(obj.user)
-            # NOTE: Possible chance of db error
-            session.add(User(api.data.object))
-            session.commit()
-        obj.user = user.first()
+    async def init(obj, *, contests={}, users={}, lock={}):
+        if not contests and hasattr(obj, 'contest'):
+            # NOTE: It's prob much better to just load the single contest
+            contests_new = session.query(Contest.key, Contest)\
+                .filter(Contest.key == obj.contest).all()
+            contests.update({k: v for k, v in contests_new})
+        if not users and hasattr(obj, 'user'):
+            users_new = session.query(User.username, User)\
+                .filter(User.username == obj.user).all()
+            users.update({k: v for k, v in users_new})
 
-        contest = session.query(Contest).filter(Contest.key == obj.contest)
-        if contest.count() == 0:
-            api = API()
-            await api.get_contest(obj.contest)
-            # NOTE: Possible chance of db error
-            session.add(Contest(api.data.object))
-            session.commit()
-        obj.contest = contest.first()
+        if hasattr(obj, 'contest'):
+            if obj.contest not in contests and obj.contest not in lock:
+                lock[obj.contest] = asyncio.Lock()
+                async with lock[obj.contest]:
+                    api = API()
+                    await api.get_contest(obj.contest)
+                    # contests_new = session.query(Contest.key, Contest)\
+                    #     .filter(Contest.key == obj.contest).all()
+                    # contests.update({k: v for k, v in contests_new})
+                    # if obj.contest not in contests:
+                    contests[obj.contest] = Contest(api.data.object)
+                    session.add(contests[obj.contest])
+                    session.commit()
+            if obj.contest in lock:
+                async with lock[obj.contest]:
+                    obj.contest = contests[obj.contest]
+            else:
+                obj.contest = contests[obj.contest]
+
+        if hasattr(obj, 'user'):
+            if obj.user not in users and obj.user not in lock:
+                lock[obj.user] = asyncio.Lock()
+                async with lock[obj.user]:
+                    api = API()
+                    await api.get_user(obj.user)
+                    # users_new = session.query(User.username, User)\
+                    #     .filter(User.username == obj.user).all()
+                    # users.update({k: v for k, v in users_new})
+                    # if obj.user not in users:
+                    users[obj.user] = User(api.data.object)
+                    session.add(users[obj.user])
+                    session.commit()
+            if obj.user in lock:
+                async with lock[obj.user]:
+                    obj.user = users[obj.user]
+            else:
+                obj.user = users[obj.user]
+
+        solutions = []
+        for solution in obj.solutions:
+            if solution is None:
+                continue
+            solution.config = ParseParticipation.config['solutions'][0]
+            solutions.append(ParticipationSolution(solution))
+        obj.solutions = solutions
 
     @staticmethod
     async def inits(objs):
-        await asyncio.gather(*[ParseParticipation.init(obj) for obj in objs])
+        contests = session.query(Contest.key, Contest).all()
+        contests = {k: v for k, v in contests}
+        users = session.query(User.username, User).all()
+        users = {k: v for k, v in users}
+        tasks = []
+        lock = {}
+        for obj in objs:
+            tasks.append(
+                ParseParticipation.init(
+                    obj,
+                    contests=contests,
+                    users=users,
+                    lock=lock,
+                )
+            )
+        await asyncio.gather(*tasks)
 
 
 class ParseUser:
@@ -375,22 +545,19 @@ class ParseUser:
         "rating": int,
         "volatility": int,
         "organizations": [Organization],
-        "contests": [Participation],  # NOTE: There is a very limited amount of info here,
-                                      # perhaps take advantage of the `user` filter in /participations
-                                      # also it's kinda counterintuative for contests to be a list of
-                                      # participation object
-                                      # Hybrid attribute TODO: remove from cfg
-        "volatilities": [int],
+        # "contests": [Participation],  # NOTE: There is a very limited amount of info here,
+        #                               # perhaps take advantage of the `user` filter in /participations
+        #                               # also it's kinda counterintuative for contests to be a list of
+        #                               # participation object
+        #                               # Hybrid attribute TODO: remove from cfg
+        # "volatilities": [int],
     }
 
     @staticmethod
-    async def init(obj, *, organizations=None, problems=None, lock={}):
-        if problems is None and hasattr(obj, 'solved_problems'):
-            problems = session.query(Problem.code, Problem).all()
-            problems = {k: v for k, v in problems}
-        if organizations is None and hasattr(obj, 'organizations'):
-            organizations = session.query(Organization.id, Organization).all()
-            organizations = {k: v for k, v in organizations}
+    async def init(obj, *, organizations={}, lock={}):
+        if not organizations and hasattr(obj, 'organizations'):
+            organizations_new = session.query(Organization.id, Organization).all()
+            organizations.update({k: v for k, v in organizations_new})
 
         if hasattr(obj, 'organizations'):
             if any(org_id not in organizations for org_id in obj.organizations) and \
@@ -399,29 +566,36 @@ class ParseUser:
                 async with lock['organization']:
                     api = API()
                     await api.get_organizations()
+                    # organizations_new = session.query(Organization.id, Organization).all()
+                    # organizations.update({k: v for k, v in organizations_new})
                     for org in api.data.objects:
                         if org.id not in organizations:
+                            print(org.id)
                             organizations[org.id] = Organization(org)
                             session.add(organizations[org.id])
                     session.commit()
 
             if any(org_id not in organizations for org_id in obj.organizations):
                 async with lock['organization']:
+                    print(organizations)
                     obj.organizations = [organizations[org_id] for org_id in obj.organizations]
             else:
                 obj.organizations = [organizations[org_id] for org_id in obj.organizations]
 
-        obj.volatilities = [contest.volatility for contest in obj.contests]
-
         if hasattr(obj, 'contests'):
+            # obj.volatilities = [contest.volatility for contest in obj.contests]
             del obj.contests
             pass
             # NOTE: This is not fetched from API, so .config needs to be added
             # FIXME: Creates a cycle
             # FIX: Make it a hybridproperty?
+            # TODO: Maybe just leave a broken foreign key?
+            # NOTE: If so, must delete the row before inserting new/better data
             # for contest in obj.contests:
             #     contest.config = ParseParticipation.config
             #     contest.virtual_participation_number = 0
+            #     contest.config['contest_id'] = str
+            #     contest.contest_id = contest.key
             # obj.contests = [Participation(contest) for contest in obj.contests]
             # for contest in obj.contests:
             #     session.add(contest)
@@ -438,7 +612,19 @@ class ParseUser:
 
     @staticmethod
     async def inits(objs):
-        await asyncio.gather(*[ParseProblem.init(obj) for obj in objs])
+        organizations = session.query(Organization.id, Organization).all()
+        organizations = {k: v for k, v in organizations}
+        tasks = []
+        lock = {}
+        for obj in objs:
+            tasks.append(
+                ParseUser.init(
+                    obj,
+                    organizations=organizations,
+                    lock=lock
+                )
+            )
+        await asyncio.gather(*tasks)
 
 
 class ParseSubmission:
@@ -468,64 +654,79 @@ class ParseSubmission:
     }
 
     @staticmethod
-    async def init(obj, *, languages=None, problems=None, users=None, lock={}):
-        if languages is None:
-            languages = session.query(Language.key, Language).all()
-            languages = {k: v for k, v in languages}
-        if problems is None:
-            problems = session.query(Problem.code, Problem).all()
-            problems = {k: v for k, v in problems}
-        if users is None:
-            users = session.query(User.username, User).all()
-            users = {k: v for k, v in users}
+    async def init(obj, *, languages={}, problems={}, users={}, lock={}):
+        if not languages and hasattr(obj, 'language'):
+            languages_new = session.query(Language.key, Language)\
+                .filter(Language.key == obj.language).all()
+            languages.update({k: v for k, v in languages_new})
+        if not problems and hasattr(obj, 'problem'):
+            problems_new = session.query(Problem.code, Problem)\
+                .filter(Problem.code == obj.problem).all()
+            problems.update({k: v for k, v in problems_new})
+        if not users and hasattr(obj, 'user'):
+            users_new = session.query(User.username, User)\
+                .filter(User.username == obj.user).all()
+            users.update({k: v for k, v in users_new})
 
-        if obj.problem not in problems and obj.problem not in lock:
-            lock[obj.problem] = asyncio.Lock()
-            async with lock[obj.problem]:
-                api = API()
-                await api.get_problem(obj.problem)
-                problem = Problem(api.data.object)
-                session.add(problem)
-                problems[obj.problem] = problem
-        if obj.problem in problems:
-            obj.problem = problems[obj.problem]
-
-        if obj.user not in users and obj.user not in lock:
-            lock[obj.user] = asyncio.Lock()
-            async with lock[obj.user]:
-                api = API()
-                await api.get_user(obj.user)
-                user = User(api.data.object)
-                session.add(user)
-                users[obj.user] = user
-        if obj.user in users:
-            obj.user = users[obj.user]
-
-        if obj.language not in languages and 'language' not in lock:
-            lock['language'] = asyncio.Lock()
-            async with lock['language']:
-                api = API()
-                await api.get_languages()
-                for language in api.data.objects:
-                    if language.key not in languages:
-                        lang = Language(language)
-                        session.add(lang)
-                        languages[language.key] = lang
-        if obj.language in languages:
-            obj.language = languages[obj.language]
-
-        if obj.language is None:
-            async with lock['language']:
+        if hasattr(obj, 'language'):
+            if obj.language not in languages and 'language' not in lock:
+                lock['language'] = asyncio.Lock()
+                async with lock['language']:
+                    api = API()
+                    await api.get_languages()
+                    # languages_new = session.query(Language.key, Language).all()
+                    # languages.update({k: v for k, v in languages_new})
+                    for language in api.data.objects:
+                        if language.key not in languages:
+                            lang = Language(language)
+                            session.add(lang)
+                            languages[language.key] = lang
+                    session.commit()
+            if 'language' in lock:
+                async with lock['language']:
+                    obj.language = languages[obj.language]
+            else:
                 obj.language = languages[obj.language]
 
-        if obj.problem is None:
-            async with lock[obj._problem]:
-                obj.problem = problems[obj._problem]
+        if hasattr(obj, 'problem'):
+            if obj.problem not in problems and obj.problem not in lock:
+                lock[obj.problem] = asyncio.Lock()
+                async with lock[obj.problem]:
+                    api = API()
+                    await api.get_problem(obj.problem)
+                    # problems_new = session.query(Problem.code, Problem)\
+                    #     .filter(Problem.code == obj.problem).all()
+                    # problems.update({k: v for k, v in problems_new})
+                    # if obj.problem not in problems:
+                    problem = Problem(api.data.object)
+                    session.add(problem)
+                    problems[obj.problem] = problem
+                    session.commit()
+            if obj.problem in lock:
+                async with lock[obj.problem]:
+                    obj.problem = problems[obj.problem]
+            else:
+                obj.problem = problems[obj.problem]
 
-        if obj.user is None:
-            async with lock[obj._user]:
-                obj.user = users[obj._user]
-
+        if hasattr(obj, 'user'):
+            if obj.user not in users and obj.user not in lock:
+                lock[obj.user] = asyncio.Lock()
+                async with lock[obj.user]:
+                    api = API()
+                    await api.get_user(obj.user)
+                    # users_new = session.query(User.username, User)\
+                    #     .filter(User.username == obj.user).all()
+                    # users.update({k: v for k, v in users_new})
+                    # if obj.user not in users:
+                    user = User(api.data.object)
+                    session.add(user)
+                    users[obj.user] = user
+                    session.commit()
+            if obj.user in lock:
+                async with lock[obj.user]:
+                    obj.user = users[obj.user]
+            else:
+                obj.user = users[obj.user]
 
     @staticmethod
     async def inits(objs):
@@ -601,10 +802,10 @@ class ParseJudge:
     }
 
     @staticmethod
-    async def init(obj, *, languages=None, lock={}):
-        if languages is None:
-            languages = session.query(Language.key, Language).all()
-            languages = {k: v for k, v in languages}
+    async def init(obj, *, languages={}, lock={}):
+        if not languages:
+            languages_new = session.query(Language.key, Language).all()
+            languages.update({k: v for k, v in languages_new})
 
         if any(lang_key not in languages for lang_key in obj.languages) and \
                 'language' not in lock:
@@ -614,6 +815,8 @@ class ParseJudge:
             async with lock['language']:
                 api = API()
                 await api.get_languages()
+                # languages_new = session.query(Language.key, Language).all()
+                # languages.update({k: v for k, v in languages_new})
                 for lang in api.data.objects:
                     if lang.key not in languages:
                         languages[lang.key] = Language(lang)
