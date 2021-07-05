@@ -3,14 +3,7 @@ from utils.gitgud import Gitgud as Gitgud_utils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
 from utils.jomd_common import (point_range, gimme_common)
-from utils.db import (session, Problem as Problem_DB,
-                      Contest as Contest_DB,
-                      Participation as Participation_DB,
-                      User as User_DB, Submission as Submission_DB,
-                      Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB,
-                      Handle as Handle_DB, Gitgud as Gitgud_DB,
-                      CurrentGitgud as CurrentGitgud_DB, Json)
+from utils.models import *
 import discord
 from DiscordUtils import Pagination
 from discord.ext import commands

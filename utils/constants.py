@@ -6,7 +6,7 @@ API_TOKEN = os.environ.get('JOMD_TOKEN', None)
 # Has no use, URI located at db.py
 DB_DIR = 'utils/db/JOMD.db'
 SITE_URL = 'https://dmoj.ca/'
-DEBUG_DB = False
+DEBUG = False
 ADMIN_ROLES = ['Admin']
 # Time zone
 # why does it not work??? asdlsadkl

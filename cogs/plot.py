@@ -4,10 +4,7 @@ from discord.ext import commands
 import typing
 from utils.query import Query
 from discord.ext.commands.errors import BadArgument
-from utils.db import (session, Contest as Contest_DB,
-                      Submission as Submission_DB,
-                      User as User_DB,
-                      Problem as Problem_DB)
+from utils.models import *
 from utils.graph import (plot_type_radar, plot_type_bar, plot_rating,
                          plot_points, plot_solved)
 from utils.jomd_common import calculate_points
@@ -81,17 +78,17 @@ class Plot(commands.Cog):
 
         total_data = {}
         for username in usernames:
-            q = session.query(Submission_DB)\
-                .filter(Submission_DB._user == username)
+            q = session.query(Submission)\
+                .filter(Submission._user == username)
             if q.count() == 0:
                 await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
-            q = session.query(func.min(Submission_DB.date))\
-                .join(Problem_DB, Problem_DB.code == Submission_DB._code)\
-                .filter(Submission_DB._user == username)\
-                .filter(Submission_DB.points == Problem_DB.points)\
-                .group_by(Submission_DB._code)
+            q = session.query(func.min(Submission.date))\
+                .join(Problem, Problem.code == Submission._code)\
+                .filter(Submission._user == username)\
+                .filter(Submission.points == Problem.points)\
+                .group_by(Submission._code)
             dates = list(map(itemgetter(0), q.all()))
             dates.sort()
             data_to_plot = {}
@@ -137,12 +134,12 @@ class Plot(commands.Cog):
 
         total_data = {}
         for username in usernames:
-            q = session.query(Submission_DB)\
+            q = session.query(Submission)\
                 .options(orm.joinedload('problem'))\
-                .join(User_DB, User_DB.username == Submission_DB._user,
+                .join(User, User.username == Submission._user,
                       aliased=True)\
-                .filter(User_DB.username == username)\
-                .order_by(Submission_DB.date)
+                .filter(User.username == username)\
+                .order_by(Submission.date)
 
             submissions = q.all()
             if len(submissions) == 0:
@@ -211,9 +208,9 @@ class Plot(commands.Cog):
         if len(users) > 10:
             return await ctx.send('Too many users given, max 10')
 
-        cond = [Contest_DB.rankings.contains(user.username) for user in users]
-        q = session.query(Contest_DB).filter(or_(*cond))\
-            .filter(Contest_DB.is_rated == 1)
+        cond = [Contest.rankings.contains(user.username) for user in users]
+        q = session.query(Contest).filter(or_(*cond))\
+            .filter(Contest.is_rated == 1)
         contests = q.all()
 
         def get_rating_change(rankings, users):
@@ -304,8 +301,8 @@ class Plot(commands.Cog):
         max_percentage = 0
 
         for username in usernames:
-            q = session.query(Submission_DB)\
-                .filter(Submission_DB._user == username)
+            q = session.query(Submission)\
+                .filter(Submission._user == username)
             if q.count() == 0:
                 await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)

@@ -1,31 +1,24 @@
 from sqlalchemy import func, desc
-from utils.db import (session, Problem as Problem_DB,
-                      Contest as Contest_DB,
-                      Participation as Participation_DB,
-                      User as User_DB, Submission as Submission_DB,
-                      Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB,
-                      Handle as Handle_DB, Gitgud as Gitgud_DB,
-                      CurrentGitgud as CurrentGitgud_DB, Json)
+from utils.models import *
 
 
 class Gitgud:
 
     def get_point(self, handle, guild_id):
-        q = session.query(func.sum(Gitgud_DB.point))\
-            .filter(Gitgud_DB.handle == handle)\
-            .filter(Gitgud_DB.guild_id == guild_id)
+        q = session.query(func.sum(Gitgud.point))\
+            .filter(Gitgud.handle == handle)\
+            .filter(Gitgud.guild_id == guild_id)
         return q.first()[0]
 
     def get_all(self, handle, guild_id):
-        q = session.query(Gitgud_DB)\
-            .filter(Gitgud_DB.handle == handle)\
-            .filter(Gitgud_DB.guild_id == guild_id)\
-            .order_by(desc(Gitgud_DB.time))
+        q = session.query(Gitgud)\
+            .filter(Gitgud.handle == handle)\
+            .filter(Gitgud.guild_id == guild_id)\
+            .order_by(desc(Gitgud.time))
         return q.all()
 
     def insert(self, handle, guild_id, point, problem, time):
-        db = Gitgud_DB()
+        db = Gitgud()
         db.handle = handle
         db.guild_id = guild_id
         db.point = point
@@ -35,16 +28,16 @@ class Gitgud:
         session.commit()
 
     def get_current(self, handle, guild_id):
-        result = session.query(CurrentGitgud_DB)\
-            .filter(CurrentGitgud_DB.handle == handle)\
-            .filter(CurrentGitgud_DB.guild_id == guild_id)
+        result = session.query(CurrentGitgud)\
+            .filter(CurrentGitgud.handle == handle)\
+            .filter(CurrentGitgud.guild_id == guild_id)
         return result.first()
 
     def has_solved(self, username, problem_code):
-        q = session.query(User_DB)\
-            .filter(User_DB.username == username)\
-            .join(User_DB.solved_problems)\
-            .filter(Problem_DB.code == problem_code)
+        q = session.query(User)\
+            .filter(User.username == username)\
+            .join(User.solved_problems)\
+            .filter(Problem.code == problem_code)
         if q.count():
             return True
         return False
@@ -53,7 +46,7 @@ class Gitgud:
     def bind(self, handle, guild_id, problem_id, point, time):
         result = self.get_current(handle, guild_id)
         if result is None:
-            db = CurrentGitgud_DB()
+            db = CurrentGitgud()
             db.handle = handle
             db.guild_id = guild_id
             db.problem_id = problem_id
@@ -74,4 +67,4 @@ class Gitgud:
 
     # delete entire table
     def wipe(self):
-        session.query(CurrentGitgud_DB).delete()
+        session.query(CurrentGitgud).delete()

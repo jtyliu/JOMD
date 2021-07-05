@@ -4,10 +4,8 @@ from discord.ext import commands
 import typing
 from discord.ext.commands.errors import BadArgument
 from utils.query import Query
-from utils.db import session
 from sqlalchemy import func, not_, orm
-from utils.db import (Problem as Problem_DB, Contest as Contest_DB,
-                      User as User_DB, Submission as Submission_DB)
+from utils.models import *
 from utils.jomd_common import (scroll_embed, str_not_int, point_range, parse_gimme,
                                calculate_points, gimme_common)
 from utils.api import ObjectNotFound
@@ -323,10 +321,10 @@ class User(commands.Cog):
             return await ctx.send(f'{username} does not exist on DMOJ')
 
         username = user.username
-        q = session.query(Submission_DB).options(orm.joinedload('problem'))\
-            .join(User_DB, User_DB.username == Submission_DB._user,
+        q = session.query(Submission).options(orm.joinedload('problem'))\
+            .join(User, User.username == Submission._user,
                   aliased=True)\
-            .filter(User_DB.username == user.username)
+            .filter(User.username == user.username)
 
         if q.count():
             submissions = q.all()
@@ -398,21 +396,21 @@ class User(commands.Cog):
             if users[i] is None:
                 return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
 
-        q = session.query(Contest_DB)
+        q = session.query(Contest)
         for user in users:
             # if the user has attempted any problems from the problem set
-            sub_q = session.query(Submission_DB,
-                                  func.max(Submission_DB.points))\
-                .filter(Submission_DB._user == user.username)\
-                .group_by(Submission_DB._code).subquery()
-            sub_q = session.query(Problem_DB.code)\
-                .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)\
+            sub_q = session.query(Submission,
+                                  func.max(Submission.points))\
+                .filter(Submission._user == user.username)\
+                .group_by(Submission._code).subquery()
+            sub_q = session.query(Problem.code)\
+                .join(sub_q, Problem.code == sub_q.c._code, isouter=True)\
                 .filter(func.ifnull(sub_q.c.points, 0) != 0)
             sub_q = list(map(itemgetter(0), sub_q.all()))
-            q = q.filter(not_(Contest_DB.rankings.contains(user.username)))\
-                .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))\
-                .filter(Contest_DB.is_private == 0)\
-                .filter(Contest_DB.is_organization_private == 0)
+            q = q.filter(not_(Contest.rankings.contains(user.username)))\
+                .filter(~Contest.problems.any(Problem.code.in_(sub_q)))\
+                .filter(Contest.is_private == 0)\
+                .filter(Contest.is_organization_private == 0)
 
         if q.count() == 0:
             await ctx.send('Cannot find any contests which '
@@ -521,14 +519,14 @@ class User(commands.Cog):
             username = query.get_handle(ctx.author.id, ctx.guild.id)
         await query.get_submissions(username, result='AC')
 
-        submissions = session.query(Submission_DB)\
-            .filter(Submission_DB._user == username)\
-            .filter(Submission_DB.result == 'AC')\
-            .options(orm.joinedload(Submission_DB.problem, innerjoin=True))\
-            .join(Submission_DB.problem)\
-            .filter(Problem_DB.is_organization_private == 0)\
-            .filter(Problem_DB.is_public == 1)\
-            .order_by(Submission_DB.date).all()
+        submissions = session.query(Submission)\
+            .filter(Submission._user == username)\
+            .filter(Submission.result == 'AC')\
+            .options(orm.joinedload(Submission.problem, innerjoin=True))\
+            .join(Submission.problem)\
+            .filter(Problem.is_organization_private == 0)\
+            .filter(Problem.is_public == 1)\
+            .order_by(Submission.date).all()
         uniqueSubmissions = []
         solved = set()
         for sub in submissions:

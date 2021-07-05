@@ -1,8 +1,7 @@
 from utils.api import ObjectNotFound
 from discord.ext import commands
 from pathlib import Path
-from utils.db import (session, Contest as Contest_DB,
-                      Problem as Problem_DB, Submission as Submission_DB)
+from utils.models import *
 from utils.query import Query
 from operator import itemgetter
 import time
@@ -44,7 +43,7 @@ class Admin(commands.Cog):
         Force a recache of a problem, or contest
         '''
         if _type.lower() == 'contest':
-            q = session.query(Contest_DB).filter(Contest_DB.key == key)
+            q = session.query(Contest).filter(Contest.key == key)
             if q.count() == 0:
                 await ctx.send(f'There is no contests with the key {key} '
                                f'cached. Will try fetching contest')
@@ -58,7 +57,7 @@ class Admin(commands.Cog):
                 return await ctx.send('Contest not found')
             await ctx.send(f'Recached contest {key}')
         if _type.lower() == 'problem':
-            q = session.query(Problem_DB).filter(Problem_DB.code == key)
+            q = session.query(Problem).filter(Problem.code == key)
             if q.count() == 0:
                 await ctx.send(f'There is no problems with the key {key} '
                                f'cached. Will try fetching problem')
@@ -86,7 +85,7 @@ class Admin(commands.Cog):
     async def update_problems(self, ctx):
         '''Update all problems in db (For when Nick nukes problems)'''
         msg = await ctx.send('Updating...')
-        session.query(Problem_DB).delete()
+        session.query(Problem).delete()
         session.commit()
         query = Query()
         await query.get_problems()

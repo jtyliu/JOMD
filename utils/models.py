@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column, String, Integer, DateTime, Float, Boolean, Table, ForeignKey, Text)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from utils.constants import DEBUG
 
 __all__ = [
     'SubmissionCase',
@@ -26,6 +27,7 @@ __all__ = [
     'Gitgud',
     'CurrentGitgud',
     'session',
+    'Base',
 ]
 
 # Topologogical order
@@ -39,7 +41,7 @@ __all__ = [
 
 URI = 'sqlite:///utils/db/JOMD1.db'
 
-engine = create_engine(URI)
+engine = create_engine(URI, echo=DEBUG)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()

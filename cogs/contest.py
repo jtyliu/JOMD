@@ -1,12 +1,6 @@
 from utils.jomd_common import scroll_message
 from utils.constants import SITE_URL, TZ, ADMIN_ROLES
-from utils.db import (session, Problem as Problem_DB,
-                      Contest as Contest_DB,
-                      Participation as Participation_DB,
-                      User as User_DB, Submission as Submission_DB,
-                      Organization as Organization_DB,
-                      Language as Language_DB, Judge as Judge_DB,
-                      Handle as Handle_DB, Json)
+from utils.models import *
 from utils.query import Query
 from utils.api import ObjectNotFound
 import discord
@@ -28,7 +22,7 @@ class Contest(commands.Cog):
     @commands.command(aliases=['contest'], usage='[contest key] [+server, +all, dmoj_handles]')
     async def ranklist(self, ctx, key, *args):
         '''List rating predictions of a contest'''
-        q = session.query(Contest_DB).filter(Contest_DB.key == key)
+        q = session.query(Contest).filter(Contest.key == key)
         # Clear cache
         if q.count():
             q.delete()
@@ -46,7 +40,7 @@ class Contest(commands.Cog):
         if contest.is_organization_private:
             return await ctx.send('Contest not found')
 
-        q = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id)
+        q = session.query(Handle).filter(Handle.guild_id == ctx.guild.id)
         handles = q.all()
 
         usernames = []
@@ -227,14 +221,14 @@ class Contest(commands.Cog):
         query = Query()
 
         if update_all:
-            usernames = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+            usernames = session.query(Handle).filter(Handle.guild_id == ctx.guild.id).all()
         else:
             username = query.get_handle(ctx.author.id, ctx.guild.id)
 
             if username is None:
                 return await ctx.send('Your account is not linked!')
 
-        q = session.query(Contest_DB).filter(Contest_DB.key == key)
+        q = session.query(Contest).filter(Contest.key == key)
         # Clear cache
         if q.count():
             q.delete()

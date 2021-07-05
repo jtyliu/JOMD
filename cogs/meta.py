@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from utils.query import Query
 from utils.api import API
-from utils.db import session, Problem as Problem_DB, Submission as Submission_DB
+from utils.models import *
 from utils.jomd_common import calculate_points
 import typing
 
@@ -32,7 +32,7 @@ class Meta(commands.Cog):
         username = user.username
 
         msg = await ctx.send(f'Caching {username}\'s submissions')
-        session.query(Submission_DB).filter(Submission_DB._user == username).delete()
+        session.query(Submission).filter(Submission._user == username).delete()
         await query.get_submissions(username)
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached')
@@ -75,8 +75,8 @@ class Meta(commands.Cog):
     @commands.command()
     async def stats(self, ctx):
         '''Display cool dmoj stats that no one asked for'''
-        problems = session.query(Problem_DB.points)\
-            .order_by(Problem_DB.points.desc()).all()
+        problems = session.query(Problem.points)\
+            .order_by(Problem.points.desc()).all()
 
         def tuple_first(data):
             return data[0]

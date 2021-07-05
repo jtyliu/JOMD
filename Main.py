@@ -2,7 +2,7 @@ import os
 from discord.ext import commands
 from pathlib import Path
 import discord
-from utils.db import session, Problem as Problem_DB
+from utils.models import session, Problem
 from utils.query import Query
 import asyncio
 import logging
@@ -37,7 +37,7 @@ def main():
         return True
 
     # Get preliminary data
-    if session.query(Problem_DB).count() == 0:
+    if session.query(Problem).count() == 0:
         q = Query()
         loop = asyncio.get_event_loop()
         loop.run_until_complete(q.get_problems())

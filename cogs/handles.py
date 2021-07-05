@@ -4,7 +4,7 @@ from operator import itemgetter
 from discord.ext import commands
 import discord
 from utils.query import Query
-from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
+from utils.models import *
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
 import typing
 import asyncio
@@ -71,9 +71,9 @@ class Handles(commands.Cog):
         if not query.get_handle(ctx.author.id, ctx.guild.id):
             await ctx.send('You are not linked with any user')
             return
-        handle = session.query(Handle_DB)\
-            .filter(Handle_DB.id == ctx.author.id)\
-            .filter(Handle_DB.guild_id == ctx.guild.id).first()
+        handle = session.query(Handle)\
+            .filter(Handle.id == ctx.author.id)\
+            .filter(Handle.guild_id == ctx.guild.id).first()
         session.delete(handle)
         session.commit()
         await ctx.send(f'Unlinked you with handle {handle.handle}')
@@ -111,7 +111,7 @@ class Handles(commands.Cog):
                            'and run the command again.')
             return
 
-        handle = Handle_DB()
+        handle = Handle()
         handle.id = ctx.author.id
         handle.handle = username
         handle.user_id = user.id
@@ -151,9 +151,9 @@ class Handles(commands.Cog):
             return await ctx.send(f'{member.display_name} is already linked with {handle}')
 
         if handle:
-            handle = session.query(Handle_DB)\
-                .filter(Handle_DB.id == member.id)\
-                .filter(Handle_DB.guild_id == ctx.guild.id).first()
+            handle = session.query(Handle)\
+                .filter(Handle.id == member.id)\
+                .filter(Handle.guild_id == ctx.guild.id).first()
             session.delete(handle)
             session.commit()
             await ctx.send(f'Unlinked {member.display_name} with handle {handle.handle}')
@@ -165,7 +165,7 @@ class Handles(commands.Cog):
             await ctx.send('This handle is already linked with another user')
             return
 
-        handle = Handle_DB()
+        handle = Handle()
         handle.id = member.id
         handle.handle = username
         handle.user_id = user.id
@@ -187,8 +187,8 @@ class Handles(commands.Cog):
         arg = arg.lower()
         if arg != 'rating' and arg != 'maxrating' and arg != 'points' and arg != 'solved':
             return await ctx.send_help('top')
-        users = session.query(User_DB).join(Handle_DB, Handle_DB.handle == User_DB.username)\
-            .filter(Handle_DB.guild_id == ctx.guild.id)
+        users = session.query(User).join(Handle, Handle.handle == User.username)\
+            .filter(Handle.guild_id == ctx.guild.id)
         leaderboard = []
         for user in users:
             if arg == 'rating':
@@ -245,10 +245,10 @@ class Handles(commands.Cog):
 
         msg = await ctx.send('Fetching ratings...')
 
-        contests = session.query(Contest_DB).filter(Contest_DB.is_rated == 1)\
-            .order_by(Contest_DB.end_time.desc()).all()
+        contests = session.query(Contest).filter(Contest.is_rated == 1)\
+            .order_by(Contest.end_time.desc()).all()
 
-        users = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
+        users = session.query(Handle).filter(Handle.guild_id == ctx.guild.id).all()
         new_ratings = {}
         # Yes this will make some of you cry
         for user in users:
