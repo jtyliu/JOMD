@@ -403,7 +403,7 @@ class Gitgud(Base):
     __tablename__ = 'gitgud'
     # NOTE: Should there be a foreign key to user?
 
-    _id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     handle = Column(String, index=True)
     guild_id = Column(Integer, index=True)
     point = Column(Integer)
@@ -416,7 +416,7 @@ class CurrentGitgud(Base):
     __tablename__ = 'current_gitgud'
     # NOTE: Should there be a foreign key to user?
 
-    _id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     handle = Column(String)
     guild_id = Column(Integer)
     problem_id = Column(String, ForeignKey('problem.code'))
@@ -466,4 +466,4 @@ problem_user = Table(
     Column('problem_code', String, ForeignKey('problem.code'), primary_key=True),
     Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
 )
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

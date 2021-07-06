@@ -7,11 +7,25 @@ Create Date: 2021-05-22 00:12:25.855255
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import orm
+from sqlalchemy import orm, TypeDecorator, Text
 from sqlalchemy.ext.declarative import declarative_base
-from utils.db import Json
+import json
 
 Base = declarative_base()
+
+
+class Json(TypeDecorator):
+    impl = Text
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
 
 
 class Contest(Base):
@@ -21,6 +35,7 @@ class Contest(Base):
     rankings = sa.Column(Json)
     is_rated = sa.Column(sa.Boolean)
     end_time = sa.Column(sa.DateTime)
+
 
 class User(Base):
     __tablename__ = 'user'
