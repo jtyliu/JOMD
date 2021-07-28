@@ -40,63 +40,45 @@ def plot_points(datas):
 
 
 def plot_rating(data):
-    # Setup
-    plt.clf()
-    users = data['users']
-    data = sorted(list(data.items())[1:])
+    df = pd.DataFrame(data, columns=['username', 'rating', 'date'])
 
-    # Make a list of tuples (user, user dates, user ratings)
-    all_dates, all_ratings = [], []
-    groups = []
-    for i, user in enumerate(users):
-        user_dates, user_ratings = [], []
-        for date, ratings in data:
-            if ratings[i] is not None:
-                user_dates.append(date)
-                user_ratings.append(ratings[i])
-                all_dates.append(date)
-                all_ratings.append(ratings[i])
-        groups.append((user, user_dates, user_ratings))
+    fig, ax = plt.subplots()
 
-    # Add the color blocks
     for (low, high), color in GRAPH_RANK_COLOURS.items():
-        plt.axhspan(low, high, facecolor=color, alpha=0.8)
+        ax.axhspan(low, high, facecolor=color, alpha=0.8)
 
     # Set the theme
     plt.style.use('default')
-    plt.grid(color='w', linestyle='solid', alpha=0.8)
-    plt.gca().set_facecolor('#E7E7F0')
+    ax.grid(color='w', linestyle='solid', alpha=0.8)
+    fig.gca().set_facecolor('#E7E7F0')
 
     # X-axis date formatting
     locator = mdt.AutoDateLocator(minticks=5, maxticks=8)
     formatter = mdt.ConciseDateFormatter(locator)
-    plt.gca().xaxis.set_major_locator(locator)
-    plt.gca().xaxis.set_major_formatter(formatter)
+    fig.gca().xaxis.set_major_locator(locator)
+    fig.gca().xaxis.set_major_formatter(formatter)
 
     # Set the X-axis scaling
     margin_x = timedelta(days=30)
-    left = min(all_dates) - margin_x
-    right = max(all_dates) + margin_x
-    plt.gca().set_xlim(left=left, right=right)
+    left = df['date'].min() - margin_x
+    right = df['date'].max() + margin_x
+    fig.gca().set_xlim(left=left, right=right)
 
     # Set the Y-axis scaling
     margin_y = 200
-    bottom = min(1000, min(all_ratings) - margin_y)
-    top = max(all_ratings) + margin_y
-    plt.gca().set_ylim(bottom=bottom, top=top)
+    bottom = min(1000, df['rating'].min() - margin_y)
+    top = df['rating'].max() + margin_y
+    fig.gca().set_ylim(bottom=bottom, top=top)
 
-    # Plot the data
-    for user, user_dates, user_ratings in groups:
-        if user_ratings:
-            label = f'{user} ({max(user_ratings)})'
-        else:
-            label = f'{user} (unrated)'
-        plt.plot(user_dates, user_ratings, label=label, marker='s',
-                 markerfacecolor='white', linestyle='-', markersize=5,
-                 markeredgewidth=0.5)
+    for username in df['username'].unique():
+        data = df[df['username'] == username]
+        data = data.pivot(index='date', columns='username')
+        ax.plot(data, label=username, marker='s',
+                markerfacecolor='white', linestyle='-', markersize=5,
+                markeredgewidth=0.5)
 
     # Legend
-    plt.legend(loc='upper left', prop={'size': 10})
+    ax.legend(loc='upper left', prop={'size': 10})
 
     plt.savefig('./graphs/plot.png')
 

@@ -110,7 +110,7 @@ class Query:
         q = session.query(Problem).\
             filter(Problem.code == a.data.object.code)
         if q.count():
-            q.delete()
+            session.delete(q.scalar())
         session.add(Problem(a.data.object))
         session.commit()
         return q.first()
@@ -158,7 +158,7 @@ class Query:
             filter(Contest.key == key)
         if q.count() and cached:
             # is_rated checks if it has detailed rows
-            if q.first().is_rated is not None:
+            if q.first().has_rating is not None:
                 return q.first()
         a = API()
         await a.get_contest(key)
@@ -202,21 +202,13 @@ class Query:
         return q.all()
 
     async def get_user(self, username: str) -> User:
-        q = session.query(User).\
-            filter(func.lower(User.username) == func.lower(username))
-        # if q.count():
-        #     # solved_problems checks if it has detailed rows
-        #     if len(q.first().solved_problems) != 0:
-        #         return q.first()
-
         a = API()
         await a.get_user(username)
         q = session.query(User).\
-            filter(func.lower(User.username) == func.lower(a.data.object.username))
+            filter(User.username == a.data.object.username)
         if q.count():
-            # Needs to be fetch, the default (evaluate) is not able to eval
-            # the query
-            q.delete(synchronize_session='fetch')
+            session.delete(q.scalar())
+
         session.add(User(a.data.object))
         session.commit()
         return q.first()
@@ -241,7 +233,7 @@ class Query:
 
         cond_user = self.parse(func.lower(User.username), func.lower(user))
         if not cond_user:
-            cond_user = Participation.user.any(cond_user)
+            cond_user = Participation.user.has(cond_user)
 
         q = session.query(Participation).\
             filter(cond_contest).\
@@ -327,7 +319,6 @@ class Query:
 
         if a.data.total_objects == q.count():
             return q.all()
-
         submission_ids = list(map(attrgetter('id'), a.data.objects))
         qq = session.query(Submission.id).\
             filter(Submission.id.in_(submission_ids)).all()

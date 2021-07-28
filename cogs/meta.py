@@ -32,7 +32,7 @@ class Meta(commands.Cog):
         username = user.username
 
         msg = await ctx.send(f'Caching {username}\'s submissions')
-        session.query(Submission).filter(Submission._user == username).delete()
+        session.query(Submission).filter(Submission.user_id == user.id).delete()
         await query.get_submissions(username)
         return await msg.edit(content=f'{username}\'s submissions ' +
                                       'have been cached')

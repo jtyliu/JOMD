@@ -4,12 +4,13 @@ from pathlib import Path
 from utils.models import *
 from utils.query import Query
 from operator import itemgetter
+from discord.utils import get
 import time
 import logging
 logger = logging.getLogger(__name__)
 
 
-class Admin(commands.Cog):
+class AdminCog(commands.Cog, name='Admin'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -45,10 +46,10 @@ class Admin(commands.Cog):
         if _type.lower() == 'contest':
             q = session.query(Contest).filter(Contest.key == key)
             if q.count() == 0:
-                await ctx.send(f'There is no contests with the key {key} '
+                await ctx.send(f'There are no contests with the key {key} '
                                f'cached. Will try fetching contest')
             else:
-                q.delete()
+                session.delete(q.scalar())
                 session.commit()
             query = Query()
             try:
@@ -59,10 +60,10 @@ class Admin(commands.Cog):
         if _type.lower() == 'problem':
             q = session.query(Problem).filter(Problem.code == key)
             if q.count() == 0:
-                await ctx.send(f'There is no problems with the key {key} '
+                await ctx.send(f'There are no problems with the key {key} '
                                f'cached. Will try fetching problem')
             else:
-                q.delete()
+                session.delete(q.scalar())
                 session.commit()
             query = Query()
             try:
@@ -70,6 +71,15 @@ class Admin(commands.Cog):
             except ObjectNotFound:
                 return await ctx.send('Problem not found')
             await ctx.send(f'Recached problem {key}')
+
+    @commands.command()
+    async def cache_users(self, ctx):
+        '''Caches every user'''
+        query = Query()
+        msg = await ctx.send('Caching...')
+        users = await query.get_users()
+        return await msg.edit(content=f'Cached {len(users)} users')
+
 
     @commands.command()
     async def cache_contests(self, ctx):
@@ -93,4 +103,4 @@ class Admin(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Admin(bot))
+    bot.add_cog(AdminCog(bot))

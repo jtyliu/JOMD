@@ -1,5 +1,5 @@
 import typing
-from utils.gitgud import Gitgud as Gitgud_utils
+from utils.gitgud import GitgudUtils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
 from utils.jomd_common import (point_range, gimme_common)
@@ -11,7 +11,7 @@ from datetime import datetime
 from sqlalchemy import func
 
 
-class Gitgud(commands.Cog):
+class GitgudCog(commands.Cog, name='Gitgud'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -38,7 +38,7 @@ class Gitgud(commands.Cog):
 
         filters = list(filters)
         query = Query()
-        gitgud_util = Gitgud_utils()
+        gitgud_util = GitgudUtils()
         # get the user's dmoj handle
         username = query.get_handle(ctx.author.id, ctx.guild.id)
         # user = await query.get_user(username)
@@ -98,7 +98,7 @@ class Gitgud(commands.Cog):
         Cancels any unfinished challenge
         '''
         query = Query()
-        gitgud_util = Gitgud_utils()
+        gitgud_util = GitgudUtils()
 
         username = query.get_handle(ctx.author.id, ctx.guild.id)
 
@@ -128,7 +128,7 @@ class Gitgud(commands.Cog):
             return await ctx.send('You have not entered a valid DMOJ handle '
                                   'or linked with a DMOJ Account')
 
-        gitgud_util = Gitgud_utils()
+        gitgud_util = GitgudUtils()
         history = gitgud_util.get_all(username, ctx.guild.id)
 
         if len(history) == 0:
@@ -187,7 +187,7 @@ class Gitgud(commands.Cog):
         Confirm completion of gitgud challenge
         '''
         query = Query()
-        gitgud_util = Gitgud_utils()
+        gitgud_util = GitgudUtils()
         username = query.get_handle(ctx.author.id, ctx.guild.id)
 
         if username is None:
@@ -259,7 +259,7 @@ class Gitgud(commands.Cog):
             username = query.get_handle(ctx.author.id, ctx.guild.id)
         user = await query.get_user(username)
         username = user.username
-        ret = Gitgud_utils().get_point(username, ctx.guild.id)
+        ret = GitgudUtils().get_point(username, ctx.guild.id)
         if ret is None:
             ret = 0
         embed = discord.Embed(
@@ -271,4 +271,4 @@ class Gitgud(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Gitgud(bot))
+    bot.add_cog(GitgudCog(bot))

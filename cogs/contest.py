@@ -15,7 +15,7 @@ from operator import itemgetter, attrgetter
 # Rating change predictions for all users in a server
 
 
-class Contest(commands.Cog):
+class ContestCog(commands.Cog, name='Contest'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -25,11 +25,20 @@ class Contest(commands.Cog):
         q = session.query(Contest).filter(Contest.key == key)
         # Clear cache
         if q.count():
-            q.delete()
+            session.delete(q.scalar())
             session.commit()
         query = Query()
         try:
             contest = await query.get_contest(key)
+            contest = session.query(Contest).\
+                options(
+                    orm.joinedload(Contest.rankings).
+                    options(
+                        orm.joinedload(Participation.solutions),
+                        orm.joinedload(Participation.user),
+                    ),
+                    orm.joinedload(Contest.problems)
+            ).filter(Contest.key == key).scalar()
         except ObjectNotFound:
             await ctx.send('Contest not found')
             return
@@ -70,7 +79,9 @@ class Contest(commands.Cog):
         #                              for username in users])
         # usernames = [user.username for user in users]
         # Filter for those who participated in contest
-        user_rankings = list(map(itemgetter('user'), contest.rankings))
+        user_rankings = session.query(User.username).join(User.contests).\
+            join(Participation.contest).filter(Contest.key == contest.key).all()
+        user_rankings = [username for (username,) in user_rankings]
         if showAll:
             usernames = list(set(user_rankings))
         else:
@@ -80,11 +91,12 @@ class Contest(commands.Cog):
         problems = len(contest.problems)
 
         data = []
+        labels = [contest.problems[i].label for i in range(len(contest.problems))]
 
         for rank_num, ranking in enumerate(contest.rankings):
             # TODO: ok ish, but placements match the rankings
             for username in usernames:
-                if ranking['user'] == username:
+                if ranking.user.username == username:
                     # If contest is not rated, this crashes
                     if contest.is_rated:
                         if username in rankings:
@@ -115,22 +127,27 @@ class Contest(commands.Cog):
                             'username': username + ':',
                         }
                     # This is a quick fix :>
-                    problems = len(ranking['solutions'])
-                    for i in range(1, problems + 1):
-                        solution = ranking['solutions'][i - 1]
-                        if solution:
-                            if int(solution['points']) == solution['points']:
-                                rank_dict[str(i)] = int(solution['points'])
+                    problems = len(ranking.solutions)
+
+                    # NOTE: For some reason solutions are not ordered by id but by points
+                    ranking.solutions.sort(key=lambda x: x.id)
+
+                    for cnt in range(problems):
+                        solution = ranking.solutions[cnt]
+                        label = labels[cnt]
+                        if solution.points:
+                            if int(solution.points) == solution.points:
+                                rank_dict[label] = int(solution.points)
                             else:
-                                rank_dict[str(i)] = round(solution['points'], 2)
+                                rank_dict[label] = round(solution.points, 2)
                         else:
-                            rank_dict[str(i)] = '-'
+                            rank_dict[label] = '-'
                     data.append(rank_dict)
         max_len = {}
         max_len['rank'] = len('#')
         max_len['username'] = len('Handle')
-        for i in range(1, problems + 1):
-            max_len[str(i)] = len(str(i))
+        for i in range(problems):
+            max_len[labels[i]] = len(labels[i])
         max_len['rating_change'] = max_len['old_rating'] = max_len['new_rating'] = 3
 
         for rank in data:
@@ -139,19 +156,19 @@ class Contest(commands.Cog):
 
         format_output = '{:>' + str(max_len['rank']) + '} '
         format_output += '{:' + str(max_len['username'] + 1) + '}  '
-        for i in range(1, problems + 1):
-            format_output += '{:' + str(max_len[str(i)]) + '} '
+        for i in range(problems):
+            format_output += '{:' + str(max_len[labels[i]]) + '} '
 
         to_format = [
             '#',
             'Handle',
-            *[str(i) for i in range(1, problems + 1)],
+            *[labels[i] for i in range(problems)],
         ]
 
         hyphen_format = [
             '—' * max_len['rank'],
             '—' * max_len['username'],
-            *['—' * max_len[str(i)] for i in range(1, problems + 1)],
+            *['—' * max_len[labels[i]] for i in range(problems)],
         ]
         if contest.is_rated:
             format_output += ' '
@@ -178,12 +195,15 @@ class Contest(commands.Cog):
 
         content = []
         output = outputBegin
+
+        data.sort(key=lambda x: x['rank'])
+
         for rank in data:
             if contest.is_rated:
                 output += format_output.format(
                     rank['rank'],
                     rank['username'],
-                    *[rank[str(i)] for i in range(1, problems + 1)],
+                    *[rank[labels[i]] for i in range(problems)],
                     str(rank['rating_change']),
                     str(rank['old_rating']),
                     str(rank['new_rating']),
@@ -192,7 +212,7 @@ class Contest(commands.Cog):
                 output += format_output.format(
                     rank['rank'],
                     rank['username'],
-                    *[rank[str(i)] for i in range(1, problems + 1)],
+                    *[rank[labels[i]] for i in range(problems)],
                 )
             output += '\n'
             if(len(output) + len(outputEnd) * 2 > 1980):
@@ -220,9 +240,7 @@ class Contest(commands.Cog):
 
         query = Query()
 
-        if update_all:
-            usernames = session.query(Handle).filter(Handle.guild_id == ctx.guild.id).all()
-        else:
+        if not update_all:
             username = query.get_handle(ctx.author.id, ctx.guild.id)
 
             if username is None:
@@ -247,26 +265,29 @@ class Contest(commands.Cog):
             return await ctx.send(f'No `postcontest {key}` role found.')
 
         if update_all:
-            participants = set()
-            for ranking in contest.rankings:
-                endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
-                if endTime < datetime.now(timezone.utc).astimezone():
-                    participants.add(ranking['user'])
+            q = session.query(User).join(User.contests).\
+                filter(Participation.contest_id == key).\
+                filter(Participation.end_time < datetime.now(timezone.utc).astimezone()).\
+                filter(Participation.virtual_participation_number == 0).subquery()
+            q = session.query(Handle.id).join(q, q.c.username == Handle.handle).\
+                filter(Handle.guild_id == ctx.guild.id)
 
-            for user in usernames:
-                if user.handle in participants:
-                    try:
-                        await ctx.guild.get_member(user.id).add_roles(role)
-                    except discord.Forbidden:
-                        return await ctx.send('No permission to assign the role')
+            for (user_id,) in q:
+                try:
+                    await ctx.guild.get_member(user_id).add_roles(role)
+                except discord.Forbidden:
+                    return await ctx.send('No permission to assign the role')
             return await ctx.send('Updated post contest for ' + key)
 
-        for ranking in contest.rankings:
-            if ranking['user'].lower() != username.lower():
-                continue
+        q = session.query(Participation.end_time).join(User.contests).\
+            filter(User.username == username).\
+            filter(Participation.contest_id == key).\
+            filter(Participation.virtual_participation_number == 0)
 
-            endTime = datetime.strptime(ranking['end_time'], '%Y-%m-%dT%H:%M:%S%z')
-            if endTime > datetime.now(timezone.utc).astimezone():
+        if q.count():
+            end_time = q.scalar()
+
+            if end_time > datetime.now(timezone.utc).astimezone():
                 return await ctx.send('Your window is not done')
             else:
                 try:
@@ -278,4 +299,4 @@ class Contest(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Contest(bot))
+    bot.add_cog(ContestCog(bot))

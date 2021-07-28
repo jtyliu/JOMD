@@ -6,12 +6,14 @@ import discord
 from utils.query import Query
 from utils.models import *
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
+from sqlalchemy import func
 import typing
 import asyncio
 import hashlib
+import traceback
 
 
-class Handles(commands.Cog):
+class HandlesCog(commands.Cog, name='Handles'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -128,7 +130,7 @@ class Handles(commands.Cog):
         if rank in rank_to_role:
             await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
         else:
-            await ctx.send('You are missing the ' + rank.name + ' role')
+            await ctx.send('You are missing the ' + rank + ' role')
 
     @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
     @commands.has_any_role(*ADMIN_ROLES)
@@ -179,7 +181,7 @@ class Handles(commands.Cog):
         if rank in rank_to_role:
             await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
         else:
-            await ctx.send('You are missing the ' + rank.name + ' role')
+            await ctx.send('You are missing the ' + rank + ' role')
 
     @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
     async def top(self, ctx, arg='rating'):
@@ -245,27 +247,25 @@ class Handles(commands.Cog):
 
         msg = await ctx.send('Fetching ratings...')
 
-        contests = session.query(Contest).filter(Contest.is_rated == 1)\
-            .order_by(Contest.end_time.desc()).all()
+        q = session.query(User.username, Participation.user_id, func.max(Contest.end_time).label('end_time')).\
+            join(Participation.contest).\
+            join(Participation.user).\
+            filter(Participation.new_rating != None).\
+            filter(Handle.guild_id == 621087609170427916).\
+            group_by(Participation.user_id).subquery()
 
-        users = session.query(Handle).filter(Handle.guild_id == ctx.guild.id).all()
-        new_ratings = {}
-        # Yes this will make some of you cry
-        for user in users:
-            new_ratings[user] = None  # unrated
-            for contest in contests:
-                found = False
-                if contest.rankings is None:
-                    continue
+        q = session.query(Handle.id, Participation.new_rating).\
+            join(Participation.contest).\
+            join(Handle, Handle.user_id == Participation.user_id).\
+            join(q, q.c.user_id == Participation.user_id).\
+            filter(q.c.end_time == Contest.end_time).\
+            filter(Contest.is_rated == 1).\
+            filter(Handle.guild_id == 621087609170427916)
 
-                for participation in contest.rankings:
-                    if participation['user'].lower() == user.handle.lower() and participation['new_rating'] is not None:
-                        new_ratings[user] = participation['new_rating']
-                        found = True
-                        break
-                if found:
-                    break
-        members = [ctx.guild.get_member(handle.id) for handle in new_ratings]
+        rating = {handle_id: new_rating for (handle_id, new_rating) in q}
+
+        handle_ids = session.query(Handle.id).filter(Handle.guild_id == 621087609170427916).all()
+        members = {handle_id: ctx.guild.get_member(handle_id) for (handle_id,) in handle_ids}
 
         rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
 
@@ -273,17 +273,15 @@ class Handles(commands.Cog):
 
         missing_roles = []
         try:
-            for member, user in zip(members, list(new_ratings.keys())):
-                if member is None:
-                    continue
-
-                rank = self.rating_to_rank(new_ratings[user])
+            for (handle_id, member) in members.items():
+                new_rating = rating.get(handle_id, None)
+                rank = self.rating_to_rank(new_rating)
                 if rank in rank_to_role:
                     await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
                 elif rank not in missing_roles:
                     missing_roles.append(rank)
-        except Exception as e:
-            await ctx.send('An error occurred. ' + str(e))
+        except Exception:
+            await ctx.send('An error occurred. ' + traceback.format_exc())
             return
 
         if len(missing_roles) != 0:
@@ -292,4 +290,4 @@ class Handles(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Handles(bot))
+    bot.add_cog(HandlesCog(bot))

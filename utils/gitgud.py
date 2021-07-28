@@ -2,7 +2,7 @@ from sqlalchemy import func, desc
 from utils.models import *
 
 
-class Gitgud:
+class GitgudUtils:
 
     def get_point(self, handle, guild_id):
         q = session.query(func.sum(Gitgud.point))\

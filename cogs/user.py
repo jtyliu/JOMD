@@ -15,7 +15,7 @@ import random
 from operator import itemgetter
 
 
-class User(commands.Cog):
+class UserCog(commands.Cog, name='User'):
     def __init__(self, bot):
         self.bot = bot
 
@@ -244,7 +244,7 @@ class User(commands.Cog):
             color=0xffff00
         )
         for submission in submissions:
-            problem = submission.problem[0]
+            problem = submission.problem
             if problem.points is not None:
                 points = str(int(problem.points)) + 'p'
                 if problem.partial:
@@ -252,10 +252,10 @@ class User(commands.Cog):
             else:
                 points = '???'
 
-            true_short_name = submission.language[0].short_name
+            true_short_name = submission.language.short_name
             if true_short_name == '':
                 # wtf dmoj
-                true_short_name = submission.language[0].key
+                true_short_name = submission.language.key
 
             embed.add_field(
                 name='%s / %s' %
@@ -267,7 +267,7 @@ class User(commands.Cog):
 
             embed.add_field(
                 name='%s (%s)' %
-                     (submission.problem[0].name, points),
+                     (submission.problem.name, points),
                 value='%s | [Problem](https://dmoj.ca/problem/%s)' %
                       (submission.date.astimezone(TZ).
                        strftime('%b. %d, %Y, %I:%M %p').
@@ -322,9 +322,7 @@ class User(commands.Cog):
 
         username = user.username
         q = session.query(Submission).options(orm.joinedload('problem'))\
-            .join(User, User.username == Submission._user,
-                  aliased=True)\
-            .filter(User.username == user.username)
+            .filter(Submission.user_id == user.id)
 
         if q.count():
             submissions = q.all()
@@ -337,7 +335,7 @@ class User(commands.Cog):
         problems_ACed = dict()
         code_to_points = dict()
         for submission in submissions:
-            code = submission.problem[0].code
+            code = submission.problem.code
             points = submission.points
             result = submission.result
 
@@ -399,15 +397,14 @@ class User(commands.Cog):
         q = session.query(Contest)
         for user in users:
             # if the user has attempted any problems from the problem set
-            sub_q = session.query(Submission,
-                                  func.max(Submission.points))\
-                .filter(Submission._user == user.username)\
-                .group_by(Submission._code).subquery()
+            sub_q = session.query(Submission, func.max(Submission.points))\
+                .filter(Submission.user_id == user.id)\
+                .group_by(Submission.problem_id).subquery()
             sub_q = session.query(Problem.code)\
-                .join(sub_q, Problem.code == sub_q.c._code, isouter=True)\
+                .join(sub_q, Problem.code == sub_q.c.problem_id, isouter=True)\
                 .filter(func.ifnull(sub_q.c.points, 0) != 0)
             sub_q = list(map(itemgetter(0), sub_q.all()))
-            q = q.filter(not_(Contest.rankings.contains(user.username)))\
+            q = q.filter(~Contest.rankings.any(Participation.user_id == user.id))\
                 .filter(~Contest.problems.any(Problem.code.in_(sub_q)))\
                 .filter(Contest.is_private == 0)\
                 .filter(Contest.is_organization_private == 0)
@@ -514,13 +511,17 @@ class User(commands.Cog):
             elif arg.startswith('p<='):
                 maxP = min(maxP, int(arg[3:]))
             else:
-                username = (await query.get_user(arg)).username
+                user = await query.get_user(arg)
+                username = user.username
+                user_id = user.id
         if username is None:
-            username = query.get_handle(ctx.author.id, ctx.guild.id)
+            username, user_id = session.query(Handle.handle, Handle.user_id).\
+                filter(Handle.id == ctx.author.id).\
+                filter(Handle.guild_id == ctx.guild.id).one()
         await query.get_submissions(username, result='AC')
 
         submissions = session.query(Submission)\
-            .filter(Submission._user == username)\
+            .filter(Submission.user_id == user_id)\
             .filter(Submission.result == 'AC')\
             .options(orm.joinedload(Submission.problem, innerjoin=True))\
             .join(Submission.problem)\
@@ -530,8 +531,8 @@ class User(commands.Cog):
         uniqueSubmissions = []
         solved = set()
         for sub in submissions:
-            if sub._code not in solved:
-                solved.add(sub._code)
+            if sub.problem_id not in solved:
+                solved.add(sub.problem_id)
                 if minP <= sub.points and sub.points <= maxP:
                     uniqueSubmissions.append(sub)
         uniqueSubmissions.reverse()
@@ -540,7 +541,7 @@ class User(commands.Cog):
         cnt = 0
         for sub in uniqueSubmissions:
             age = (datetime.now() - sub.date).days
-            page += f'[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n'
+            page += f'[{sub.problem.name}]({SITE_URL}/problem/{sub.problem_id}) [{sub.points}] ({age} days ago)\n'
             cnt += 1
             if cnt % 10 == 0:
                 content.append(page)
@@ -555,4 +556,4 @@ class User(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(User(bot))
+    bot.add_cog(UserCog(bot))

@@ -8,10 +8,11 @@ import time
 import html
 import math
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.models import *
 from operator import itemgetter
 from contextlib import asynccontextmanager
+from collections import namedtuple
 import typing
 import logging
 from abc import ABC, abstractmethod
@@ -133,7 +134,7 @@ async def _query_api(url, resp_obj, *, object_hook=None):
     if object_hook is not None:
         json_loads = functools.partial(json.loads, object_hook=object_hook)
     else:
-        json_loads = json.loads()
+        json_loads = json.loads
 
     if rate_limiter is None:
         # Allow at most 3 concurrent requests tokens are emptied at 1 per second
@@ -323,6 +324,7 @@ class ParseContest:
                     {
                         'points': float,
                         'time': float,
+                        'contest': Contest,
                     }
                 ],
                 'virtual_participation_number': int,
@@ -332,6 +334,11 @@ class ParseContest:
 
     @staticmethod
     async def init(obj, *, organizations={}, problems={}, users={}, lock={}):
+
+        if obj.key == 'mockccc15s':
+            # This contest ends with mockccc15j at the same time
+            obj.end_time += timedelta(microseconds=1)
+
         # TODO: Check if attr exists for optimization
         if hasattr(obj, 'organizations'):
             organizations_new = session.query(Organization.id, Organization).all()
@@ -362,24 +369,31 @@ class ParseContest:
                 for problem in obj.problems:
                     code = problem.code
                     if code not in problems and code not in lock:
-                        lock[code] = asyncio.Lock()
-                        async with lock[code]:
-                            api = API()
-                            await api.get_problem(code)
-                            # problems_new = session.query(Problem.code, Problem)\
-                            #     .filter(Problem.code == code).all()
-                            # problems.update({k: v for k, v in problems_new})
-                            # if code not in problems:
-                            problems[code] = Problem(api.data.object)
-                            session.add(problems[code])
-                            session.commit()
+                        try:
+                            lock[code] = asyncio.Lock()
+                            async with lock[code]:
+                                api = API()
+                                await api.get_problem(code)
+                                problems[code] = Problem(api.data.object)
+                                session.add(problems[code])
+                                session.commit()
+                        except ObjectNotFound:
+                            del lock[code]
 
+            # There is an important reason why this code does not look similar to the rest
+            # The /contest endpoint does show problem codes but sometimes the /problem might not be public yet
             for problem in obj.problems:
                 if problem.code in lock:
                     async with lock[problem.code]:
-                        problem.problem = problems[problem.code]
+                        if problem.code in problems:
+                            problem.problem = problems[problem.code]
+                        else:
+                            problem.problem = None
                 else:
-                    problem.problem = problems[problem.code]
+                    if problem.code in problems:
+                        problem.problem = problems[problem.code]
+                    else:
+                        problem.problem = None
 
         if hasattr(obj, 'problems'):
             for problem in obj.problems:
@@ -387,12 +401,15 @@ class ParseContest:
             obj.problems = [ContestProblem(problem) for problem in obj.problems]
 
         if hasattr(obj, 'rankings'):
-            users_new = session.query(User.username, User).all()
+            participant_names = [participation.user for participation in obj.rankings]
+            users_new = session.query(User.username, User)\
+                .filter(User.username.in_(participant_names)).all()
             users.update({k: v for k, v in users_new})
             tasks = []
             for ranking in obj.rankings:
                 ranking.virtual_participation_number = 0
                 ranking.config = ParseParticipation.config
+                ranking._contest = obj.key
                 tasks.append(ParseParticipation.init(ranking, users=users))
             await asyncio.gather(*tasks)
             obj.rankings = [Participation(ranking) for ranking in obj.rankings]
@@ -421,6 +438,7 @@ class ParseParticipation:
         "solutions": [{
             'points': float,
             'time': float,
+            'contest_id': str,
         }],
         "virtual_participation_number": int,
     }
@@ -471,13 +489,24 @@ class ParseParticipation:
             else:
                 obj.user = users[obj.user]
 
-        solutions = []
-        for solution in obj.solutions:
-            if solution is None:
-                continue
-            solution.config = ParseParticipation.config['solutions'][0]
-            solutions.append(ParticipationSolution(solution))
-        obj.solutions = solutions
+        if hasattr(obj, 'solutions'):
+            solutions = []
+            NoneObj = namedtuple('NoneObj', ['points', 'time', 'config', 'contest_id'])
+            for solution in obj.solutions:
+                if solution is None:
+                    if hasattr(obj, 'contest') and isinstance(obj.contest, Contest):
+                        noneobj = NoneObj(None, None, ParseParticipation.config['solutions'][0], obj.contest.key)
+                    else:
+                        noneobj = NoneObj(None, None, ParseParticipation.config['solutions'][0], obj._contest)
+                    solutions.append(ParticipationSolution(noneobj))
+                else:
+                    solution.config = ParseParticipation.config['solutions'][0]
+                    if hasattr(obj, 'contest') and isinstance(obj.contest, Contest):
+                        solution.contest_id = obj.contest.key
+                    else:
+                        solution.contest_id = obj._contest
+                    solutions.append(ParticipationSolution(solution))
+            obj.solutions = solutions
 
     @staticmethod
     async def inits(objs):
@@ -719,7 +748,7 @@ class ParseJudge:
 
     @staticmethod
     async def init(obj, *, languages={}, lock={}):
-    
+
         if any(lang_key not in languages for lang_key in obj.languages) and \
                 'language' not in lock:
             languages_new = session.query(Language.key, Language).all()
@@ -922,6 +951,7 @@ class API:
         return description
 
     async def get_latest_submission(self, username: str, num: int) -> Submission:
+        # TODO: Fix
         # Don't look at me! I'm hideous!
         def soup_parse(soup):
             submission_id = soup['id']

@@ -69,28 +69,30 @@ class Plot(commands.Cog):
         except ObjectNotFound:
             return await ctx.send('User not found')
 
+        user_ids = [user.id for user in users]
         usernames = [user.username for user in users]
-        for i in range(len(users)):
-            if users[i] is None:
-                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+        for user, username in zip(users, usernames):
+            if user is None:
+                return await ctx.send(f'{username} does not exist on DMOJ')
         if len(users) > 10:
             return await ctx.send('Too many users given, max 10')
 
         total_data = {}
-        for username in usernames:
-            q = session.query(Submission)\
-                .filter(Submission._user == username)
-            if q.count() == 0:
+        for user_id, username in zip(user_ids, usernames):
+            q = session.query(func.count(Submission.id))\
+                .filter(Submission.user_id == user_id)
+            if q.scalar() == 0:
                 await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
 
-            q = session.query(func.min(Submission.date))\
-                .join(Problem, Problem.code == Submission._code)\
-                .filter(Submission._user == username)\
-                .filter(Submission.points == Problem.points)\
-                .group_by(Submission._code)
-            dates = list(map(itemgetter(0), q.all()))
-            dates.sort()
+            q = session.query(func.min(Submission.date)).\
+                join(Problem.submissions).\
+                filter(Submission.user_id == user_id).\
+                filter(Submission.points == Problem.points).\
+                group_by(Submission.problem_id).\
+                order_by(func.min(Submission.date))
+
+            dates = [date for (date,) in q]
             data_to_plot = {}
             cnt = 0
             for date in dates:
@@ -125,20 +127,19 @@ class Plot(commands.Cog):
         except ObjectNotFound:
             return await ctx.send('User not found')
 
+        user_ids = [user.id for user in users]
         usernames = [user.username for user in users]
-        for i in range(len(users)):
-            if users[i] is None:
-                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+        for user, username in zip(users, usernames):
+            if user is None:
+                return await ctx.send(f'{username} does not exist on DMOJ')
         if len(users) > 10:
             return await ctx.send('Too many users given, max 10')
 
         total_data = {}
-        for username in usernames:
+        for user_id, username in zip(user_ids, usernames):
             q = session.query(Submission)\
                 .options(orm.joinedload('problem'))\
-                .join(User, User.username == Submission._user,
-                      aliased=True)\
-                .filter(User.username == username)\
+                .filter(Submission.user_id == user_id)\
                 .order_by(Submission.date)
 
             submissions = q.all()
@@ -153,7 +154,7 @@ class Plot(commands.Cog):
             data_to_plot = {}
             # O(N^2logN) :blobcreep:
             for submission in submissions:
-                code = submission.problem[0].code
+                code = submission.problem.code
                 points = submission.points
                 result = submission.result
 
@@ -201,41 +202,22 @@ class Plot(commands.Cog):
         except ObjectNotFound:
             return await ctx.send('User not found')
 
+        user_ids = [user.id for user in users]
         usernames = [user.username for user in users]
-        for i in range(len(users)):
-            if users[i] is None:
-                return await ctx.send(f'{usernames[i]} does not exist on DMOJ')
+        for user, username in zip(users, usernames):
+            if user is None:
+                return await ctx.send(f'{username} does not exist on DMOJ')
         if len(users) > 10:
             return await ctx.send('Too many users given, max 10')
 
-        cond = [Contest.rankings.contains(user.username) for user in users]
-        q = session.query(Contest).filter(or_(*cond))\
-            .filter(Contest.is_rated == 1)
-        contests = q.all()
+        q = session.query(User.username, Participation.new_rating, Contest.end_time).\
+            join(Participation.contest).\
+            join(Participation.user).\
+            filter(Participation.user_id.in_(user_ids)).\
+            filter(Participation.new_rating != None).\
+            order_by(Contest.end_time)
+        data = q.all()
 
-        def get_rating_change(rankings, users):
-            ret = {}
-            for ranking in rankings:
-                for user in users:
-                    if (user.username == ranking['user'] and
-                       ranking['new_rating']):
-                        ret[user.username] = ranking['new_rating']
-            return ret
-
-        data = {}
-        data['users'] = [user.username for user in users]
-        userPrevRating = {}
-        for contest in contests:
-            changes = get_rating_change(contest.rankings, users)
-            data[contest.end_time] = []
-            for user in users:
-                if user.username in changes \
-                        and (not peak or changes[user.username] >= userPrevRating.get(user.username, -9999)):
-                    change = changes[user.username]
-                    userPrevRating[user.username] = change
-                    data[contest.end_time].append(change)
-                else:
-                    data[contest.end_time].append(None)
         plot_rating(data)
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
@@ -274,6 +256,7 @@ class Plot(commands.Cog):
         if len(users) > 6:
             return await ctx.send('Too many users given, max 6')
 
+        user_ids = [data.id for data in users]
         usernames = [data.username for data in users]
 
         important_types = [
@@ -300,9 +283,9 @@ class Plot(commands.Cog):
 
         max_percentage = 0
 
-        for username in usernames:
+        for user_id, username in zip(user_ids, usernames):
             q = session.query(Submission)\
-                .filter(Submission._user == username)
+                .filter(Submission.user_id == user_id)
             if q.count() == 0:
                 await ctx.send(f'`{username}` does not have any cached submissions, caching now')
                 await query.get_submissions(username)
