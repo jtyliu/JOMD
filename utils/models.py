@@ -50,30 +50,28 @@ Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()
 
-total_time = 0
-
-
+# total_time = 0
 # @event.listens_for(engine, "before_cursor_execute")
 # def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
 #     conn.info.setdefault('query_start_time', []).append(time.time())
-#     logging.info("Start Query: %s", statement)
-#     logging.info("Query params: %s", parameters)
+#    logging.info("Start Query: %s", statement)
+#    logging.info("Query params: %s", parameters)
 
 # @event.listens_for(engine, "after_cursor_execute")
 # def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
 #     global total_time
 #     total = time.time() - conn.info['query_start_time'].pop(-1)
-#     logging.info("Query Complete!")
-#     logging.info("Total Time: %f", total)
-#     total_time += total
+#    logging.info("Query Complete!")
+#    logging.info("Total Time: %f", total)
+#    total_time += total
 
-import atexit
+# import atexit
 
-def exit_handler():
-    global total_time
-    print("Total time communicating with db", total_time)
+# def exit_handler():
+#     global total_time
+#     print("Total time communicating with db", total_time)
 
-atexit.register(exit_handler)
+# atexit.register(exit_handler)
 
 
 class AttrMixin:

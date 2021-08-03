@@ -249,7 +249,7 @@ class ContestCog(commands.Cog, name='Contest'):
         q = session.query(Contest).filter(Contest.key == key)
         # Clear cache
         if q.count():
-            q.delete()
+            session.delete(q.scalar())
             session.commit()
         try:
             contest = await query.get_contest(key)

@@ -166,7 +166,7 @@ class Query:
         q = session.query(Contest).\
             filter(Contest.key == a.data.object.key)
         if q.count():
-            q.delete()
+            session.delete(q.scalar())
         session.add(Contest(a.data.object))
         session.commit()
         return q.first()
@@ -246,17 +246,13 @@ class Query:
         if a.data.total_objects == q.count():
             return q.all()
 
-        participation_id = list(map(attrgetter('id'), a.data.objects))
-        qq = session.query(Submission.id).\
-            filter(Submission.id.in_(participation_id)).all()
-        qq = list(map(itemgetter(0), qq))
-        for submission in a.data.objects:
-            if submission.id not in qq:
-                session.add(Submission(submission))
+        for participation in q.all():
+            session.delete(participation)
+        session.commit()
+
         total_pages = a.data.total_pages
         for participation in a.data.objects:
-            if participation.id not in participation_id:
-                session.add(Participation(participation))
+            session.add(Participation(participation))
 
         apis = []
         to_gather = []
@@ -273,17 +269,9 @@ class Query:
             to_gather.append(to_await)
         await asyncio.gather(*to_gather)
         for api in apis:
-            participation_id = list(map(attrgetter('id'), api.data.objects))
-            qq = session.query(Submission.id).\
-                filter(Submission.id.in_(participation_id)).all()
-            qq = list(map(itemgetter(0), qq))
-            for submission in api.data.objects:
-                if submission.id not in qq:
-                    session.add(Submission(submission))
             total_pages = api.data.total_pages
             for participation in api.data.objects:
-                if participation.id not in participation_id:
-                    session.add(Participation(participation))
+                session.add(Participation(participation))
         session.commit()
         return q.all()
 
