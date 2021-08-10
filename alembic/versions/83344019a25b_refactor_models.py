@@ -348,7 +348,9 @@ def upgrade():
                     sa.Column('time', sa.Float(), nullable=True),
                     sa.Column('participation_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['participation_id'], ['participation.id'], ),
-                    sa.PrimaryKeyConstraint('id')
+                    sa.PrimaryKeyConstraint('id'),
+                    sa.Column('contest_id', sa.String(), nullable=True),
+                    sa.ForeignKeyConstraint(['contest_id'], ['contest.key'], ),
                     )
     op.create_index(op.f('ix_participation_solution_points'), 'participation_solution', ['points'], unique=False)
     op.create_table('participation_user',
