@@ -178,7 +178,7 @@ class Query:
             filter(Contest_DB.key == key)
         if q.count() and cached:
             # is_rated checks if it has detailed rows
-            if q.first().is_rated is not None:
+            if q.first().has_rating is not None:
                 return q.first()
         a = API()
         await a.get_contest(key)
