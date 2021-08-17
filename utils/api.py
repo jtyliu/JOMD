@@ -330,7 +330,6 @@ class User:
         self.rank = data['problem_count']
         self.rating = data['rating']
         self.max_rating = data['rating']
-        self.volatility = data['volatility']
         self._solved_problems = data.get('solved_problems', [])
         self.solved_problems = []
         self._organizations = data.get('organizations', [])

@@ -263,7 +263,6 @@ class User(Base):
     rank = Column(String)
     rating = Column(Integer)
     max_rating = Column(Integer)
-    volatility = Column(Integer)
     solved_problems = relationship('Problem', secondary=problem_user,
                                    back_populates='solved_users')
     organizations = relationship('Organization', secondary=organization_user,
@@ -286,7 +285,6 @@ class User(Base):
         self.problem_count = user.problem_count
         self.rank = user.rank
         self.rating = user.rating
-        self.volatility = user.volatility
         self.solved_problems += user.solved_problems
         self.organizations += user.organizations
         self.contests += user.contests
