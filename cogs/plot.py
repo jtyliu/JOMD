@@ -299,6 +299,10 @@ class Plot(commands.Cog):
 
             for username in usernames:
                 points = query.get_attempted_problems(username, types)
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
                 points.sort(reverse=True)
 
                 points = calculate_partial_points(points)
