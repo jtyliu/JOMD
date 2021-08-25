@@ -393,25 +393,23 @@ class Query:
             .filter(Problem.is_organization_private == 0)\
             .filter(Problem.is_public == 1)
         if types:
-            conds = [Problem.types.contains(_type) for _type in types]
+            conds = [Problem.types == _type for _type in types]
             q = q.filter(or_(*conds))
         return q.all()
 
-    def get_attempted_problems(self, username: str, types: List[str], low: int = 1, high: int = 50) -> Problem:
-        sub_q = session.query(Submission, func.max(Submission.points))\
-            .join(Submission.user)\
-            .filter(User.username == username)\
-            .group_by(Submission.problem_id).subquery()
-        q = session.query(Problem)\
-            .outerjoin(sub_q, Problem.code == sub_q.c.problem_id)\
-            .filter(func.ifnull(sub_q.c.points, 0) != Problem.points)\
+    def get_attempted_problems(self, username: str, types: List[str], low: int = 1, high: int = 50) -> List[int]:
+        sub_q = session.query(Problem.code)\
             .filter(Problem.points.between(low, high))\
             .filter(Problem.is_organization_private == 0)\
-            .filter(Problem.is_public == 1)
-        if types:
-            conds = [Problem.types.contains(_type) for _type in types]
-            q = q.filter(or_(*conds))
-        return q.all()
+            .filter(Problem.is_public == 1)\
+            .filter(or_(*[Problem.types == _type for _type in types])).subquery()
+        q = session.query(func.max(Submission.points))\
+            .join(sub_q, Submission.problem_id == sub_q.c.code)\
+            .join(Submission.user)\
+            .filter(User.username == username)\
+            .filter(func.ifnull(Submission.points, 0) != 0)\
+            .group_by(Submission.problem_id)
+        return [point for (point,) in q.all()]
 
     def get_member_named(self, guild, name):
         result = None

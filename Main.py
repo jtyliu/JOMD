@@ -2,7 +2,8 @@ import os
 from discord.ext import commands
 from pathlib import Path
 import discord
-from utils.models import session, Problem
+from sqlalchemy.sql.functions import session_user
+from utils.models import User, session, Problem
 from utils.query import Query
 import asyncio
 import logging
@@ -36,10 +37,13 @@ def main():
             raise commands.NoPrivateMessage('Private messages not permitted.')
         return True
 
+    loop = asyncio.get_event_loop()
     # Get preliminary data
+    if session.query(User).count() == 0:
+        q = Query()
+        loop.run_until_complete(q.get_users())
     if session.query(Problem).count() == 0:
         q = Query()
-        loop = asyncio.get_event_loop()
         loop.run_until_complete(q.get_problems())
 
     # Restrict bot usage to inside guild channels only.

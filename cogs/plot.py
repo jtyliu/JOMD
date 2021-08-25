@@ -190,6 +190,7 @@ class Plot(commands.Cog):
     @plot.command(usage='[+peak] [usernames]')
     async def rating(self, ctx, peak: typing.Optional[plot_peak] = False, *usernames):
         '''Plot rating progression'''
+        # NOTE: The function does not work, https://github.com/DMOJ/online-judge/pull/1743 needs to be merged
         usernames = list(usernames)
 
         query = Query()
@@ -217,7 +218,7 @@ class Plot(commands.Cog):
             filter(Participation.new_rating != None).\
             order_by(Contest.end_time)
         data = q.all()
-
+        print(data)
         plot_rating(data)
         with open('./graphs/plot.png', 'rb') as file:
             file = discord.File(io.BytesIO(file.read()), filename='plot.png')
@@ -297,9 +298,7 @@ class Plot(commands.Cog):
             total_points = calculate_partial_points(total_points)
 
             for username in usernames:
-                problems = query.get_attempted_problems(username, types)
-
-                points = list(map(attrgetter('points'), problems))
+                points = query.get_attempted_problems(username, types)
                 points.sort(reverse=True)
 
                 points = calculate_partial_points(points)
