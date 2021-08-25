@@ -233,7 +233,7 @@ class HandlesCog(commands.Cog, name='Handles'):
         add_role = all([rank.name != role.name for role in member.roles])
         to_remove = []
         for role in member.roles:
-            if rank.name != role.name and role.name in RATING_TO_RANKS.values():
+            if rank.name != role.name and role.name in RANKS:
                 to_remove.append(role)
 
         if len(to_remove) != 0:
