@@ -5,7 +5,8 @@ from discord.ext import commands
 from discord.utils import escape_markdown
 import discord
 from utils.query import Query
-from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB
+from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, \
+    Submission as Submission_DB
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
 import typing
 import asyncio
@@ -77,7 +78,11 @@ class Handles(commands.Cog):
         handle = session.query(Handle_DB)\
             .filter(Handle_DB.id == ctx.author.id)\
             .filter(Handle_DB.guild_id == ctx.guild.id).first()
+        user = session.query(User_DB)\
+            .filter(User_DB.id == handle.user_id).first()
+        session.query(Submission_DB).filter(Submission_DB._user == handle.handle).delete()            
         session.delete(handle)
+        session.delete(user)
         session.commit()
         await ctx.send(escape_markdown(f'Unlinked you with handle {handle.handle}'))
 
