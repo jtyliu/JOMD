@@ -79,10 +79,9 @@ class Handles(commands.Cog):
             .filter(Handle_DB.id == ctx.author.id)\
             .filter(Handle_DB.guild_id == ctx.guild.id).first()
         user = session.query(User_DB)\
-            .filter(User_DB.id == handle.user_id).first()
+            .filter(User_DB.id == handle.user_id).delete()
         session.query(Submission_DB).filter(Submission_DB._user == handle.handle).delete()
         session.delete(handle)
-        session.delete(user)
         session.commit()
         await ctx.send(escape_markdown(f'Unlinked you with handle {handle.handle}'))
 
