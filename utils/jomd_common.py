@@ -1,9 +1,9 @@
 import asyncio
-from discord.ext.commands.errors import BadArgument
+# from discord.ext.commands.errors import BadArgument
 import typing
 from utils.query import Query
 import random
-import discord
+# import discord
 
 
 def list_to_str(arg):
@@ -26,47 +26,47 @@ def is_int(val):
         return False
 
 
-def str_not_int(argument) -> typing.Optional[str]:
-    if is_int(argument):
-        raise BadArgument('Passed argument is not int')
-    return argument.replace('\'', '')
+# def str_not_int(argument) -> typing.Optional[str]:
+#     if is_int(argument):
+#         raise BadArgument('Passed argument is not int')
+#     return argument.replace('\'', '')
 
 
-def point_range(argument) -> typing.Optional[list]:
-    if '-' in argument:
-        argument = argument.split('-')
-        if len(argument) != 2:
-            raise BadArgument('Too many -, invalid range')
-        try:
-            point_low = int(argument[0])
-            point_high = int(argument[1])
-            return [point_low, point_high]
-        except ValueError:
-            raise BadArgument('Point values are not an integer')
-    try:
-        point_high = point_low = int(argument)
-        return [point_high, point_low]
-    except ValueError:
-        raise BadArgument('Point value is not an integer')
+# def point_range(argument) -> typing.Optional[list]:
+#     if '-' in argument:
+#         argument = argument.split('-')
+#         if len(argument) != 2:
+#             raise BadArgument('Too many -, invalid range')
+#         try:
+#             point_low = int(argument[0])
+#             point_high = int(argument[1])
+#             return [point_low, point_high]
+#         except ValueError:
+#             raise BadArgument('Point values are not an integer')
+#     try:
+#         point_high = point_low = int(argument)
+#         return [point_high, point_low]
+#     except ValueError:
+#         raise BadArgument('Point value is not an integer')
 
 
-def parse_gimme(argument) -> typing.Optional[str]:
-    keywords = [
-        'adhoc', 'Ad Hoc', 'math', 'Advanced Math', 'Intermediate Math',
-        'Simple Math', 'bf', 'Brute Force', 'ctf', 'Capture the Flag', 'ds',
-        'Data Structures', 'd&c', 'Divide and Conquer', 'dp',
-        'Dynamic Programming', 'geo', 'Geometry', 'gt', 'Graph Theory',
-        'greedy', 'Greedy Algorithms', 'regex', 'Regular Expressions',
-        'string', 'String Algorithms'
-    ]
-    if argument in keywords:
-        raise BadArgument('Argument is keyword')
+# def parse_gimme(argument) -> typing.Optional[str]:
+#     keywords = [
+#         'adhoc', 'Ad Hoc', 'math', 'Advanced Math', 'Intermediate Math',
+#         'Simple Math', 'bf', 'Brute Force', 'ctf', 'Capture the Flag', 'ds',
+#         'Data Structures', 'd&c', 'Divide and Conquer', 'dp',
+#         'Dynamic Programming', 'geo', 'Geometry', 'gt', 'Graph Theory',
+#         'greedy', 'Greedy Algorithms', 'regex', 'Regular Expressions',
+#         'string', 'String Algorithms'
+#     ]
+#     if argument in keywords:
+#         raise BadArgument('Argument is keyword')
 
-    try:
-        point_range(argument)
-    except BadArgument:
-        return argument.replace('\'', '')
-    raise BadArgument('Argument is point range')
+#     try:
+#         point_range(argument)
+#     except BadArgument:
+#         return argument.replace('\'', '')
+#     raise BadArgument('Argument is point range')
 
 
 def calculate_points(points, fully_solved):

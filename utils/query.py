@@ -1,6 +1,4 @@
-from discord import utils
-from discord.ext import commands
-from discord.ext.commands.errors import MemberNotFound
+from lightbulb.converters.special import MemberConverter
 from utils.api import API
 from sqlalchemy import or_, func
 from utils.db import (session, Problem as Problem_DB,
@@ -448,31 +446,9 @@ class Query:
             .group_by(Submission_DB._code)
         return [point for (point,) in q.all()]
 
-    def get_member_named(self, guild, name):
-        result = None
-        members = guild.members
-        if len(name) > 5 and name[-5] == '#':
-            # The 5 length is checking to see if #0000 is in the string,
-            # as a#0000 has a length of 6, the minimum for a potential
-            # discriminator lookup.
-            potential_discriminator = name[-4:]
-
-            # do the actual lookup and return if found
-            # if it isn't found then we'll do a full name lookup below.
-            result = utils.get(members, name=name[:-5], discriminator=potential_discriminator)
-            if result is not None:
-                return result
-
-        name = name.casefold()
-
-        def pred(m):
-            return m.nick and m.nick.casefold() == name or m.name.casefold() == name
-
-        return utils.find(pred, members)
-
     async def parseUser(self, ctx, arg):
         try:
-            return await commands.MemberConverter().convert(ctx, arg)
-        except MemberNotFound:
-            return self.get_member_named(ctx.guild, arg)
+            return await MemberConverter().convert(arg)
+        except TypeError:
+            # TODO: Reimplement get_member_named
             return None
