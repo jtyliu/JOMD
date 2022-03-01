@@ -1,9 +1,9 @@
 import asyncio
-# from discord.ext.commands.errors import BadArgument
 import typing
 from utils.query import Query
 import random
-# import discord
+import hikari
+import re
 
 
 def list_to_str(arg):
@@ -19,17 +19,9 @@ def str_to_list(arg):
 
 
 def is_int(val):
-    try:
-        int(val)
-        return True
-    except (TypeError, ValueError):
-        return False
+    return re.match(r'[-+]?\d+', val) is not None
 
 
-# def str_not_int(argument) -> typing.Optional[str]:
-#     if is_int(argument):
-#         raise BadArgument('Passed argument is not int')
-#     return argument.replace('\'', '')
 
 
 # def point_range(argument) -> typing.Optional[list]:
@@ -51,7 +43,7 @@ def is_int(val):
 
 
 # def parse_gimme(argument) -> typing.Optional[str]:
-#     keywords = [
+    # keywords = [
 #         'adhoc', 'Ad Hoc', 'math', 'Advanced Math', 'Intermediate Math',
 #         'Simple Math', 'bf', 'Brute Force', 'ctf', 'Capture the Flag', 'ds',
 #         'Data Structures', 'd&c', 'Divide and Conquer', 'dp',
@@ -103,7 +95,7 @@ async def gimme_common(username, points, types):
     else:
         memory = '%dK' % (memory)
 
-    embed = discord.Embed(
+    embed = hikari.Embed(
         title=problem.name,
         url='https://dmoj.ca/problem/%s' % problem.code,
         description='Points: %s\nProblem Types: %s' %
@@ -111,7 +103,7 @@ async def gimme_common(username, points, types):
         color=0xfcdb05,
     )
 
-    embed.set_thumbnail(url=await query.get_pfp(username))
+    embed.set_thumbnail(await query.get_pfp(username))
     embed.add_field(name='Group', value=problem.group, inline=True)
     embed.add_field(
         name='Time',
@@ -197,7 +189,7 @@ async def scroll_embed(ctx, bot, message, title, content):
                 page = 0
             elif str(reaction.emoji) == LAST:
                 page = len(content) - 1
-            await message.edit(embed=discord.Embed().add_field(name=title, value=content[page]))
+            await message.edit(embed=hikari.Embed().add_field(name=title, value=content[page]))
             await message.remove_reaction(reaction, user)
         except asyncio.TimeoutError:
             break

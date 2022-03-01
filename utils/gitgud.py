@@ -1,4 +1,5 @@
 from sqlalchemy import func, desc
+from sqlalchemy.orm import joinedload
 from utils.db import (session, Problem as Problem_DB,
                       Contest as Contest_DB,
                       Participation as Participation_DB,
@@ -44,7 +45,8 @@ class Gitgud:
         q = session.query(User_DB)\
             .filter(User_DB.username == username)\
             .join(User_DB.solved_problems)\
-            .filter(Problem_DB.code == problem_code)
+            .filter(Problem_DB.code == problem_code)\
+            .options(joinedload(User_DB.solved_problems))
         if q.count():
             return True
         return False

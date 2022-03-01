@@ -403,6 +403,8 @@ class Query:
             return q.first().handle
 
     def get_handle_user(self, handle: str, guild_id: int) -> int:
+        """Returns discord user id"""
+        # TODO make this make sense
         q = session.query(Handle_DB).\
             filter(Handle_DB.handle == handle).\
             filter(Handle_DB.guild_id == guild_id)

@@ -29,7 +29,7 @@ def main():
 
     # bot.load_extensions_from('./extensions/')
     # TESTING
-    extensions = ['admin', 'meta']
+    extensions = ['admin', 'meta', 'gitgud', 'handles', 'user']
     for extension in extensions:
         bot.load_extensions(f'extensions.{extension}')
     logger.debug('Extensions loaded: %s', ', '.join(bot.extensions))
