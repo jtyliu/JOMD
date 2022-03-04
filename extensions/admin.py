@@ -32,9 +32,12 @@ async def on_error(event: lightbulb.CommandErrorEvent) -> None:
             return await event.context.respond(f"Not enough arguments ({event.exception})")
         if isinstance(event.exception, lightbulb.CommandInvocationError):
             if isinstance(event.exception.original, hikari.ForbiddenError):
-                return await event.context.respond(f"I do not have permissions ({event.exception})")
+                return await event.context.respond(f"I do not have permissions to do this ({event.exception})")
         if isinstance(event.exception, lightbulb.CommandNotFound):
-            return await event.context.respond(f"Where command ({event.exception})")
+            return await event.context.respond(f"Where command? ({event.exception})")
+
+        if isinstance(event.exception, lightbulb.errors.MissingRequiredRole):
+            return await event.context.respond(f"Missing required roles ({event.exception})")
 
         trace = "".join(traceback.format_exception(None, event.exception, event.exception.__traceback__))
         await event.context.respond(
@@ -43,7 +46,7 @@ Backtrace:""".format(
                 event.exception
             ),
             attachment=hikari.Bytes(trace, "traceback.txt"),
-        )  # Truncate or face error
+        )
     except Exception as e:
         logger.critical("Error handling raised error: was handling %s, raised %s", event, e)
         await event.context.respond("Crtitical error encountered, check logs")
@@ -59,11 +62,10 @@ async def on_slash_command(event: lightbulb.SlashCommandCompletionEvent) -> None
 
 @plugin.command()
 @lightbulb.command("reload_all", "Reload all extensions")
-@lightbulb.implements(lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def reload_all(ctx: lightbulb.Context) -> None:
     try:
-        # extensions = [file.stem for file in Path('extensions').glob('*.py')]
-        extensions = ["admin", "meta", "gitgud", "handles", "user", "plot"]
+        extensions = [file.stem for file in Path("extensions").glob("*.py")]
         for extension in extensions:
             ctx.bot.reload_extensions(f"extensions.{extension}")
     except lightbulb.ExtensionNotLoaded as e:

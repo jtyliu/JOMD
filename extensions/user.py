@@ -468,9 +468,7 @@ async def gimmie(self, ctx):
 
 
 @plugin.command()
-@lightbulb.option(
-    "filters", "Problem filters", t.List[str], required=False, modifier=OptionModifier.GREEDY, default=[]
-)
+@lightbulb.option("filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[])
 @lightbulb.option(
     "points",
     "point range, e.g. ('1', '1-10') DOES NOT WORK WITH SLASH COMMANDS",
@@ -557,9 +555,7 @@ async def gimme(ctx):
 
 
 @plugin.command()
-@lightbulb.option(
-    "args", "[username] [p<=points, p>=points]", str, modifier=OptionModifier.GREEDY, required=False
-)
+@lightbulb.option("args", "[username] [p<=points, p>=points]", str, modifier=OptionModifier.GREEDY, required=False)
 @lightbulb.set_help(
     "Usage: [username] [p<=points, p>=points]\nUse surround your username with '' if it can be interpreted as a number"
 )

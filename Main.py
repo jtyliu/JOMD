@@ -26,11 +26,11 @@ def main():
         token=BOT_TOKEN, prefix=pref, banner=None, intents=hikari.Intents.ALL, default_enabled_guilds=707067613993500692
     )
 
-    # bot.load_extensions_from('./extensions/')
+    bot.load_extensions_from("./extensions/")
     # TESTING
-    extensions = ["admin", "meta", "gitgud", "handles", "user", "plot"]
-    for extension in extensions:
-        bot.load_extensions(f"extensions.{extension}")
+    # extensions = ["admin", "meta", "gitgud", "handles", "user", "plot"]
+    # for extension in extensions:
+    #     bot.load_extensions(f"extensions.{extension}")
     logger.debug("Extensions loaded: %s", ", ".join(bot.extensions))
 
     # Get preliminary data
@@ -41,7 +41,7 @@ def main():
 
     # Restrict bot usage to inside guild channels only.
     bot.check(lightbulb.checks.guild_only)
-
+    # TODO Make something that will automatically fetch recent contests
     bot.run()
 
 

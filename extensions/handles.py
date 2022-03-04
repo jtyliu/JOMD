@@ -1,15 +1,20 @@
+import functools
 from utils.api import ObjectNotFound
 from utils.jomd_common import scroll_embed
 from operator import itemgetter
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, Submission as Submission_DB
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
-import typing
+import typing as t
 import asyncio
+import functools
 import hashlib
 import lightbulb
 import hikari
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 # https://github.com/Rapptz/discord.py/blob/master/discord/utils.py
 _MARKDOWN_ESCAPE_COMMON = r"^>(?:>>)?\s|\[.+\]\(.+\)"
@@ -33,6 +38,19 @@ def escape_markdown(text: str, *, ignore_links: bool = True) -> str:
     if ignore_links:
         regex = f"(?:{_URL_REGEX}|{regex})"
     return re.sub(regex, replacement, text, 0, re.MULTILINE)
+
+
+def has_any_role_names(role_names: t.List[str]) -> bool:
+    def _has_any_role_names(ctx: lightbulb.Context, *, role_names: t.List[str]):
+        assert ctx.member is not None
+
+        if any(role.name in role_names for role in ctx.member.get_roles()):
+            return True
+        raise lightbulb.errors.MissingRequiredRole(
+            "You are missing the roles required in order to run this command %s" % role_names
+        )
+
+    return lightbulb.Check(functools.partial(_has_any_role_names, role_names=role_names))
 
 
 plugin = lightbulb.Plugin("Handles")
@@ -88,7 +106,7 @@ async def whois(ctx):
             color=0xFCDB05,
         )
         return await ctx.respond(embed=embed)
-    
+
     name = None
     if member:
         name = member.nickname or member.name
@@ -182,56 +200,71 @@ async def link(ctx: lightbulb.Context) -> None:
         await ctx.respond("You are missing the `" + rank.name + "` role")
 
 
-# @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')
-# @commands.has_any_role(*ADMIN_ROLES)
-# async def _set(self, ctx, member, username: str):
-#     '''Manually link two accounts together'''
-#     query = Query()
-#     member = await query.parseUser(ctx, member)
+@plugin.command()
+@lightbulb.add_checks(has_any_role_names(ADMIN_ROLES))
+@lightbulb.option("handle", "Dmoj handle", str)
+@lightbulb.option("member", "Discord user or [+remove] to force unlink", hikari.Member)
+@lightbulb.command("set", "Manually link two accounts together")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def _set(ctx):
+    """Manually link two accounts together"""
+    # TODO: I don't like the bot spamming replies to itself, figure out a way to lessen that
+    member = ctx.options.member
+    username = ctx.options.handle
+    query = Query()
 
-#     if username != '+remove':
-#         user = await query.get_user(username)
+    if username != "+remove":
+        user = await query.get_user(username)
 
-#         if user is None:
-#             await ctx.respond(escape_markdown(f'{username} does not exist on dmoj'))
-#             return
+        if user is None:
+            await ctx.respond(escape_markdown(f"{username} does not exist on dmoj"))
+            return
 
-#         username = user.username
+        username = user.username
 
-#     handle = query.get_handle(member.id, ctx.guild.id)
-#     if handle == username:
-#         return await ctx.respond(escape_markdown(f'{member.display_name} is already linked with {handle}'))
+    handle = query.get_handle(member.id, ctx.get_guild().id)
+    if handle == username:
+        return await ctx.respond(escape_markdown(f"{member.display_name} is already linked with {handle}"))
 
-#     if handle:
-#         handle = session.query(Handle_DB)\
-#             .filter(Handle_DB.id == member.id)\
-#             .filter(Handle_DB.guild_id == ctx.guild.id).first()
-#         session.delete(handle)
-#         session.commit()
-#         await ctx.respond(escape_markdown(f'Unlinked {member.display_name} with handle {handle.handle}'))
+    if handle:
+        handle = (
+            session.query(Handle_DB)
+            .filter(Handle_DB.id == member.id)
+            .filter(Handle_DB.guild_id == ctx.get_guild().id)
+            .first()
+        )
+        session.delete(handle)
+        session.commit()
+        await ctx.respond(escape_markdown(f"Unlinked {member.display_name} with handle {handle.handle}"))
 
-#     if username == '+remove':
-#         return
+    if username == "+remove":
+        return
 
-#     if query.get_handle_user(username, ctx.guild.id):
-#         await ctx.respond('This handle is already linked with another user')
-#         return
+    if query.get_handle_user(username, ctx.get_guild().id):
+        await ctx.respond("This handle is already linked with another user")
+        return
 
-#     handle = Handle_DB()
-#     handle.id = member.id
-#     handle.handle = username
-#     handle.user_id = user.id
-#     handle.guild_id = ctx.guild.id
-#     session.add(handle)
-#     session.commit()
-#     await ctx.respond(escape_markdown(f'Linked {member.name} with {username}'))
+    handle = Handle_DB()
+    handle.id = member.id
+    handle.handle = username
+    handle.user_id = user.id
+    handle.guild_id = ctx.get_guild().id
+    session.add(handle)
+    session.commit()
+    await ctx.respond(escape_markdown(f"Linked {member.display_name} with {username}"))
 
-#     rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
-#     rank = self.rating_to_rank(user.rating)
-#     if rank in rank_to_role:
-#         await self._update_rank(ctx.author, rank_to_role[rank], 'Dmoj account linked')
-#     else:
-#         await ctx.respond('You are missing the `' + rank.name + '` role')
+    rank_to_role = {}
+    rc = lightbulb.RoleConverter(ctx)
+    for role_id in ctx.get_guild().get_roles():
+        role = await rc.convert(str(role_id))
+        if role.name in RANKS:
+            rank_to_role[role.name] = role
+
+    rank = rating_to_rank(user.rating)
+    if rank in rank_to_role:
+        await _update_rank(member, rank_to_role[rank], "Dmoj account linked")
+    else:
+        await ctx.respond("You are missing the `" + rank.name + "` role")
 
 
 # @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
@@ -241,7 +274,7 @@ async def link(ctx: lightbulb.Context) -> None:
 #     if arg != 'rating' and arg != 'maxrating' and arg != 'points' and arg != 'solved':
 #         return await ctx.respond_help('top')
 #     users = session.query(User_DB).join(Handle_DB, Handle_DB.handle == User_DB.username)\
-#         .filter(Handle_DB.guild_id == ctx.guild.id)
+#         .filter(Handle_DB.guild_id == ctx.get_guild().id)
 #     leaderboard = []
 #     for user in users:
 #         if arg == 'rating':
@@ -292,59 +325,63 @@ async def _update_rank(member: hikari.Member, role: hikari.Role, reason: str):
         await member.add_role(role, reason=reason)
 
 
-# @commands.command()
-# @commands.has_any_role(*ADMIN_ROLES)
-# async def update_roles(self, ctx):
-#     '''Manually update roles'''
-#     # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
-#     # TODO: Migrate to work with participation table
+@plugin.command()
+@lightbulb.add_checks(has_any_role_names(ADMIN_ROLES))
+@lightbulb.command("update_roles", "Manually update roles")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def update_roles(ctx):
+    """Manually update roles"""
+    # Big problem, I stored rankings column in Contest table as Json instead of using foreign keys to participation
+    # TODO: Migrate to work with participation table
 
-#     msg = await ctx.respond('Fetching ratings...')
+    msg = await ctx.respond("Fetching ratings...")
 
-#     contests = session.query(Contest_DB).filter(Contest_DB.is_rated == 1)\
-#         .order_by(Contest_DB.end_time.desc()).all()
+    contests = session.query(Contest_DB).filter(Contest_DB.is_rated == 1).order_by(Contest_DB.end_time.desc()).all()
 
-#     users = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.guild.id).all()
-#     new_ratings = {}
-#     # Yes this will make some of you cry
-#     for user in users:
-#         new_ratings[user] = None  # unrated
-#         for contest in contests:
-#             found = False
-#             if contest.rankings is None:
-#                 continue
+    users = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.get_guild().id).all()
+    new_ratings = {}
+    # Yes this will make some of you cry
+    for user in users:
+        new_ratings[user] = None  # unrated
+        for contest in contests:
+            found = False
+            if contest.rankings is None:
+                continue
 
-#             for participation in contest.rankings:
-#                 if participation['user'].lower() == user.handle.lower() and participation['new_rating'] is not None:
-#                     new_ratings[user] = participation['new_rating']
-#                     found = True
-#                     break
-#             if found:
-#                 break
-#     members = [ctx.guild.get_member(handle.id) for handle in new_ratings]
+            for participation in contest.rankings:
+                if participation["user"].lower() == user.handle.lower() and participation["new_rating"] is not None:
+                    new_ratings[user] = participation["new_rating"]
+                    found = True
+                    break
+            if found:
+                break
+    members = [ctx.get_guild().get_member(handle.id) for handle in new_ratings]
 
-#     rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
+    # NOTE: Same piece of code in two other places
+    rank_to_role = {}
+    rc = lightbulb.RoleConverter(ctx)
+    for role_id in ctx.get_guild().get_roles():
+        role = await rc.convert(str(role_id))
+        if role.name in RANKS:
+            rank_to_role[role.name] = role
 
-#     await msg.edit(content='Updating roles...')
+    await msg.edit(content="Updating roles...")
 
-#     missing_roles = []
-#     try:
-#         for member, user in zip(members, list(new_ratings.keys())):
-#             if member is None:
-#                 continue
+    missing_roles = []
 
-#             rank = self.rating_to_rank(new_ratings[user])
-#             if rank in rank_to_role:
-#                 await self._update_rank(member, rank_to_role[rank], 'Dmoj rank update')
-#             elif rank not in missing_roles:
-#                 missing_roles.append(rank)
-#     except Exception as e:
-#         await ctx.respond('An error occurred. ' + str(e))
-#         return
+    for member, user in zip(members, list(new_ratings.keys())):
+        if member is None:
+            continue
 
-#     if len(missing_roles) != 0:
-#         await ctx.respond('You are missing the ' + ', '.join(missing_roles) + ' roles')
-#     await msg.edit(content='Roles updated')
+        rank = rating_to_rank(new_ratings[user])
+        if rank in rank_to_role:
+            await _update_rank(member, rank_to_role[rank], "Dmoj rank update")
+        elif rank not in missing_roles:
+            missing_roles.append(rank)
+
+    if len(missing_roles) != 0:
+        await ctx.respond("You are missing the " + ", ".join(missing_roles) + " roles")
+    await msg.edit(content="Roles updated")
 
 
 def load(bot: lightbulb.BotApp) -> None:

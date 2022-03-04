@@ -34,9 +34,7 @@ plugin = lightbulb.Plugin("GitGud")
 
 
 @plugin.command()
-@lightbulb.option(
-    "filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[]
-)
+@lightbulb.option("filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[])
 @lightbulb.option(
     "points",
     "point range, e.g. ('1', '1-10') DOES NOT WORK WITH SLASH COMMANDS",
