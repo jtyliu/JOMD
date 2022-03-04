@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 plugin = lightbulb.Plugin("Admin")
 plugin.add_checks(lightbulb.checks.owner_only)
+# NOTE: REMOVE SLASH COMMANDS UNTIL SLASH PERMS V2 COME OUT
 
 
 @plugin.listener(lightbulb.PrefixCommandCompletionEvent)
@@ -58,7 +59,7 @@ async def on_slash_command(event: lightbulb.SlashCommandCompletionEvent) -> None
 
 @plugin.command()
 @lightbulb.command("reload_all", "Reload all extensions")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.PrefixCommand)
 async def reload_all(ctx: lightbulb.Context) -> None:
     try:
         # extensions = [file.stem for file in Path('extensions').glob('*.py')]
@@ -75,7 +76,7 @@ async def reload_all(ctx: lightbulb.Context) -> None:
 @lightbulb.option("key", "key/id of problem or contest", str)
 @lightbulb.option("type", "Thing to recache", choices=["contest", "problem"])
 @lightbulb.command("force", "Force a recache of a problem, or contest")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.PrefixCommand)
 async def force(ctx: lightbulb.Context) -> None:
     if ctx.options.type.lower() == "contest":
         q = session.query(Contest_DB).filter(Contest_DB.key == ctx.options.key)
@@ -113,7 +114,7 @@ async def force(ctx: lightbulb.Context) -> None:
 
 @plugin.command()
 @lightbulb.command("cache_contests", "Cache every contest")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.PrefixCommand)
 async def cache_contests(ctx: lightbulb.Context) -> None:
     # TODO Add live counter
     query = Query()
@@ -126,7 +127,7 @@ async def cache_contests(ctx: lightbulb.Context) -> None:
 
 @plugin.command()
 @lightbulb.command("update_problems", "Clears problem table and recaches problems")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.PrefixCommand)
 async def update_problems(ctx: lightbulb.Context) -> None:
     """Update all problems in db (For when Nick nukes problems)"""
     # TODO Add live counter
