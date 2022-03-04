@@ -37,16 +37,16 @@ async def cache(ctx: lightbulb.Context) -> None:
 
 
 @plugin.command()
-@lightbulb.command("check", "Check if the bot has been rate limited")
+@lightbulb.command("check", "Perform sanity check on bot")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def check(ctx: lightbulb.Context) -> None:
     api = API()
     await api.get_user("JoshuaL")
     user = api.data.object
     if user is None:
-        await ctx.send("There is something wrong with the api, " "please contact an admin")
+        await ctx.respond("There is something wrong with the api, " "please contact an admin")
     else:
-        await ctx.send("Api is all good, move along")
+        await ctx.respond("Api is all good, move along")
 
 
 @plugin.command()

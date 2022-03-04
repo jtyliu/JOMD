@@ -62,7 +62,7 @@ async def on_slash_command(event: lightbulb.SlashCommandCompletionEvent) -> None
 async def reload_all(ctx: lightbulb.Context) -> None:
     try:
         # extensions = [file.stem for file in Path('extensions').glob('*.py')]
-        extensions = ["admin", "meta", "gitgud", "handles", "user"]
+        extensions = ["admin", "meta", "gitgud", "handles", "user", "plot"]
         for extension in extensions:
             ctx.bot.reload_extensions(f"extensions.{extension}")
     except lightbulb.ExtensionNotLoaded as e:

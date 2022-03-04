@@ -2,7 +2,7 @@ import typing as t
 from utils.gitgud import Gitgud as Gitgud_utils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
-from utils.jomd_common import gimme_common
+from utils.jomd_common import gimme_common, PointRangeConverter
 from utils.db import (
     session,
     Problem as Problem_DB,
@@ -33,27 +33,9 @@ logger = logging.getLogger(__name__)
 plugin = lightbulb.Plugin("GitGud")
 
 
-class PointRangeConverter(base.BaseConverter[t.List[int]]):
-    """Implementation of the base converter for converting arguments into a point range."""
-
-    __slots__ = ()
-
-    async def convert(self, arg: str) -> t.List[int]:
-        try:
-            if "-" in arg:
-                arg = arg.split("-")
-                if len(arg) != 2:
-                    raise TypeError("Too many arguements, invalid range")
-                return list(map(int, arg))
-            point_high = point_low = int(arg)
-            return [point_high, point_low]
-        except ValueError:
-            raise TypeError("Point value is not an integer")
-
-
 @plugin.command()
 @lightbulb.option(
-    "filters", "Problem filters", t.List[str], required=False, modifier=OptionModifier.CONSUME_REST, default=[]
+    "filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[]
 )
 @lightbulb.option(
     "points",
@@ -83,7 +65,6 @@ async def gitgud(ctx: lightbulb.Context) -> None:
     # TODO Fix converters for slash commands
     points = ctx.options.points
     filters = ctx.options.filters
-    logging.info(f"Filter: %s, Points: %s" % (filters, points))
     query = Query()
     gitgud_util = Gitgud_utils()
     # get the user's dmoj handle
@@ -188,7 +169,6 @@ async def gitlog(ctx):
     # paginate
 
     pag = lightbulb.utils.EmbedPaginator()
-    content = ""
     for idx, solved in enumerate(history):
         # problem = solved.problem_id or await query.get_problem(solved.problem_id)
         problem = await query.get_problem(solved.problem_id)
@@ -199,9 +179,7 @@ async def gitlog(ctx):
             days_str = "yesterday"
         else:
             days_str = f"{days} days ago"
-        content += f"[{problem.name}](https://dmoj.ca/problem/{problem.code}) " f"[+{solved.point}] ({days_str})"
-        pag.add_line(content)
-        content = ""
+        pag.add_line(f"[{problem.name}](https://dmoj.ca/problem/{problem.code}) " f"[+{solved.point}] ({days_str})")
         if idx == 100:
             break
 

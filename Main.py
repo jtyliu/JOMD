@@ -15,24 +15,23 @@ logger = logging.getLogger(__name__)
 def main():
     # https://github.com/cheran-senthil/TLE/blob/bae59c2de6a2313be4a6ba4a5a5cbba81352e229/tle/__main__.py
     dotenv.load_dotenv()
-    BOT_TOKEN = os.environ.get('JOMD_BOT_TOKEN')
+    BOT_TOKEN = os.environ.get("JOMD_BOT_TOKEN")
 
     if not BOT_TOKEN:
-        logger.critical('Missing bot token')
+        logger.critical("Missing bot token")
         return
 
-    pref = '+'
-    bot = lightbulb.BotApp(token=BOT_TOKEN, prefix=pref,
-                           banner=None,
-                           intents=hikari.Intents.ALL,
-                           default_enabled_guilds=707067613993500692)
+    pref = "+"
+    bot = lightbulb.BotApp(
+        token=BOT_TOKEN, prefix=pref, banner=None, intents=hikari.Intents.ALL, default_enabled_guilds=707067613993500692
+    )
 
     # bot.load_extensions_from('./extensions/')
     # TESTING
-    extensions = ['admin', 'meta', 'gitgud', 'handles', 'user']
+    extensions = ["admin", "meta", "gitgud", "handles", "user", "plot"]
     for extension in extensions:
-        bot.load_extensions(f'extensions.{extension}')
-    logger.debug('Extensions loaded: %s', ', '.join(bot.extensions))
+        bot.load_extensions(f"extensions.{extension}")
+    logger.debug("Extensions loaded: %s", ", ".join(bot.extensions))
 
     # Get preliminary data
     if session.query(Problem_DB).count() == 0:
@@ -46,5 +45,5 @@ def main():
     bot.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

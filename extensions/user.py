@@ -11,7 +11,7 @@ from utils.query import Query
 from utils.db import session
 from sqlalchemy import alias, func, not_, orm
 from utils.db import Problem as Problem_DB, Contest as Contest_DB, User as User_DB, Submission as Submission_DB
-from utils.jomd_common import is_int
+from utils.jomd_common import is_int, calculate_points, PointRangeConverter, gimme_common
 from utils.api import ObjectNotFound
 from utils.constants import SITE_URL, TZ, SHORTHANDS
 import asyncio
@@ -20,6 +20,7 @@ from operator import itemgetter
 import logging
 from lightbulb.converters import base
 from lightbulb.commands.base import OptionModifier
+from lightbulb.utils import nav
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,9 @@ async def user(ctx):
         amount = None
 
     if username is None:
-        return
+        return await ctx.respond("No username given!")
+
+    username = username.replace("'", "")
 
     if amount is not None:
         amount = min(amount, 8)
@@ -168,7 +171,9 @@ async def userinfo(ctx):
         amount = None
 
     if username is None:
-        return
+        return await ctx.respond("No username given!")
+
+    username = username.replace("'", "")
 
     if amount is not None:
         amount = min(amount, 8)
@@ -286,15 +291,15 @@ async def userinfo(ctx):
 
 
 @plugin.command()
-@lightbulb.option("point_vals", "Points values", t.Sequence[int], modifier=OptionModifier.GREEDY, required=False, default=[])
+@lightbulb.option("point_vals", "Points values", int, modifier=OptionModifier.GREEDY, required=False, default=[])
 @lightbulb.option("username", "Dmoj username", StrNotIntConverter, required=False)
 @lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
 @lightbulb.command("predict", "Predict total points after solving N point problem(s)")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.PrefixCommand)  # No way to implement the list in slash commands
 async def predict(ctx):
     username = ctx.options.username
     amounts = ctx.options.point_vals
-    logger.info("Point vals: %s, username: %s", amounts, username)
+
     query = Query()
     username = username or query.get_handle(ctx.author.id, ctx.get_guild().id)
     if username is None and len(amounts) > 0:
@@ -305,7 +310,9 @@ async def predict(ctx):
         return await ctx.respond("No points given!")
 
     if username is None:
-        return await ctx.respond("No user given")
+        return await ctx.respond("No username given!")
+
+    username = username.replace("'", "")
 
     amounts = amounts[:10]
 
@@ -325,7 +332,7 @@ async def predict(ctx):
         submissions = q.all()
         msg = None
     else:
-        await ctx.respond("No submissions cached, " "Please use +cache to get new submissions")
+        await ctx.respond("No submissions cached, " "Please use +cache or /cache to get new submissions")
         return
 
     problems_ACed = dict()
@@ -347,7 +354,7 @@ async def predict(ctx):
     points = list(code_to_points.values())
     points.sort(reverse=True)
 
-    embed = discord.Embed(
+    embed = hikari.Embed(
         title=f"Point prediction for {username}",
         description="Current points: %.2fp" % calculate_points(points, fully_solved),
         color=0xFCDB05,
@@ -372,193 +379,244 @@ async def predict(ctx):
     return
 
 
-# @commands.command(usage="[usernames]")
-# async def vc(self, ctx, *usernames):
-#     """Suggest a contest"""
-#     usernames = list(usernames)
+@plugin.command()
+@lightbulb.option(
+    "usernames",
+    "Usernames participating in contest",
+    str,
+    modifier=OptionModifier.GREEDY,
+    required=False,
+    default=[],
+)
+@lightbulb.command("vc", "Suggest a contest")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def vc(ctx):
+    usernames = ctx.options.usernames
+    print(usernames)
+    query = Query()
+    if usernames == []:
+        username = query.get_handle(ctx.author.id, ctx.get_guild().id)
+        if username:
+            usernames = [username]
 
-#     query = Query()
-#     if usernames == []:
-#         username = query.get_handle(ctx.author.id, ctx.get_guild().id)
-#         if username:
-#             usernames = [username]
+    users = await asyncio.gather(*[query.get_user(username) for username in usernames])
+    usernames = [user.username for user in users]
+    for i in range(len(users)):
+        if users[i] is None:
+            return await ctx.respond(f"{usernames[i]} does not exist on DMOJ")
 
-#     users = await asyncio.gather(*[query.get_user(username) for username in usernames])
-#     usernames = [user.username for user in users]
-#     for i in range(len(users)):
-#         if users[i] is None:
-#             return await ctx.respond(f"{usernames[i]} does not exist on DMOJ")
+    q = session.query(Contest_DB)
+    for user in users:
+        # if the user has attempted any problems from the problem set
+        sub_q = (
+            session.query(Submission_DB, func.max(Submission_DB.points))
+            .filter(Submission_DB._user == user.username)
+            .group_by(Submission_DB._code)
+            .subquery()
+        )
+        sub_q = (
+            session.query(Problem_DB.code)
+            .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)
+            .filter(func.ifnull(sub_q.c.points, 0) != 0)
+        )
+        sub_q = list(map(itemgetter(0), sub_q.all()))
+        q = (
+            q.filter(not_(Contest_DB.rankings.contains(user.username)))
+            .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))
+            .filter(Contest_DB.is_private == 0)
+            .filter(Contest_DB.is_organization_private == 0)
+        )
 
-#     q = session.query(Contest_DB)
-#     for user in users:
-#         # if the user has attempted any problems from the problem set
-#         sub_q = (
-#             session.query(Submission_DB, func.max(Submission_DB.points))
-#             .filter(Submission_DB._user == user.username)
-#             .group_by(Submission_DB._code)
-#             .subquery()
-#         )
-#         sub_q = (
-#             session.query(Problem_DB.code)
-#             .join(sub_q, Problem_DB.code == sub_q.c._code, isouter=True)
-#             .filter(func.ifnull(sub_q.c.points, 0) != 0)
-#         )
-#         sub_q = list(map(itemgetter(0), sub_q.all()))
-#         q = (
-#             q.filter(not_(Contest_DB.rankings.contains(user.username)))
-#             .filter(~Contest_DB.problems.any(Problem_DB.code.in_(sub_q)))
-#             .filter(Contest_DB.is_private == 0)
-#             .filter(Contest_DB.is_organization_private == 0)
-#         )
+    if q.count() == 0:
+        await ctx.respond("Cannot find any contests which " "all users have not done")
+        return
 
-#     if q.count() == 0:
-#         await ctx.respond("Cannot find any contests which " "all users have not done")
-#         return
+    contests = q.all()
 
-#     contests = q.all()
+    while True:
+        contest = random.choice(contests)
+        try:
+            contest = await query.get_contest(contest.key, cached=False)
+            break
+        except ObjectNotFound:
+            pass
 
-#     while True:
-#         contest = random.choice(contests)
-#         try:
-#             contest = await query.get_contest(contest.key, cached=False)
-#             break
-#         except ObjectNotFound:
-#             pass
-
-#     # When problems are private, it says there are no problems
-#     window = "No"
-#     is_rated = "Not Rated"
-#     if contest.time_limit:
-#         window = f"{round(contest.time_limit/60/60, 2)} Hr"
-#     if contest.is_rated:
-#         is_rated = "Rated"
-#     embed = discord.Embed(
-#         title=contest.name,
-#         url=f"https://dmoj.ca/contest/{contest.key}",
-#         description=f"{window} window | {len(contest.problems)} Problems | {is_rated}",
-#         color=0xFCDB05,
-#     )
-#     await ctx.respond(embed=embed)
-
-
-# def force(argument) -> typing.Optional[bool]:
-#     if argument == "+f":
-#         return True
-#     raise BadArgument("No force argument")
-
-
-# @commands.command(hidden=True)
-# async def gimmie(self, ctx):
-#     return await ctx.respond(":monkey:")
+    # When problems are private, it says there are no problems
+    window = "No"
+    is_rated = "Not Rated"
+    if contest.time_limit:
+        window = f"{round(contest.time_limit/60/60, 2)} Hr"
+    if contest.is_rated:
+        is_rated = "Rated"
+    embed = hikari.Embed(
+        title=contest.name,
+        url=f"https://dmoj.ca/contest/{contest.key}",
+        description=f"{window} window | {len(contest.problems)} Problems | {is_rated}",
+        color=0xFCDB05,
+    )
+    await ctx.respond(embed=embed)
 
 
-# @commands.command(aliases=["recommend"], usage="username [points] [problem types]")
-# async def gimme(
-#     self, ctx, username: typing.Optional[parse_gimme] = None, points: typing.Optional[point_range] = [1, 50], *filters
-# ):
-#     """
-#     Recommend a problem
-
-#     Use surround your username with '' if it can be interpreted as a number
-
-#     SHORTHANDS:
-#     - adhoc
-#     - math
-#     - bf
-#     - ctf
-#     - ds
-#     - d&c
-#     - dp
-#     - geo
-#     - gt
-#     - greedy
-#     - regex
-#     - string
-#     """
-#     filters = list(filters)
-#     query = Query()
-#     username = username or query.get_handle(ctx.author.id, ctx.get_guild().id)
-
-#     if username is None:
-#         return await ctx.respond("No username provided")
-
-#     user = await query.get_user(username)
-#     if user is None:
-#         return await ctx.respond(f"{username} does not exist on DMOJ")
-
-#     username = user.username
-#     filter_list = []
-#     for filter in filters:
-#         if filter in SHORTHANDS:
-#             filter_list += SHORTHANDS[filter]
-#         else:
-#             filter_list.append(filter.title())
-
-#     filters = filter_list
-
-#     # Get all problems that are unsolved by user and fits the filter and
-#     # point range
-#     result, problem = await gimme_common(username, points, filters)
-
-#     if result is None:
-#         return await ctx.respond("No problem that satisfies the filter")
-#     return await ctx.respond(embed=result)
+@plugin.command()
+@lightbulb.option(
+    "args", "Usernames participating in contest", str, modifier=OptionModifier.GREEDY, required=False, default=[]
+)
+@lightbulb.command("gimmie", ":monkey:", hidden=True)
+@lightbulb.implements(lightbulb.PrefixCommand)
+async def gimmie(self, ctx):
+    return await ctx.respond(":monkey:")
 
 
-# @commands.command(aliases=["stalk", "sp"], usage="[username] [p<=points, p>=points]")
-# async def solved(self, ctx, *args):
-#     """Shows a user's last solved problems"""
-#     minP = 0
-#     maxP = 100
-#     query = Query()
-#     username = None
-#     for arg in args:
-#         if arg.startswith("p>="):
-#             minP = max(minP, int(arg[3:]))
-#         elif arg.startswith("p<="):
-#             maxP = min(maxP, int(arg[3:]))
-#         else:
-#             username = (await query.get_user(arg)).username
-#     if username is None:
-#         username = query.get_handle(ctx.author.id, ctx.get_guild().id)
-#     await query.get_submissions(username, result="AC")
+@plugin.command()
+@lightbulb.option(
+    "filters", "Problem filters", t.List[str], required=False, modifier=OptionModifier.GREEDY, default=[]
+)
+@lightbulb.option(
+    "points",
+    "point range, e.g. ('1', '1-10') DOES NOT WORK WITH SLASH COMMANDS",
+    PointRangeConverter,
+    required=False,
+    default=[1, 50],
+)
+@lightbulb.option(
+    "username",
+    "Dmoj username",
+    StrNotIntConverter,
+    required=False,
+    default=None,
+)
+@lightbulb.set_help(
+    """SHORTHANDS:
+    - adhoc
+    - math
+    - bf
+    - ctf
+    - ds
+    - d&c
+    - dp
+    - geo
+    - gt
+    - greedy
+    - regex
+    - string"""
+)
+@lightbulb.command("gimme", "Recommend a problem")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def gimme(ctx):
+    """
+    Recommend a problem
 
-#     submissions = (
-#         session.query(Submission_DB)
-#         .filter(Submission_DB._user == username)
-#         .filter(Submission_DB.result == "AC")
-#         .options(orm.joinedload(Submission_DB.problem, innerjoin=True))
-#         .join(Submission_DB.problem)
-#         .filter(Problem_DB.is_organization_private == 0)
-#         .filter(Problem_DB.is_public == 1)
-#         .order_by(Submission_DB.date)
-#         .all()
-#     )
-#     uniqueSubmissions = []
-#     solved = set()
-#     for sub in submissions:
-#         if sub._code not in solved:
-#             solved.add(sub._code)
-#             if minP <= sub.points and sub.points <= maxP:
-#                 uniqueSubmissions.append(sub)
-#     uniqueSubmissions.reverse()
-#     page = ""
-#     content = []
-#     cnt = 0
-#     for sub in uniqueSubmissions:
-#         age = (datetime.now() - sub.date).days
-#         page += f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)\n"
-#         cnt += 1
-#         if cnt % 10 == 0:
-#             content.append(page)
-#             page = ""
-#     if page != "":
-#         content.append(page)
-#     if len(content) == 0:
-#         content.append("No submission")
-#     title = "Recently solved problems by " + username
-#     message = await ctx.respond(embed=discord.Embed().add_field(name=title, value=content[0]))
-#     await scroll_embed(ctx, self.bot, message, title, content)
+    Use surround your username with '' if it can be interpreted as a number
+
+    SHORTHANDS:
+    - adhoc
+    - math
+    - bf
+    - ctf
+    - ds
+    - d&c
+    - dp
+    - geo
+    - gt
+    - greedy
+    - regex
+    - string
+    """
+    username = ctx.options.username
+    points = ctx.options.points
+    filters = ctx.options.filters
+    query = Query()
+    username = username or query.get_handle(ctx.author.id, ctx.get_guild().id)
+
+    if username is None:
+        return await ctx.respond("No username given!")
+
+    username = username.replace("'", "")
+
+    user = await query.get_user(username)
+    if user is None:
+        return await ctx.respond(f"{username} does not exist on DMOJ")
+
+    username = user.username
+    filter_list = []
+    for filter in filters:
+        if filter in SHORTHANDS:
+            filter_list += SHORTHANDS[filter]
+        else:
+            filter_list.append(filter.title())
+
+    filters = filter_list
+
+    # Get all problems that are unsolved by user and fits the filter and
+    # point range
+    result, problem = await gimme_common(username, points, filters)
+
+    if result is None:
+        return await ctx.respond("No problem that satisfies the filter")
+    return await ctx.respond(embed=result)
+
+
+@plugin.command()
+@lightbulb.option(
+    "args", "[username] [p<=points, p>=points]", str, modifier=OptionModifier.GREEDY, required=False
+)
+@lightbulb.set_help(
+    "Usage: [username] [p<=points, p>=points]\nUse surround your username with '' if it can be interpreted as a number"
+)
+@lightbulb.command("solved", "Shows a user's last solved problems (Adelaide command)", aliases=["stalk", "sp"])
+@lightbulb.implements(lightbulb.PrefixCommand)
+async def solved(ctx):
+    """Shows a user's last solved problems"""
+    minP = 0
+    maxP = 100
+    query = Query()
+    username = None
+    for arg in ctx.options.args:
+        if arg.startswith("p>="):
+            minP = max(minP, int(arg[3:]))
+        elif arg.startswith("p<="):
+            maxP = min(maxP, int(arg[3:]))
+        else:
+            username = arg
+    username = (await query.get_user(username)).username
+    if username is None:
+        username = query.get_handle(ctx.author.id, ctx.get_guild().id)
+    await query.get_submissions(username, result="AC")
+
+    submissions = (
+        session.query(Submission_DB)
+        .filter(Submission_DB._user == username)
+        .filter(Submission_DB.result == "AC")
+        .options(orm.joinedload(Submission_DB.problem, innerjoin=True))
+        .join(Submission_DB.problem)
+        .filter(Problem_DB.is_organization_private == 0)
+        .filter(Problem_DB.is_public == 1)
+        .order_by(Submission_DB.date)
+        .all()
+    )
+    uniqueSubmissions = []
+    solved = set()
+    for sub in submissions:
+        if sub._code not in solved:
+            solved.add(sub._code)
+            if minP <= sub.points and sub.points <= maxP:
+                uniqueSubmissions.append(sub)
+    uniqueSubmissions.reverse()
+    pag = lightbulb.utils.EmbedPaginator(max_chars=1024)
+
+    for sub in uniqueSubmissions:
+        age = (datetime.now() - sub.date).days
+        pag.add_line(f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)")
+
+    if len(uniqueSubmissions) == 0:
+        pag.add_line("No submission")
+
+    @pag.embed_factory()
+    def build_embed(page_index, content):
+        return hikari.Embed().add_field(name="Recently solved problems by " + username, value=content)
+
+    navigator = nav.ButtonNavigator(pag.build_pages())
+    await navigator.run(ctx)
 
 
 def load(bot: lightbulb.BotApp) -> None:

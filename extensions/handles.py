@@ -2,8 +2,7 @@ from utils.api import ObjectNotFound
 from utils.jomd_common import scroll_embed
 from operator import itemgetter
 from utils.query import Query
-from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, \
-    Submission as Submission_DB
+from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, Submission as Submission_DB
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
 import typing
 import asyncio
@@ -13,11 +12,11 @@ import hikari
 import re
 
 # https://github.com/Rapptz/discord.py/blob/master/discord/utils.py
-_MARKDOWN_ESCAPE_COMMON = r'^>(?:>>)?\s|\[.+\]\(.+\)'
+_MARKDOWN_ESCAPE_COMMON = r"^>(?:>>)?\s|\[.+\]\(.+\)"
 
-_MARKDOWN_STOCK_REGEX = fr'(?P<markdown>[_\\~|\*`]|{_MARKDOWN_ESCAPE_COMMON})'
+_MARKDOWN_STOCK_REGEX = rf"(?P<markdown>[_\\~|\*`]|{_MARKDOWN_ESCAPE_COMMON})"
 
-_URL_REGEX = r'(?P<url><[^: >]+:\/[^ >]+>|(?:https?|steam):\/\/[^\s<]+[^<.,:;\"\'\]\s])'
+_URL_REGEX = r"(?P<url><[^: >]+:\/[^ >]+>|(?:https?|steam):\/\/[^\s<]+[^<.,:;\"\'\]\s])"
 
 
 def escape_markdown(text: str, *, ignore_links: bool = True) -> str:
@@ -25,69 +24,80 @@ def escape_markdown(text: str, *, ignore_links: bool = True) -> str:
 
     def replacement(match):
         groupdict = match.groupdict()
-        is_url = groupdict.get('url')
+        is_url = groupdict.get("url")
         if is_url:
             return is_url
-        return '\\' + groupdict['markdown']
+        return "\\" + groupdict["markdown"]
 
     regex = _MARKDOWN_STOCK_REGEX
     if ignore_links:
-        regex = f'(?:{_URL_REGEX}|{regex})'
+        regex = f"(?:{_URL_REGEX}|{regex})"
     return re.sub(regex, replacement, text, 0, re.MULTILINE)
 
 
 plugin = lightbulb.Plugin("Handles")
 
 
-# @commands.command()
-# async def whois(self, ctx, member: typing.Optional[discord.Member] = None,
-#                 handle: typing.Optional[str] = None):
-#     try:
-#         query = Query()
-#         username, linked_username, pfp = None, None, None
-#         if handle:
-#             user = None
-#             try:
-#                 user = await query.get_user(handle)
-#             except ObjectNotFound:
-#                 username = None
-#             if user:
-#                 handle = user.username
-#                 author_id = query.get_handle_user(handle, ctx.guild.id)
-#                 username = handle
-#                 if author_id:
-#                     member = ctx.message.guild.get_member(author_id)
-#                     linked_username = member.nick or member.name
-#                     pfp = member.avatar_url
-#         elif member:
-#             handle = query.get_handle(member.id, ctx.guild.id)
-#             username = member.nick or member.name
-#             if handle:
-#                 linked_username = handle
-#                 pfp = await query.get_pfp(handle)
-#         if linked_username:
-#             embed = discord.Embed(
-#                 color=0xfcdb05,
-#                 title=escape_markdown(f'{username} is {linked_username}'),
-#             )
-#             embed.set_thumbnail(url=pfp)
-#             return await ctx.respond(embed=embed)
-#         elif username:
-#             embed = discord.Embed(
-#                 title=escape_markdown(f'{username} is not linked with any account here'),
-#                 color=0xfcdb05,
-#             )
-#             return await ctx.respond(embed=embed)
-#     except Exception:
-#         pass
-#     name = None
-#     if member:
-#         name = member.nick or member.name
-#     embed = discord.Embed(
-#         title=escape_markdown(f'Nothing found on {handle or name}'),
-#         color=0xfcdb05,
-#     )
-#     await ctx.respond(embed=embed)
+@plugin.command()
+@lightbulb.option(
+    "handle",
+    "Dmoj handle",
+    str,
+    required=False,
+    default=None,
+)
+@lightbulb.option("member", "Discord user", hikari.Member, required=False, default=None)
+@lightbulb.command("whois", "Lookup linked account")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def whois(ctx):
+    member = ctx.options.member
+    handle = ctx.options.handle
+
+    query = Query()
+    username, linked_username, pfp = None, None, None
+    if handle:
+        user = None
+        try:
+            user = await query.get_user(handle)
+        except ObjectNotFound:
+            username = None
+        if user:
+            handle = user.username
+            author_id = query.get_handle_user(handle, ctx.get_guild().id)
+            username = handle
+            if author_id:
+                member = ctx.get_guild().get_member(author_id)
+                linked_username = member.nickname or member.name
+                pfp = member.avatar_url
+    elif member:
+        handle = query.get_handle(member.id, ctx.get_guild().id)
+        username = member.nickname or member.name
+        if handle:
+            linked_username = handle
+            pfp = await query.get_pfp(handle)
+    if linked_username:
+        embed = hikari.Embed(
+            color=0xFCDB05,
+            title=escape_markdown(f"{username} is {linked_username}"),
+        )
+        embed.set_thumbnail(pfp)
+        return await ctx.respond(embed=embed)
+    elif username:
+        embed = hikari.Embed(
+            title=escape_markdown(f"{username} is not linked with any account here"),
+            color=0xFCDB05,
+        )
+        return await ctx.respond(embed=embed)
+    
+    name = None
+    if member:
+        name = member.nickname or member.name
+    embed = hikari.Embed(
+        title=escape_markdown(f"Nothing found on {handle or name}"),
+        color=0xFCDB05,
+    )
+    await ctx.respond(embed=embed)
+
 
 @plugin.command()
 @lightbulb.command("unlink", "Unlink your discord account from your dmoj account")
@@ -96,17 +106,19 @@ async def unlink(ctx: lightbulb.Context) -> None:
     # TODO: Add admin ability to manually unlink
     query = Query()
     if not query.get_handle(ctx.author.id, ctx.get_guild().id):
-        await ctx.respond('You are not linked with any user')
+        await ctx.respond("You are not linked with any user")
         return
-    handle = session.query(Handle_DB)\
-        .filter(Handle_DB.id == ctx.author.id)\
-        .filter(Handle_DB.guild_id == ctx.get_guild().id).first()
-    session.query(User_DB)\
-        .filter(User_DB.id == handle.user_id).delete()
+    handle = (
+        session.query(Handle_DB)
+        .filter(Handle_DB.id == ctx.author.id)
+        .filter(Handle_DB.guild_id == ctx.get_guild().id)
+        .first()
+    )
+    session.query(User_DB).filter(User_DB.id == handle.user_id).delete()
     session.query(Submission_DB).filter(Submission_DB._user == handle.handle).delete()
     session.delete(handle)
     session.commit()
-    await ctx.respond(escape_markdown(f'Unlinked you with handle {handle.handle}'))
+    await ctx.respond(escape_markdown(f"Unlinked you with handle {handle.handle}"))
 
 
 @plugin.command()
@@ -120,29 +132,30 @@ async def link(ctx: lightbulb.Context) -> None:
     user = await query.get_user(username)
 
     if user is None:
-        await ctx.respond(escape_markdown(f'{username} does not exist on DMOJ'))
+        await ctx.respond(escape_markdown(f"{username} does not exist on DMOJ"))
         return
 
     username = user.username
 
     if query.get_handle(ctx.author.id, ctx.get_guild().id):
         await ctx.respond(
-            '%s, your handle is already linked with %s.' %
-            (ctx.author.mention,
-                query.get_handle(ctx.author.id, ctx.get_guild().id))
+            "%s, your handle is already linked with %s."
+            % (ctx.author.mention, query.get_handle(ctx.author.id, ctx.get_guild().id))
         )
         return
 
     if query.get_handle_user(username, ctx.get_guild().id):
-        await ctx.respond('This handle is already linked with another user')
+        await ctx.respond("This handle is already linked with another user")
         return
 
     # verify from dmoj user description
     description = await query.get_user_description(username)
     userKey = hashlib.sha256(str(ctx.author.id).encode()).hexdigest()
     if userKey not in description:
-        await ctx.respond('Put `' + userKey + '` in your DMOJ user description (https://dmoj.ca/edit/profile/) '
-                          'and run the command again.')
+        await ctx.respond(
+            "Put `" + userKey + "` in your DMOJ user description (https://dmoj.ca/edit/profile/) "
+            "and run the command again."
+        )
         return
 
     handle = Handle_DB()
@@ -152,10 +165,7 @@ async def link(ctx: lightbulb.Context) -> None:
     handle.guild_id = ctx.get_guild().id
     session.add(handle)
     session.commit()
-    await ctx.respond(escape_markdown(
-        '%s, you now have linked your account to %s' %
-        (ctx.author, username)
-    ))
+    await ctx.respond(escape_markdown("%s, you now have linked your account to %s" % (ctx.author, username)))
 
     rank_to_role = {}
     rc = lightbulb.RoleConverter(ctx)
@@ -167,9 +177,9 @@ async def link(ctx: lightbulb.Context) -> None:
     rank = rating_to_rank(user.rating)
     # TODO Add guild specific option to disable updating roles
     if rank in rank_to_role:
-        await _update_rank(ctx.member, rank_to_role[rank], 'Dmoj account linked')
+        await _update_rank(ctx.member, rank_to_role[rank], "Dmoj account linked")
     else:
-        await ctx.respond('You are missing the `' + rank.name + '` role')
+        await ctx.respond("You are missing the `" + rank.name + "` role")
 
 
 # @commands.command(name='set', usage='discord_account [dmoj_handle, +remove]')

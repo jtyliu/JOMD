@@ -16,6 +16,7 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 from utils.db import Base
+
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
@@ -65,7 +66,8 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata,
+            connection=connection,
+            target_metadata=target_metadata,
             render_as_batch=True,
         )
 

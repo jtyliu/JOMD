@@ -3,47 +3,47 @@ import typing
 from utils.query import Query
 import random
 import hikari
+from lightbulb.converters import base
+import typing as t
 import re
 
 
 def list_to_str(arg):
     if arg is None:
         return None
-    return '&'.join(arg)
+    return "&".join(arg)
 
 
 def str_to_list(arg):
     if arg is None:
         return None
-    return arg.split('&')
+    return arg.split("&")
 
 
 def is_int(val):
-    return re.match(r'[-+]?\d+', val) is not None
+    return re.match(r"[-+]?\d+", val) is not None
 
 
+class PointRangeConverter(base.BaseConverter[t.List[int]]):
+    """Implementation of the base converter for converting arguments into a point range."""
 
+    __slots__ = ()
 
-# def point_range(argument) -> typing.Optional[list]:
-#     if '-' in argument:
-#         argument = argument.split('-')
-#         if len(argument) != 2:
-#             raise BadArgument('Too many -, invalid range')
-#         try:
-#             point_low = int(argument[0])
-#             point_high = int(argument[1])
-#             return [point_low, point_high]
-#         except ValueError:
-#             raise BadArgument('Point values are not an integer')
-#     try:
-#         point_high = point_low = int(argument)
-#         return [point_high, point_low]
-#     except ValueError:
-#         raise BadArgument('Point value is not an integer')
+    async def convert(self, arg: str) -> t.List[int]:
+        try:
+            if "-" in arg:
+                arg = arg.split("-")
+                if len(arg) != 2:
+                    raise TypeError("Too many arguements, invalid range")
+                return list(map(int, arg))
+            point_high = point_low = int(arg)
+            return [point_high, point_low]
+        except ValueError:
+            raise TypeError("Point value is not an integer")
 
 
 # def parse_gimme(argument) -> typing.Optional[str]:
-    # keywords = [
+# keywords = [
 #         'adhoc', 'Ad Hoc', 'math', 'Advanced Math', 'Intermediate Math',
 #         'Simple Math', 'bf', 'Brute Force', 'ctf', 'Capture the Flag', 'ds',
 #         'Data Structures', 'd&c', 'Divide and Conquer', 'dp',
@@ -71,8 +71,7 @@ def calculate_points(points, fully_solved):
 
 async def gimme_common(username, points, types):
     query = Query()
-    unsolved = query.get_unsolved_problems(username, types, points[0],
-                                           points[1])
+    unsolved = query.get_unsolved_problems(username, types, points[0], points[1])
 
     if len(unsolved) == 0:
         return None, None
@@ -85,43 +84,38 @@ async def gimme_common(username, points, types):
 
     points = str(problem.points)
     if problem.partial:
-        points += 'p'
+        points += "p"
 
     memory = problem.memory_limit
     if memory >= 1024 * 1024:
-        memory = '%dG' % (memory // 1024 // 1024)
+        memory = "%dG" % (memory // 1024 // 1024)
     elif memory >= 1024:
-        memory = '%dM' % (memory // 1024)
+        memory = "%dM" % (memory // 1024)
     else:
-        memory = '%dK' % (memory)
+        memory = "%dK" % (memory)
 
     embed = hikari.Embed(
         title=problem.name,
-        url='https://dmoj.ca/problem/%s' % problem.code,
-        description='Points: %s\nProblem Types: %s' %
-                    (points, ', '.join(problem.types)),
-        color=0xfcdb05,
+        url="https://dmoj.ca/problem/%s" % problem.code,
+        description="Points: %s\nProblem Types: %s" % (points, ", ".join(problem.types)),
+        color=0xFCDB05,
     )
 
     embed.set_thumbnail(await query.get_pfp(username))
-    embed.add_field(name='Group', value=problem.group, inline=True)
-    embed.add_field(
-        name='Time',
-        value='%ss' % problem.time_limit,
-        inline=True
-    )
-    embed.add_field(name='Memory', value=memory, inline=True)
+    embed.add_field(name="Group", value=problem.group, inline=True)
+    embed.add_field(name="Time", value="%ss" % problem.time_limit, inline=True)
+    embed.add_field(name="Memory", value=memory, inline=True)
 
     return embed, problem
 
 
 async def scroll_message(ctx, bot, message, content):
-    PREV = '\u25C0'
-    NEXT = '\u25B6'
-    PREV2 = '\u23EA'
-    NEXT2 = '\u23E9'
-    FIRST = '\u23EE'
-    LAST = '\u23ED'
+    PREV = "\u25C0"
+    NEXT = "\u25B6"
+    PREV2 = "\u23EA"
+    NEXT2 = "\u23E9"
+    FIRST = "\u23EE"
+    LAST = "\u23ED"
     await message.add_reaction(FIRST)
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
@@ -131,11 +125,15 @@ async def scroll_message(ctx, bot, message, content):
     page = 0
 
     def check(reaction, user):  # from stackoverflow :monkey:
-        return not user.bot and reaction.message == message\
+        return (
+            not user.bot
+            and reaction.message == message
             and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
+        )
+
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=60, check=check)
+            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
 
             if str(reaction.emoji) == PREV:
                 page = max(0, min(len(content) - 1, page - 1))
@@ -156,12 +154,12 @@ async def scroll_message(ctx, bot, message, content):
 
 
 async def scroll_embed(ctx, bot, message, title, content):
-    PREV = '\u25C0'
-    NEXT = '\u25B6'
-    PREV2 = '\u23EA'
-    NEXT2 = '\u23E9'
-    FIRST = '\u23EE'
-    LAST = '\u23ED'
+    PREV = "\u25C0"
+    NEXT = "\u25B6"
+    PREV2 = "\u23EA"
+    NEXT2 = "\u23E9"
+    FIRST = "\u23EE"
+    LAST = "\u23ED"
     await message.add_reaction(FIRST)
     await message.add_reaction(PREV2)
     await message.add_reaction(PREV)
@@ -171,11 +169,15 @@ async def scroll_embed(ctx, bot, message, title, content):
     page = 0
 
     def check(reaction, user):  # from stackoverflow :monkey:
-        return not user.bot and reaction.message == message\
+        return (
+            not user.bot
+            and reaction.message == message
             and str(reaction.emoji) in [PREV, NEXT, PREV2, NEXT2, FIRST, LAST]
+        )
+
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=60, check=check)
+            reaction, user = await bot.wait_for("reaction_add", timeout=60, check=check)
 
             if str(reaction.emoji) == PREV:
                 page = max(0, min(len(content) - 1, page - 1))

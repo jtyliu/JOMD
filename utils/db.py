@@ -1,10 +1,22 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Column, String, Integer, Date, TypeDecorator,
-                        Float, Boolean, DateTime, JSON, Table, ForeignKey,
-                        Text)
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    Date,
+    TypeDecorator,
+    Float,
+    Boolean,
+    DateTime,
+    JSON,
+    Table,
+    ForeignKey,
+    Text,
+)
 from sqlalchemy.orm import relationship
+
 # Will cause a cycle but don't worry as it is not used
 # only to specify types
 # will remove to be safe
@@ -16,7 +28,7 @@ from sqlalchemy.orm import relationship
 from utils.constants import DEBUG_DB
 import json
 
-URI = 'sqlite:///utils/db/JOMD1.db'
+URI = "sqlite:///utils/db/JOMD1.db"
 
 engine = create_engine(URI, echo=DEBUG_DB)
 Base = declarative_base(bind=engine)
@@ -40,86 +52,99 @@ class Json(TypeDecorator):
 
 
 contest_problem = Table(
-    'contest_problem', Base.metadata,
-    Column('contest_id', String, ForeignKey('contest.key')),
-    Column('problem_id', String, ForeignKey('problem.code')),
+    "contest_problem",
+    Base.metadata,
+    Column("contest_id", String, ForeignKey("contest.key")),
+    Column("problem_id", String, ForeignKey("problem.code")),
 )
 
 contest_participation = Table(
-    'contest_participation', Base.metadata,
-    Column('contest_id', String, ForeignKey('contest.key')),
-    Column('participation_id', String, ForeignKey('participation.id')),
+    "contest_participation",
+    Base.metadata,
+    Column("contest_id", String, ForeignKey("contest.key")),
+    Column("participation_id", String, ForeignKey("participation.id")),
 )
 
 contest_user = Table(
-    'contest_user', Base.metadata,
-    Column('contest_id', String, ForeignKey('contest.key')),
-    Column('user_id', Integer, ForeignKey('user.id')),
+    "contest_user",
+    Base.metadata,
+    Column("contest_id", String, ForeignKey("contest.key")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 problem_user = Table(
-    'problem_user', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code')),
-    Column('user_id', Integer, ForeignKey('user.id')),
+    "problem_user",
+    Base.metadata,
+    Column("problem_id", String, ForeignKey("problem.code")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 language_problem = Table(
-    'language_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code')),
-    Column('language_id', Integer, ForeignKey('language.id')),
+    "language_problem",
+    Base.metadata,
+    Column("problem_id", String, ForeignKey("problem.code")),
+    Column("language_id", Integer, ForeignKey("language.id")),
 )
 
 organization_problem = Table(
-    'organization_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code')),
-    Column('organization_id', Integer, ForeignKey('organization.id')),
+    "organization_problem",
+    Base.metadata,
+    Column("problem_id", String, ForeignKey("problem.code")),
+    Column("organization_id", Integer, ForeignKey("organization.id")),
 )
 
 contest_organization = Table(
-    'contest_organization', Base.metadata,
-    Column('contest_id', String, ForeignKey('contest.key')),
-    Column('organization_id', Integer, ForeignKey('organization.id')),
+    "contest_organization",
+    Base.metadata,
+    Column("contest_id", String, ForeignKey("contest.key")),
+    Column("organization_id", Integer, ForeignKey("organization.id")),
 )
 
 participation_user = Table(
-    'participation_user', Base.metadata,
-    Column('participation_id', String, ForeignKey('participation.id')),
-    Column('user_id', Integer, ForeignKey('user.id')),
+    "participation_user",
+    Base.metadata,
+    Column("participation_id", String, ForeignKey("participation.id")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 language_submission = Table(
-    'language_submission', Base.metadata,
-    Column('language_id', Integer, ForeignKey('language.id')),
-    Column('submission_id', Integer, ForeignKey('submission.id')),
+    "language_submission",
+    Base.metadata,
+    Column("language_id", Integer, ForeignKey("language.id")),
+    Column("submission_id", Integer, ForeignKey("submission.id")),
 )
 
 organization_user = Table(
-    'organization_user', Base.metadata,
-    Column('organization_id', Integer, ForeignKey('organization.id')),
-    Column('user_id', Integer, ForeignKey('user.id')),
+    "organization_user",
+    Base.metadata,
+    Column("organization_id", Integer, ForeignKey("organization.id")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 judge_language = Table(
-    'judge_language', Base.metadata,
-    Column('judge_id', String, ForeignKey('judge.name')),
-    Column('language_id', Integer, ForeignKey('language.id')),
+    "judge_language",
+    Base.metadata,
+    Column("judge_id", String, ForeignKey("judge.name")),
+    Column("language_id", Integer, ForeignKey("language.id")),
 )
 
 submission_user = Table(
-    'submission_user', Base.metadata,
-    Column('submission_id', Integer, ForeignKey('submission.id')),
-    Column('user_id', Integer, ForeignKey('user.id')),
+    "submission_user",
+    Base.metadata,
+    Column("submission_id", Integer, ForeignKey("submission.id")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 problem_submission = Table(
-    'problem_submission', Base.metadata,
-    Column('submission_id', Integer, ForeignKey('submission.id')),
-    Column('problem_id', String, ForeignKey('problem.code')),
+    "problem_submission",
+    Base.metadata,
+    Column("submission_id", Integer, ForeignKey("submission.id")),
+    Column("problem_id", String, ForeignKey("problem.code")),
 )
 
 
 class Problem(Base):
-    __tablename__ = 'problem'
+    __tablename__ = "problem"
 
     code = Column(String, primary_key=True)
     name = Column(String)
@@ -134,20 +159,14 @@ class Problem(Base):
     points = Column(Integer)
     partial = Column(Boolean)
     short_circuit = Column(Boolean)
-    languages = relationship('Language', secondary=language_problem,
-                             back_populates='problems')
+    languages = relationship("Language", secondary=language_problem, back_populates="problems")
     is_organization_private = Column(Boolean)
-    organizations = relationship('Organization',
-                                 secondary=organization_problem,
-                                 back_populates='problems')
+    organizations = relationship("Organization", secondary=organization_problem, back_populates="problems")
     is_public = Column(Boolean)
 
-    contests = relationship('Contest', secondary=contest_problem,
-                            back_populates='problems')
-    solved_users = relationship('User', secondary=problem_user,
-                                back_populates='solved_problems')
-    submissions = relationship('Submission', secondary=problem_submission,
-                               back_populates='problem')
+    contests = relationship("Contest", secondary=contest_problem, back_populates="problems")
+    solved_users = relationship("User", secondary=problem_user, back_populates="solved_problems")
+    submissions = relationship("Submission", secondary=problem_submission, back_populates="problem")
 
     def __init__(self, problem):
         self.code = problem.code
@@ -175,7 +194,7 @@ class Problem(Base):
 
 
 class Contest(Base):
-    __tablename__ = 'contest'
+    __tablename__ = "contest"
 
     key = Column(String, primary_key=True)
     name = Column(String)
@@ -189,21 +208,15 @@ class Contest(Base):
     rating_ceiling = Column(Integer)
     hidden_scoreboard = Column(Boolean)
     is_organization_private = Column(Boolean)
-    organizations = relationship('Organization',
-                                 secondary=contest_organization,
-                                 back_populates='contest')
+    organizations = relationship("Organization", secondary=contest_organization, back_populates="contest")
     is_private = Column(Boolean)
     tags = Column(Json)
-    _format = Column('format', Json)
+    _format = Column("format", Json)
     rankings = Column(Json)
-    problems = relationship('Problem', secondary=contest_problem,
-                            back_populates='contests')
+    problems = relationship("Problem", secondary=contest_problem, back_populates="contests")
 
-    participations = relationship('Participation',
-                                  secondary=contest_participation,
-                                  back_populates='contest')
-    users = relationship('User', secondary=contest_user,
-                         back_populates='contests')
+    participations = relationship("Participation", secondary=contest_participation, back_populates="contest")
+    users = relationship("User", secondary=contest_user, back_populates="contests")
 
     def __init__(self, contest):
         self.key = contest.key
@@ -227,13 +240,11 @@ class Contest(Base):
 
 
 class Participation(Base):
-    __tablename__ = 'participation'
+    __tablename__ = "participation"
 
     id = Column(String, primary_key=True)
-    user = relationship('User', secondary=participation_user,
-                        back_populates='participation')
-    contest = relationship('Contest', secondary=contest_participation,
-                           back_populates='participations')
+    user = relationship("User", secondary=participation_user, back_populates="participation")
+    contest = relationship("Contest", secondary=contest_participation, back_populates="participations")
     score = Column(Float)
     cumulative_time = Column(Integer)
     tiebreaker = Column(Float)
@@ -253,7 +264,7 @@ class Participation(Base):
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
     username = Column(String)
@@ -263,19 +274,14 @@ class User(Base):
     rank = Column(String)
     rating = Column(Integer)
     max_rating = Column(Integer)
-    solved_problems = relationship('Problem', secondary=problem_user,
-                                   back_populates='solved_users')
-    organizations = relationship('Organization', secondary=organization_user,
-                                 back_populates='users')
-    contests = relationship('Contest', secondary=contest_user,
-                            back_populates='users')
+    solved_problems = relationship("Problem", secondary=problem_user, back_populates="solved_users")
+    organizations = relationship("Organization", secondary=organization_user, back_populates="users")
+    contests = relationship("Contest", secondary=contest_user, back_populates="users")
 
     # authored = relationship('Problem', secondary=problem_author_user,
     #                         back_populates='authors')
-    participation = relationship('Participation', secondary=participation_user,
-                                 back_populates='user')
-    submissions = relationship('Submission', secondary=submission_user,
-                               back_populates='user')
+    participation = relationship("Participation", secondary=participation_user, back_populates="user")
+    submissions = relationship("Submission", secondary=submission_user, back_populates="user")
 
     def __init__(self, user):
         self.id = user.id
@@ -292,17 +298,14 @@ class User(Base):
 
 
 class Submission(Base):
-    __tablename__ = 'submission'
+    __tablename__ = "submission"
 
     id = Column(Integer, primary_key=True)
     # TODO: Should only be a single foreign key
-    problem = relationship('Problem', secondary=problem_submission,
-                           back_populates='submissions')
-    user = relationship('User', secondary=submission_user,
-                        back_populates='submissions')
+    problem = relationship("Problem", secondary=problem_submission, back_populates="submissions")
+    user = relationship("User", secondary=submission_user, back_populates="submissions")
     date = Column(DateTime)
-    language = relationship('Language', secondary=language_submission,
-                            back_populates='submissions')
+    language = relationship("Language", secondary=language_submission, back_populates="submissions")
     time = Column(Float)
     memory = Column(Float)
     points = Column(Float)
@@ -334,7 +337,7 @@ class Submission(Base):
 
 
 class Organization(Base):
-    __tablename__ = 'organization'
+    __tablename__ = "organization"
 
     id = Column(Integer, primary_key=True)
     slug = Column(String)
@@ -342,12 +345,9 @@ class Organization(Base):
     is_open = Column(Boolean)
     member_count = Column(Integer)
 
-    problems = relationship('Problem', secondary=organization_problem,
-                            back_populates='organizations')
-    contest = relationship('Contest', secondary=contest_organization,
-                           back_populates='organizations')
-    users = relationship('User', secondary=organization_user,
-                         back_populates='organizations')
+    problems = relationship("Problem", secondary=organization_problem, back_populates="organizations")
+    contest = relationship("Contest", secondary=contest_organization, back_populates="organizations")
+    users = relationship("User", secondary=organization_user, back_populates="organizations")
 
     def __init__(self, organization):
         self.id = organization.id
@@ -358,7 +358,7 @@ class Organization(Base):
 
 
 class Language(Base):
-    __tablename__ = 'language'
+    __tablename__ = "language"
 
     id = Column(Integer, primary_key=True)
     key = Column(String)
@@ -368,12 +368,9 @@ class Language(Base):
     pygments_name = Column(String)
     code_template = Column(String)
 
-    problems = relationship('Problem', secondary=language_problem,
-                            back_populates='languages')
-    submissions = relationship('Submission', secondary=language_submission,
-                               back_populates='language')
-    judges = relationship('Judge', secondary=judge_language,
-                          back_populates='languages')
+    problems = relationship("Problem", secondary=language_problem, back_populates="languages")
+    submissions = relationship("Submission", secondary=language_submission, back_populates="language")
+    judges = relationship("Judge", secondary=judge_language, back_populates="languages")
 
     def __init__(self, language):
         self.id = language.id
@@ -387,14 +384,13 @@ class Language(Base):
 
 # I don't think I'll ever use this
 class Judge(Base):
-    __tablename__ = 'judge'
+    __tablename__ = "judge"
 
     name = Column(String, primary_key=True)
     start_time = Column(DateTime)
     ping = Column(Float)
     load = Column(Float)
-    languages = relationship('Language', secondary=judge_language,
-                             back_populates='judges')
+    languages = relationship("Language", secondary=judge_language, back_populates="judges")
 
     def __init__(self, judge):
         self.name = judge.name
@@ -402,13 +398,12 @@ class Judge(Base):
         self.ping = judge.ping
         self.load = judge.load
         for language_key in judge.languages:
-            language = session.query(Language).\
-                filter(Language.key == language_key).first()
+            language = session.query(Language).filter(Language.key == language_key).first()
             self.languages.append(language)
 
 
 class Handle(Base):
-    __tablename__ = 'handle'
+    __tablename__ = "handle"
     _id = Column(Integer, primary_key=True, autoincrement=True)
     id = Column(Integer, index=True)
     handle = Column(String, index=True)
@@ -417,7 +412,7 @@ class Handle(Base):
 
 
 class Gitgud(Base):
-    __tablename__ = 'gitgud'
+    __tablename__ = "gitgud"
     _id = Column(Integer, primary_key=True, autoincrement=True)
     handle = Column(String)
     guild_id = Column(Integer)
@@ -428,7 +423,7 @@ class Gitgud(Base):
 
 
 class CurrentGitgud(Base):
-    __tablename__ = 'current_gitgud'
+    __tablename__ = "current_gitgud"
     _id = Column(Integer, primary_key=True)
     handle = Column(String)
     guild_id = Column(Integer)
