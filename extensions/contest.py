@@ -227,76 +227,82 @@ async def ranklist(ctx):
     await navigator.run(ctx)
 
 
-# @commands.command(aliases=["pc"], usage="[contest key]")
-# async def postcontest(self, ctx, key, option=""):
-#     """Updates post-contest role"""
-#     try:
-#         await ctx.message.delete()
-#     except discord.Forbidden:
-#         pass
+@plugin.command()
+@lightbulb.option("option", "+all Give every applicable user the post-contest role", str, required=False, default="")
+@lightbulb.option("key", "contest key", str)
+@lightbulb.command("postcontest", "Get post-contest role", aliases=["pc"])
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def postcontest(ctx):
+    """Updates post-contest role"""
+    key = ctx.options.key
+    option = ctx.options.option
+    try:
+        await ctx.event.message.delete()
+    except hikari.ForbiddenError as e:
+        logger.info(e)
+        pass
 
-#     def has_admin_perms(ctx):
-#         return any(get(ctx.get_guild().roles, name=role) in ctx.author.roles for role in ADMIN_ROLES)
+    def has_admin_perms(ctx):
+        return any(role.name in ADMIN_ROLES for role in ctx.member.get_roles())
 
-#     update_all = option == "+all" and has_admin_perms(ctx)
+    update_all = option == "+all" and has_admin_perms(ctx)
 
-#     query = Query()
+    query = Query()
 
-#     if update_all:
-#         usernames = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.get_guild().id).all()
-#     else:
-#         username = query.get_handle(ctx.author.id, ctx.get_guild().id)
+    if update_all:
+        usernames = session.query(Handle_DB).filter(Handle_DB.guild_id == ctx.get_guild().id).all()
+    else:
+        username = query.get_handle(ctx.author.id, ctx.get_guild().id)
 
-#         if username is None:
-#             return await ctx.respond("Your account is not linked!")
+        if username is None:
+            return await ctx.respond("Your account is not linked!")
 
-#     q = session.query(Contest_DB).filter(Contest_DB.key == key)
-#     # Clear cache
-#     if q.count():
-#         q.delete()
-#         session.commit()
-#     try:
-#         contest = await query.get_contest(key)
-#     except ObjectNotFound:
-#         await ctx.respond("Contest not found")
-#         return
+    q = session.query(Contest_DB).filter(Contest_DB.key == key)
+    # Clear cache
+    if q.count():
+        q.delete()
+        session.commit()
+    try:
+        contest = await query.get_contest(key)
+    except ObjectNotFound:
+        await ctx.respond("Contest not found")
+        return
 
-#     if contest.is_organization_private:
-#         return await ctx.respond("Contest not found")
+    if contest.is_organization_private:
+        return await ctx.respond("Contest not found")
 
-#     role = get(ctx.get_guild().roles, name="postcontest " + key)
-#     if not role:
-#         return await ctx.respond(f"No `postcontest {key}` role found.")
+    rc = lightbulb.RoleConverter(ctx)
+    for role_id in ctx.get_guild().get_roles():
+        _role = await rc.convert(str(role_id))
+        if _role.name == "postcontest " + key:
+            role = _role
+            break
+    else:
+        return await ctx.respond(f"No `postcontest {key}` role found.")
 
-#     if update_all:
-#         participants = set()
-#         for ranking in contest.rankings:
-#             endTime = datetime.strptime(ranking["end_time"], "%Y-%m-%dT%H:%M:%S%z")
-#             if endTime < datetime.now(timezone.utc).astimezone():
-#                 participants.add(ranking["user"])
+    if update_all:
+        participants = set()
+        for ranking in contest.rankings:
+            endTime = datetime.strptime(ranking["end_time"], "%Y-%m-%dT%H:%M:%S%z")
+            if endTime < datetime.now(timezone.utc).astimezone():
+                participants.add(ranking["user"])
 
-#         for user in usernames:
-#             if user.handle in participants:
-#                 try:
-#                     await ctx.get_guild().get_member(user.id).add_roles(role)
-#                 except discord.Forbidden:
-#                     return await ctx.respond("No permission to assign the role")
-#         return await ctx.respond("Updated post contest for " + key)
+        for user in usernames:
+            if user.handle in participants:
+                await ctx.get_guild().get_member(user.id).add_role(role)
+        return await ctx.respond("Updated post contest for " + key)
 
-#     for ranking in contest.rankings:
-#         if ranking["user"].lower() != username.lower():
-#             continue
+    for ranking in contest.rankings:
+        if ranking["user"].lower() != username.lower():
+            continue
 
-#         endTime = datetime.strptime(ranking["end_time"], "%Y-%m-%dT%H:%M:%S%z")
-#         if endTime > datetime.now(timezone.utc).astimezone():
-#             return await ctx.respond("Your window is not done")
-#         else:
-#             try:
-#                 await ctx.author.add_roles(role)
-#             except discord.Forbidden:
-#                 return await ctx.respond("No permission to assign the role")
-#             return await ctx.respond("You've been added to post contest")
-#     return await ctx.respond("You haven't joined the contest yet")
+        endTime = datetime.strptime(ranking["end_time"], "%Y-%m-%dT%H:%M:%S%z")
+        if endTime > datetime.now(timezone.utc).astimezone():
+            return await ctx.respond("Your window is not done")
+        else:
+            await ctx.member.add_role(role)
+            return await ctx.respond("You've been added to post contest")
+    return await ctx.respond("You haven't joined the contest yet")
 
 
 def load(bot: lightbulb.BotApp) -> None:

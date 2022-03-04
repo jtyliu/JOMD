@@ -32,7 +32,9 @@ async def on_error(event: lightbulb.CommandErrorEvent) -> None:
             return await event.context.respond(f"Not enough arguments ({event.exception})")
         if isinstance(event.exception, lightbulb.CommandInvocationError):
             if isinstance(event.exception.original, hikari.ForbiddenError):
-                return await event.context.respond(f"I do not have permissions to do this ({event.exception})")
+                return await event.context.respond(
+                    f"I do not have permissions to do this ({event.exception.original.message})"
+                )
         if isinstance(event.exception, lightbulb.CommandNotFound):
             return await event.context.respond(f"Where command? ({event.exception})")
 

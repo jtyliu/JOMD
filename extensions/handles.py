@@ -5,6 +5,7 @@ from operator import itemgetter
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, Submission as Submission_DB
 from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
+from lightbulb.utils import nav
 import typing as t
 import asyncio
 import functools
@@ -267,41 +268,56 @@ async def _set(ctx):
         await ctx.respond("You are missing the `" + rank.name + "` role")
 
 
-# @commands.command(aliases=['users', 'leaderboard'], usage='[rating|maxrating|points|solved]')
-# async def top(self, ctx, arg='rating'):
-#     '''Shows registered server members in ranked order'''
-#     arg = arg.lower()
-#     if arg != 'rating' and arg != 'maxrating' and arg != 'points' and arg != 'solved':
-#         return await ctx.respond_help('top')
-#     users = session.query(User_DB).join(Handle_DB, Handle_DB.handle == User_DB.username)\
-#         .filter(Handle_DB.guild_id == ctx.get_guild().id)
-#     leaderboard = []
-#     for user in users:
-#         if arg == 'rating':
-#             leaderboard.append([-(user.rating or -9999), user.username])
-#         elif arg == 'maxrating':
-#             leaderboard.append([-(user.max_rating or -9999), user.username])
-#         elif arg == 'points':
-#             leaderboard.append([-user.performance_points, user.username])
-#         elif arg == 'solved':
-#             leaderboard.append([-(user.problem_count or 0), user.username])
-#     leaderboard.sort()
-#     content = []
-#     page = ''
-#     for i, user in enumerate(leaderboard):
-#         if (arg == 'rating' or arg == 'maxrating') and user[0] == 9999:
-#             page += f'{i+1} {user[1]} unrated\n'
-#         else:
-#             page += f'{i+1} {user[1]} {-round(user[0],3)}\n'
-#         if i % 10 == 9:
-#             content.append(page)
-#             page = ''
-#     if page != '':
-#         content.append(page)
-#     if len(content) == 0:
-#         content.append('No users')
-#     message = await ctx.respond(embed=discord.Embed().add_field(name='Top DMOJ ' + arg, value=content[0]))
-#     await scroll_embed(ctx, self.bot, message, 'Top DMOJ ' + arg, content)
+@plugin.command()
+@lightbulb.option(
+    "arg",
+    "[rating|maxrating|points|solved]",
+    str,
+    required=False,
+    choices=["rating", "maxrating", "points", "solved"],
+    default="rating",
+)
+@lightbulb.command(
+    "top", "Shows registered server members in ranked order (Adelaide Command)", aliases=["users", "leaderboard"]
+)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def top(ctx):
+    """Shows registered server members in ranked order"""
+    arg = ctx.options.arg.lower()
+    if arg != "rating" and arg != "maxrating" and arg != "points" and arg != "solved":
+        return await ctx.respond_help("top")
+    users = (
+        session.query(User_DB)
+        .join(Handle_DB, Handle_DB.handle == User_DB.username)
+        .filter(Handle_DB.guild_id == ctx.get_guild().id)
+    )
+    leaderboard = []
+    for user in users:
+        if arg == "rating":
+            leaderboard.append([-(user.rating or -9999), user.username])
+        elif arg == "maxrating":
+            leaderboard.append([-(user.max_rating or -9999), user.username])
+        elif arg == "points":
+            leaderboard.append([-user.performance_points, user.username])
+        elif arg == "solved":
+            leaderboard.append([-(user.problem_count or 0), user.username])
+    leaderboard.sort()
+    pag = lightbulb.utils.EmbedPaginator()
+    for i, user in enumerate(leaderboard):
+        if (arg == "rating" or arg == "maxrating") and user[0] == 9999:
+            pag.add_line(f"{i+1} {user[1]} unrated")
+        else:
+            pag.add_line(f"{i+1} {user[1]} {-round(user[0],3)}")
+
+    if len(leaderboard) == 0:
+        pag.add_line("No users")
+
+    @pag.embed_factory()
+    def build_embed(page_index, content):
+        return hikari.Embed().add_field(name="Top DMOJ " + arg, value=content)
+
+    navigator = nav.ButtonNavigator(pag.build_pages())
+    await navigator.run(ctx)
 
 
 def rating_to_rank(rating):
