@@ -1,5 +1,6 @@
 **/JOMD.db
 **/JOMD1.db
+**/JOMD1_old.db
 __pycache__/
 .vscode/
 Test.py
@@ -11,3 +12,5 @@ plot.png
 */.DS_Store
 */.idea
 tempCodeRunnerFile.py
+setenv.sh
+.env
