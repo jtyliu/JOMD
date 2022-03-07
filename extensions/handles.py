@@ -8,7 +8,6 @@ from utils.constants import RATING_TO_RANKS, RANKS, ADMIN_ROLES
 from lightbulb.utils import nav
 import typing as t
 import asyncio
-import functools
 import hashlib
 import lightbulb
 import hikari

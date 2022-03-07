@@ -28,6 +28,7 @@ async def on_prefix_command(event: lightbulb.PrefixCommandCompletionEvent) -> No
 @plugin.listener(lightbulb.CommandErrorEvent)
 async def on_error(event: lightbulb.CommandErrorEvent) -> None:
     try:
+        logger.warning("Error handling: raised %s", event)
         if isinstance(event.exception, lightbulb.NotEnoughArguments):
             return await event.context.respond(f"Not enough arguments ({event.exception})")
         if isinstance(event.exception, lightbulb.CommandInvocationError):

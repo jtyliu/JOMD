@@ -23,8 +23,7 @@ def main():
 
     pref = "+"
     bot = lightbulb.BotApp(
-        token=BOT_TOKEN, prefix=pref, banner=None, intents=hikari.Intents.ALL, default_enabled_guilds=707067613993500692
-    )
+        token=BOT_TOKEN, prefix=pref, banner=None, intents=hikari.Intents.ALL)
 
     bot.load_extensions_from("./extensions/")
     # TESTING

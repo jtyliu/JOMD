@@ -463,7 +463,7 @@ async def vc(ctx):
 )
 @lightbulb.command("gimmie", ":monkey:", hidden=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
-async def gimmie(self, ctx):
+async def gimmie(ctx):
     return await ctx.respond(":monkey:")
 
 
