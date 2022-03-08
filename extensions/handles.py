@@ -1,6 +1,5 @@
 import functools
 from utils.api import ObjectNotFound
-from utils.jomd_common import scroll_embed
 from operator import itemgetter
 from utils.query import Query
 from utils.db import session, User as User_DB, Handle as Handle_DB, Contest as Contest_DB, Submission as Submission_DB
