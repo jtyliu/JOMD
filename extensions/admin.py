@@ -83,6 +83,7 @@ async def reload_all(ctx: lightbulb.Context) -> None:
 @lightbulb.command("force", "Force a recache of a problem, or contest")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def force(ctx: lightbulb.Context) -> None:
+    logger.info("AAAAAA %s", ctx.options.type.lower())
     if ctx.options.type.lower() == "contest":
         q = session.query(Contest).filter(Contest.key == ctx.options.key)
         if q.count() == 0:
@@ -97,7 +98,7 @@ async def force(ctx: lightbulb.Context) -> None:
             await query.get_contest(ctx.options.key)
         except ObjectNotFound:
             return await ctx.respond("Contest not found")
-        await ctx.respond(f"Recached contest {ctx.options.key}")
+        return await ctx.respond(f"Recached contest {ctx.options.key}")
     if ctx.options.type.lower() == "problem":
         q = session.query(Problem).filter(Problem.code == ctx.options.key)
         if q.count() == 0:
@@ -112,9 +113,7 @@ async def force(ctx: lightbulb.Context) -> None:
             await query.get_problem(ctx.options.key)
         except ObjectNotFound:
             return await ctx.respond("Problem not found")
-        await ctx.respond(f"Recached problem {ctx.options.key}")
-    else:
-        await ctx.send_help()
+        return await ctx.respond(f"Recached problem {ctx.options.key}")
 
 
 # NOTE: MAYBE CREATE A cache_users COMMAND?

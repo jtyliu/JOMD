@@ -94,7 +94,7 @@ async def user(ctx):
 
     embed = hikari.Embed(title=f"{username}'s latest submissions", color=0xFCDB05)
     for submission in submissions:
-        problem = submission.problem[0]
+        problem = submission.problem
         if problem.points is not None:
             points = str(int(problem.points)) + "p"
             if problem.partial:
@@ -114,14 +114,14 @@ async def user(ctx):
         )
 
         embed.add_field(
-            name="%s (%s)" % (submission.problem[0].name, points),
+            name="%s (%s)" % (submission.problem.name, points),
             value="%s | [Problem](https://dmoj.ca/problem/%s)"
             % (
                 submission.date.astimezone(TZ)
                 .strftime("%b. %d, %Y, %I:%M %p")
                 .replace("AM", "a.m.")
                 .replace("PM", "p.m."),
-                submission.problem[0].code,
+                submission.problem.code,
             ),
             # Jan. 13, 2021, 12:17 a.m.
             # %b. %d, %Y, %I:%M %p
@@ -234,7 +234,7 @@ async def userinfo(ctx):
 
     embed = hikari.Embed(title=f"{username}'s latest submissions", color=0xFFFF00)
     for submission in submissions:
-        problem = submission.problem[0]
+        problem = submission.problem
         if problem.points is not None:
             points = str(int(problem.points)) + "p"
             if problem.partial:
@@ -254,14 +254,14 @@ async def userinfo(ctx):
         )
 
         embed.add_field(
-            name="%s (%s)" % (submission.problem[0].name, points),
+            name="%s (%s)" % (submission.problem.name, points),
             value="%s | [Problem](https://dmoj.ca/problem/%s)"
             % (
                 submission.date.astimezone(TZ)
                 .strftime("%b. %d, %Y, %I:%M %p")
                 .replace("AM", "a.m.")
                 .replace("PM", "p.m."),
-                submission.problem[0].code,
+                submission.problem.code,
             ),
             # Jan. 13, 2021, 12:17 a.m.
             # %b. %d, %Y, %I:%M %p
@@ -331,7 +331,7 @@ async def predict(ctx):
     problems_ACed = dict()
     code_to_points = dict()
     for submission in submissions:
-        code = submission.problem[0].code
+        code = submission.problem.code
         points = submission.points
         result = submission.result
 
@@ -586,7 +586,7 @@ async def solved(ctx):
 
     for sub in uniqueSubmissions:
         age = (datetime.now() - sub.date).days
-        pag.add_line(f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)")
+        pag.add_line(f"[{sub.problem.name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)")
 
     if len(uniqueSubmissions) == 0:
         pag.add_line("No submission")

@@ -34,6 +34,9 @@ __all__ = [
 ]
 
 
+# TODO: Use rate limiter provided by lightbulb
+
+
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
 class RateLimiter:
     def __init__(self, rate_limit: int, concurrency_limit: int) -> None:
@@ -832,7 +835,7 @@ class API:
             await parse_obj.init(self.data.object)
             self.data.object.config = parse_obj.config
             self.data.objects = None
-        else:
+        elif hasattr(self.data, 'objects'):
             await parse_obj.inits(self.data.objects)
             for obj in self.data.objects:
                 obj.config = parse_obj.config
@@ -1027,6 +1030,8 @@ class API:
                 'score_num': score_num,  # TODO: Replace this
                 'score_denom': score_denom,  # TODO: Replace this
                 'problem_name': html.unescape(name),
+                # +user 2 crashes here
+                # TODO: Add cfg integration
             }
             ret = Submission(res)
             return ret

@@ -95,7 +95,7 @@ class AttrMixin:
                 else:
                     if hasattr(obj, key):
                         # TODO: Logging
-                        # print(add_attr(attr, key), getattr(obj, key))
+                        print(add_attr(attr, key), getattr(obj, key))
                         setattr(self, add_attr(attr, key), getattr(obj, key))
         init(obj, self.cfg, '')
 

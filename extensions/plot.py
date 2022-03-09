@@ -195,7 +195,7 @@ async def points(ctx):
         data_to_plot = {}
         # O(N^2logN) :blobcreep:
         for submission in submissions:
-            code = submission.problem[0].code
+            code = submission.problem.code
             points = submission.points
             result = submission.result
 
