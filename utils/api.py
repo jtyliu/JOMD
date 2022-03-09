@@ -36,13 +36,11 @@ __all__ = [
 
 # Credit to Danny Mor https://medium.com/analytics-vidhya/async-python-client-rate-limiter-911d7982526b
 class RateLimiter:
-    def __init__(self,
-                 rate_limit: int,
-                 concurrency_limit: int) -> None:
+    def __init__(self, rate_limit: int, concurrency_limit: int) -> None:
         if not rate_limit or rate_limit < 1:
-            raise ValueError('rate limit must be non zero positive number')
+            raise ValueError("rate limit must be non zero positive number")
         if not concurrency_limit or concurrency_limit < 1:
-            raise ValueError('concurrent limit must be non zero positive number')
+            raise ValueError("concurrent limit must be non zero positive number")
 
         self.rate_limit = rate_limit
         self.tokens_queue = asyncio.Queue(rate_limit)
@@ -66,10 +64,7 @@ class RateLimiter:
                 current_consumption_time = time.monotonic()
                 total_tokens = self.tokens_queue.qsize()
                 tokens_to_consume = self.get_tokens_amount_to_consume(
-                    consumption_rate,
-                    current_consumption_time,
-                    last_consumption_time,
-                    total_tokens
+                    consumption_rate, current_consumption_time, last_consumption_time, total_tokens
                 )
 
                 for i in range(0, tokens_to_consume):
@@ -142,21 +137,21 @@ async def _query_api(url, resp_obj, *, object_hook=None):
 
     async with rate_limiter.throttle():
         start = time.time()
-        logger.info('Calling %s', url)
+        logger.info("Calling %s", url)
         if _session is None:
             if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
             else:
-                _session = aiohttp.ClientSession(headers={'Authorization': 'Bearer ' + API_TOKEN})
+                _session = aiohttp.ClientSession(headers={"Authorization": "Bearer " + API_TOKEN})
         async with _session.get(url) as resp:
-            if resp_obj == 'text':
+            if resp_obj == "text":
                 resp = await resp.text()
             if resp_obj == 'json':
                 resp = await resp.json(loads=json_loads)
             # if 'error' in resp:  ApiError would interfere with some other stuff,
             # might just change to error trapping
             #     raise ApiError
-        logger.info('Parsed data, returning... Time: %s', time.time() - start)
+        logger.info("Parsed data, returning... Time: %s", time.time() - start)
     return resp
 
 
@@ -826,7 +821,7 @@ class API:
                     query_args.append((k, str(vv)))
             else:
                 query_args.append((k, str(v)))
-        return '?' + urllib.parse.urlencode(query_args)
+        return "?" + urllib.parse.urlencode(query_args)
 
     async def parse(self, resp, parse_obj):
         self.__dict__.update(resp.__dict__)
@@ -845,9 +840,9 @@ class API:
 
     async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
         params = {
-            'tag': tag,
-            'organization': organization,
-            'page': page,
+            "tag": tag,
+            "organization": organization,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/contests' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -858,29 +853,41 @@ class API:
                                 contest_key, 'json', object_hook=self.from_dict)
         await self.parse(resp, ParseContest)
 
-    async def get_participations(self, contest: str = None, user: str = None,
-                                 is_disqualified: bool = None,
-                                 virtual_participation_number: int = None, page: int = None) -> None:
+    async def get_participations(
+        self,
+        contest: str = None,
+        user: str = None,
+        is_disqualified: bool = None,
+        virtual_participation_number: int = None,
+        page: int = None,
+    ) -> None:
         params = {
-            'contest': contest,
-            'user': user,
-            'is_disqualified': is_disqualified,
-            'virtual_participation_number': virtual_participation_number,
-            'page': page,
+            "contest": contest,
+            "user": user,
+            "is_disqualified": is_disqualified,
+            "virtual_participation_number": virtual_participation_number,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/participations' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
         await self.parse(resp, ParseParticipation)
 
-    async def get_problems(self, partial: bool = None, group: str = None, _type: str = None,
-                           organization: str = None, search: str = None, page: int = None) -> None:
+    async def get_problems(
+        self,
+        partial: bool = None,
+        group: str = None,
+        _type: str = None,
+        organization: str = None,
+        search: str = None,
+        page: int = None,
+    ) -> None:
         params = {
-            'partial': partial,
-            'group': group,
-            'type': _type,
-            'organization': organization,
-            'search': search,
-            'page': page,
+            "partial": partial,
+            "group": group,
+            "type": _type,
+            "organization": organization,
+            "search": search,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/problems' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -893,8 +900,8 @@ class API:
 
     async def get_users(self, organization: str = None, page: int = None) -> None:
         params = {
-            'organization': organization,
-            'page': page,
+            "organization": organization,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/users' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -905,14 +912,15 @@ class API:
                                 username, 'json', object_hook=self.from_dict)
         await self.parse(resp, ParseUser)
 
-    async def get_submissions(self, user: str = None, problem: str = None,
-                              language: str = None, result: str = None, page: int = None) -> None:
+    async def get_submissions(
+        self, user: str = None, problem: str = None, language: str = None, result: str = None, page: int = None
+    ) -> None:
         params = {
-            'user': user,
-            'problem': problem,
-            'language': language,
-            'result': result,
-            'page': page,
+            "user": user,
+            "problem": problem,
+            "language": language,
+            "result": result,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/submissions' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -927,8 +935,8 @@ class API:
 
     async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
         params = {
-            'is_open': is_open,
-            'page': page,
+            "is_open": is_open,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/organizations' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -936,8 +944,8 @@ class API:
 
     async def get_languages(self, common_name: str = None, page: int = None) -> None:
         params = {
-            'common_name': common_name,
-            'page': page,
+            "common_name": common_name,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/languages' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
@@ -945,39 +953,38 @@ class API:
 
     async def get_judges(self, page: int = None) -> None:
         params = {
-            'page': page,
+            "page": page,
         }
         resp = await _query_api(SITE_URL + 'api/v2/judges' +
                                 self.url_encode(params), 'json', object_hook=self.from_dict)
         await self.parse(resp, ParseJudge)
 
     async def get_pfp(self, username: str) -> str:
-        resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features='html5lib')
-        pfp = soup.find('div', class_='user-gravatar').find('img')['src']
+        resp = await _query_api(SITE_URL + "user/" + username, "text")
+        soup = BeautifulSoup(resp, features="html5lib")
+        pfp = soup.find("div", class_="user-gravatar").find("img")["src"]
         return pfp
 
     async def get_user_description(self, username: str) -> str:
-        resp = await _query_api(SITE_URL + 'user/' + username, 'text')
-        soup = BeautifulSoup(resp, features='html5lib')
-        description = str(soup.find('div', class_='content-description'))
+        resp = await _query_api(SITE_URL + "user/" + username, "text")
+        soup = BeautifulSoup(resp, features="html5lib")
+        description = str(soup.find("div", class_="content-description"))
         return description
 
     async def get_latest_submission(self, username: str, num: int) -> Submission:
         # TODO: Fix
         # Don't look at me! I'm hideous!
         def soup_parse(soup):
-            submission_id = soup['id']
-            result = soup.find(class_='sub-result')['class'][-1]
+            submission_id = soup["id"]
+            result = soup.find(class_="sub-result")["class"][-1]
             try:
-                score = soup.find(class_='sub-result')\
-                            .find(class_='score').text.split('/')
+                score = soup.find(class_="sub-result").find(class_="score").text.split("/")
                 score_num, score_denom = map(int, score)
                 points = score_num / score_denom
             except ValueError:
                 score_num, score_denom = 0, 0
                 points = 0
-            lang = soup.find(class_='language').text
+            lang = soup.find(class_="language").text
 
             q = session.query(Language).\
                 filter(Language.short_name == lang)
@@ -985,24 +992,23 @@ class API:
                 lang = q.first().key
             # if not as short_name it'll be key, why? idk
 
-            problem = soup.find(class_='name')\
-                          .find('a')['href'].split('/')[-1]
-            name = soup.find(class_='name').find('a').text
-            date = soup.find(class_='time-with-rel')['data-iso']
+            problem = soup.find(class_="name").find("a")["href"].split("/")[-1]
+            name = soup.find(class_="name").find("a").text
+            date = soup.find(class_="time-with-rel")["data-iso"]
             try:
-                time = float(soup.find('div', class_='time')['title'][:-1])
+                time = float(soup.find("div", class_="time")["title"][:-1])
             except ValueError:
                 time = None
             except KeyError:
                 time = None
-            size = ''
-            memory = soup.find('div', class_='memory').text.split(' ')
+            size = ""
+            memory = soup.find("div", class_="memory").text.split(" ")
             if len(memory) == 2:
                 memory, size = memory
                 memory = float(memory)
-                if size == 'MB':
+                if size == "MB":
                     memory *= 1024
-                if size == 'GB':
+                if size == "GB":
                     memory *= 1024 * 1024
             else:
                 # --- case
@@ -1024,20 +1030,19 @@ class API:
             }
             ret = Submission(res)
             return ret
-        resp = await _query_api(SITE_URL +
-                                f'submissions/user/{username}/', 'text')
-        soup = BeautifulSoup(resp, features='html5lib')
+
+        resp = await _query_api(SITE_URL + f"submissions/user/{username}/", "text")
+        soup = BeautifulSoup(resp, features="html5lib")
         ret = []
-        for sub in soup.find_all('div', class_='submission-row')[:num]:
+        for sub in soup.find_all("div", class_="submission-row")[:num]:
             ret.append(soup_parse(sub))
         # TODO: Do something about this
         await Submission.async_map(Submission, ret)
         return ret
 
     async def get_placement(self, username: str) -> int:
-        resp = await _query_api(SITE_URL + f'user/{username}', 'text')
-        soup = BeautifulSoup(resp, features='html5lib')
-        rank_str = soup.find('div', class_='user-sidebar')\
-                       .findChildren(recursive=False)[3].text
-        rank = int(rank_str.split('#')[-1])
+        resp = await _query_api(SITE_URL + f"user/{username}", "text")
+        soup = BeautifulSoup(resp, features="html5lib")
+        rank_str = soup.find("div", class_="user-sidebar").findChildren(recursive=False)[3].text
+        rank = int(rank_str.split("#")[-1])
         return rank

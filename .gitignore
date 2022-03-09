@@ -1,5 +1,6 @@
 **/JOMD.db
 **/JOMD1.db
+**/JOMD1_old.db
 __pycache__/
 .vscode/
 Test.py
@@ -12,3 +13,7 @@ plot.png
 */.idea
 tempCodeRunnerFile.py
 setenv.sh
+<<<<<<< HEAD
+=======
+.env
+>>>>>>> master

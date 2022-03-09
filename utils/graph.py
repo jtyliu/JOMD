@@ -7,7 +7,7 @@ from math import pi
 from datetime import timedelta
 
 
-categories = ['Users', 'DS', 'DP', 'GT', 'String', 'Math', 'Ad Hoc', 'Greedy']
+categories = ["Users", "DS", "DP", "GT", "String", "Math", "Ad Hoc", "Greedy"]
 
 
 def plot_solved(datas):
@@ -18,12 +18,12 @@ def plot_solved(datas):
         solved_num = df.max()
         if isinstance(solved_num, float):
             solved_num = 0
-        df.plot(label='%s (%d)' % (username, solved_num))
-    sns.set_style('whitegrid')
-    plt.xlabel('Date')
-    plt.ylabel('Problem Solved Count')
-    plt.legend(loc='upper left', fontsize='8')
-    plt.savefig('./graphs/plot.png')
+        df.plot(label="%s (%d)" % (username, solved_num))
+    sns.set_style("whitegrid")
+    plt.xlabel("Date")
+    plt.ylabel("Problem Solved Count")
+    plt.legend(loc="upper left", fontsize="8")
+    plt.savefig("./graphs/plot.png")
 
 
 def plot_points(datas):
@@ -31,12 +31,12 @@ def plot_points(datas):
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
-        df.plot(label='%s (%.2f)' % (username, df.max()))
-    sns.set_style('whitegrid')
-    plt.xlabel('Date')
-    plt.ylabel('Points')
-    plt.legend(loc='upper left', fontsize='8')
-    plt.savefig('./graphs/plot.png')
+        df.plot(label="%s (%.2f)" % (username, df.max()))
+    sns.set_style("whitegrid")
+    plt.xlabel("Date")
+    plt.ylabel("Points")
+    plt.legend(loc="upper left", fontsize="8")
+    plt.savefig("./graphs/plot.png")
 
 
 def plot_rating(data):
@@ -80,7 +80,7 @@ def plot_rating(data):
     # Legend
     ax.legend(loc='upper left', prop={'size': 10})
 
-    plt.savefig('./graphs/plot.png')
+    plt.savefig("./graphs/plot.png")
 
 
 def plot_type_bar(data, as_percent):
@@ -88,15 +88,13 @@ def plot_type_bar(data, as_percent):
     plt.subplots()
     df = pd.DataFrame(data)
     df.columns = categories
-    ylabel = 'Points (%)' if as_percent else 'Points'
-    df = pd.melt(df, id_vars='Users', var_name='Problem Type',
-                 value_name=ylabel)
+    ylabel = "Points (%)" if as_percent else "Points"
+    df = pd.melt(df, id_vars="Users", var_name="Problem Type", value_name=ylabel)
     sns.set_theme()
-    sns.set_style('whitegrid')
-    sns.barplot(x='Problem Type', y=ylabel, hue='Users', data=df,
-                palette='tab10')
-    plt.legend(loc='upper right', fontsize='8')
-    plt.savefig('./graphs/plot.png')
+    sns.set_style("whitegrid")
+    sns.barplot(x="Problem Type", y=ylabel, hue="Users", data=df, palette="tab10")
+    plt.legend(loc="upper right", fontsize="8")
+    plt.savefig("./graphs/plot.png")
 
 
 def plot_type_radar(data, as_percent, maxval):
@@ -109,7 +107,7 @@ def plot_type_radar(data, as_percent, maxval):
     # number of variable
     categories = list(df)[1:]
     N = len(categories)
-    usernames = data['group']
+    usernames = data["group"]
 
     # What will be the angle of each axis in the plot?
     # (we divide the plot / number of variable)
@@ -133,22 +131,16 @@ def plot_type_radar(data, as_percent, maxval):
     if as_percent:
         plt.yticks(
             [scale / 4, scale / 2, 3 * scale / 4],
-            [
-                '%.1f%%' % (scale / 4),
-                '%.1f%%' % (scale / 2),
-                '%.1f%%' % (3 * scale / 4)
-            ],
-            color='grey', size=7
+            ["%.1f%%" % (scale / 4), "%.1f%%" % (scale / 2), "%.1f%%" % (3 * scale / 4)],
+            color="grey",
+            size=7,
         )
     else:
         plt.yticks(
             [scale / 4, scale / 2, 3 * scale / 4],
-            [
-                '%.1f' % (scale / 4),
-                '%.1f' % (scale / 2),
-                '%.1f' % (3 * scale / 4)
-            ],
-            color='grey', size=7
+            ["%.1f" % (scale / 4), "%.1f" % (scale / 2), "%.1f" % (3 * scale / 4)],
+            color="grey",
+            size=7,
         )
     plt.ylim(0, maxval * 1.1)
 
@@ -156,16 +148,14 @@ def plot_type_radar(data, as_percent, maxval):
     # I don't do a loop, because plotting more than
     # 3 groups makes the chart unreadable
 
-    colours = ['b', 'g', 'r', 'c', 'm', 'y']
+    colours = ["b", "g", "r", "c", "m", "y"]
 
     for i in range(len(usernames)):
-        values = df.loc[i].drop('group').values.flatten().tolist()
+        values = df.loc[i].drop("group").values.flatten().tolist()
         values += values[:1]
-        ax.plot(angles, values, colours[i], linewidth=1, linestyle='solid',
-                label=usernames[i])
+        ax.plot(angles, values, colours[i], linewidth=1, linestyle="solid", label=usernames[i])
         ax.fill(angles, values, colours[i], alpha=0.1)
 
     # Add legend
-    plt.legend(loc='lower right', bbox_to_anchor=(0.95, 0.95),
-               labelspacing=0.1, fontsize='small')
-    plt.savefig('./graphs/plot.png')
+    plt.legend(loc="lower right", bbox_to_anchor=(0.95, 0.95), labelspacing=0.1, fontsize="small")
+    plt.savefig("./graphs/plot.png")

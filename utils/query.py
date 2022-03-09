@@ -1,6 +1,4 @@
-from discord import utils
-from discord.ext import commands
-from discord.ext.commands.errors import MemberNotFound
+from lightbulb.converters.special import MemberConverter
 from utils.api import API
 from sqlalchemy import or_, func
 from utils.models import *
@@ -9,13 +7,14 @@ from sqlalchemy.sql import functions
 import asyncio
 from operator import attrgetter, itemgetter
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class Query:
-    '''
+    """
     Every object returned from this should be a DB object, not class object
-    '''
+    """
 
     def parse(self, key, val):
         cond = True
@@ -70,9 +69,9 @@ class Query:
             return list(map(Problem, a.data.objects))
 
         page = 1
-        await a.get_problems(partial=partial, group=group, _type=_type,
-                             organization=organization, search=search,
-                             page=page)
+        await a.get_problems(
+            partial=partial, group=group, _type=_type, organization=organization, search=search, page=page
+        )
 
         if a.data.total_objects == q.count():
             return q.all()
@@ -85,9 +84,9 @@ class Query:
 
         while a.data.has_more:
             page += 1
-            await a.get_problems(partial=partial, group=group, _type=_type,
-                                 organization=organization, search=search,
-                                 page=page)
+            await a.get_problems(
+                partial=partial, group=group, _type=_type, organization=organization, search=search, page=page
+            )
 
             for problem in a.data.objects:
                 qq = session.query(Problem).\
@@ -221,9 +220,11 @@ class Query:
 
         page = 1
         await a.get_participations(
-            contest=contest, user=user, is_disqualified=is_disqualified,
+            contest=contest,
+            user=user,
+            is_disqualified=is_disqualified,
             virtual_participation_number=virtual_participation_number,
-            page=page
+            page=page,
         )
 
         # why the hell are these names so long?
@@ -261,9 +262,11 @@ class Query:
             page += 1
             api = API()
             to_await = await a.get_participations(
-                contest=contest, user=user, is_disqualified=is_disqualified,
+                contest=contest,
+                user=user,
+                is_disqualified=is_disqualified,
                 virtual_participation_number=virtual_participation_number,
-                page=page
+                page=page,
             )
             apis.append(api)
             to_gather.append(to_await)
@@ -283,9 +286,9 @@ class Query:
         a = API()
         page = 1
         import time
+
         start = time.time()
-        await a.get_submissions(user=user, problem=problem, language=language,
-                                result=result, page=page)
+        await a.get_submissions(user=user, problem=problem, language=language, result=result, page=page)
 
         logger.info("Got submissions for %s, time elasped %s", user, time.time() - start)
         start = time.time()
@@ -322,9 +325,7 @@ class Query:
         for _ in range(2, total_pages + 1):
             page += 1
             api = API()
-            to_await = api.get_submissions(user=user, problem=problem,
-                                           language=language, result=result,
-                                           page=page)
+            to_await = api.get_submissions(user=user, problem=problem, language=language, result=result, page=page)
             apis.append(api)
             tasks.append(to_await)
         await asyncio.gather(*tasks)
@@ -411,31 +412,9 @@ class Query:
             .group_by(Submission.problem_id)
         return [point for (point,) in q.all()]
 
-    def get_member_named(self, guild, name):
-        result = None
-        members = guild.members
-        if len(name) > 5 and name[-5] == '#':
-            # The 5 length is checking to see if #0000 is in the string,
-            # as a#0000 has a length of 6, the minimum for a potential
-            # discriminator lookup.
-            potential_discriminator = name[-4:]
-
-            # do the actual lookup and return if found
-            # if it isn't found then we'll do a full name lookup below.
-            result = utils.get(members, name=name[:-5], discriminator=potential_discriminator)
-            if result is not None:
-                return result
-
-        name = name.casefold()
-
-        def pred(m):
-            return m.nick and m.nick.casefold() == name or m.name.casefold() == name
-
-        return utils.find(pred, members)
-
     async def parseUser(self, ctx, arg):
         try:
-            return await commands.MemberConverter().convert(ctx, arg)
-        except MemberNotFound:
-            return self.get_member_named(ctx.guild, arg)
+            return await MemberConverter().convert(arg)
+        except TypeError:
+            # TODO: Reimplement get_member_named
             return None

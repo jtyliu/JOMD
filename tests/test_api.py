@@ -14,6 +14,7 @@ def async_test(f):
         future = coro(*args, **kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(future)
+
     return wrapper
 
 
@@ -73,15 +74,7 @@ class TestAPI:
     @pytest.mark.asyncio
     async def test_parse_data(self):
         self.api.Data = self.DataMock
-        data = {
-            "api_version": "v2",
-            "method": "GET",
-            "fetched": "ISO_DATE",
-            "data": {
-                "a": "aa",
-                "b": "bb"
-            }
-        }
+        data = {"api_version": "v2", "method": "GET", "fetched": "ISO_DATE", "data": {"a": "aa", "b": "bb"}}
         await self.api.parse(data, object)
         assert self.api.api_version == data["api_version"]
         assert self.api.method == data["method"]
@@ -95,10 +88,7 @@ class TestAPI:
             "api_version": "v2",
             "method": "GET",
             "fetched": "ISO_DATE",
-            "error": {
-                "code": "404",
-                "message": "User not found"
-            }
+            "error": {"code": "404", "message": "User not found"},
         }
         with pytest.raises(ObjectNotFound):
             await self.api.parse(data, object)
