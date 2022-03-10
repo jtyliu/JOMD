@@ -49,21 +49,22 @@ engine = create_engine(URI, echo=DEBUG)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()
+logger = logging.getLogger(__name__)
 
-# total_time = 0
-# @event.listens_for(engine, "before_cursor_execute")
-# def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-#     conn.info.setdefault('query_start_time', []).append(time.time())
-#    logging.info("Start Query: %s", statement)
-#    logging.info("Query params: %s", parameters)
 
-# @event.listens_for(engine, "after_cursor_execute")
-# def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-#     global total_time
-#     total = time.time() - conn.info['query_start_time'].pop(-1)
-#    logging.info("Query Complete!")
-#    logging.info("Total Time: %f", total)
-#    total_time += total
+total_time = 0
+@event.listens_for(engine, "before_cursor_execute")
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    conn.info.setdefault('query_start_time', []).append(time.time())
+
+@event.listens_for(engine, "after_cursor_execute")
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    global total_time
+    total = time.time() - conn.info['query_start_time'].pop(-1)
+    logger.info("Start Query: %s", statement)
+    logger.info("Query params: %s", parameters)
+    logger.info("Total Time: %f", total)
+    total_time += total
 
 # import atexit
 
@@ -95,13 +96,15 @@ class AttrMixin:
                 else:
                     if hasattr(obj, key):
                         # TODO: Logging
-                        print(add_attr(attr, key), getattr(obj, key))
+                        # print(add_attr(attr, key), getattr(obj, key))
                         setattr(self, add_attr(attr, key), getattr(obj, key))
         init(obj, self.cfg, '')
 
+    # Note this little hack of __getattr__ is only meant for building the data retrieved from API into a proper format which can be stored into the db
+    # This is not intended for use outside of that scope
     def __getattr__(self, key):
         if not hasattr(self, 'cfg') or key not in self.cfg:
-            return super().__getattr_(key)
+            raise Exception("Key not found in config!")
         if self.attr != '':
             self.attr += '__'
         self.attr += key
@@ -131,7 +134,7 @@ class SubmissionCase(Base):
     submission: Optional['Submission'] = relationship('Submission', back_populates='cases')
 
 
-class Submission(Base, AttrMixin):
+class Submission(Base):
     __tablename__ = 'submission'
 
     id: int = Column(Integer, primary_key=True)
@@ -172,7 +175,7 @@ class ParticipationSolution(Base):
         AttrMixin.__init__(self, obj)
 
 
-class Participation(Base, AttrMixin):
+class Participation(Base):
     __tablename__ = 'participation'
 
     id: int = Column(Integer, primary_key=True, autoincrement=True)
@@ -198,7 +201,7 @@ class Participation(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class ContestProblem(Base, AttrMixin):
+class ContestProblem(Base):
     __tablename__ = 'contest_problem'
 
     id: int = Column(Integer, primary_key=True, autoincrement=True)
@@ -228,7 +231,7 @@ class ContestTag(Base):
         self.tag = tag
 
 
-class Contest(Base, AttrMixin):
+class Contest(Base):
     __tablename__ = 'contest'
 
     key: str = Column(String, primary_key=True)
@@ -280,7 +283,7 @@ class ProblemType(Base):
         self.type = type
 
 
-class ProblemLanguageLimit(Base, AttrMixin):
+class ProblemLanguageLimit(Base):
     __tablename__ = 'problem_language_limit'
 
     id: int = Column(Integer, primary_key=True, autoincrement=True)
@@ -297,7 +300,7 @@ class ProblemLanguageLimit(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class Problem(Base, AttrMixin):
+class Problem(Base):
     __tablename__ = 'problem'
 
     code: str = Column(String, primary_key=True)
@@ -342,7 +345,7 @@ class UserVolatility(Base):
         self.volatility = volatility
 
 
-class User(Base, AttrMixin):
+class User(Base):
     __tablename__ = 'user'
 
     id: int = Column(Integer, primary_key=True)
@@ -361,8 +364,7 @@ class User(Base, AttrMixin):
     vols: List[UserVolatility] = relationship('UserVolatility', back_populates='user',
                                               cascade='all, delete')
     volatilities: List[int] = association_proxy('vols', 'volatility')
-    contests: List[Participation] = relationship('Participation', back_populates='user',
-                                                 passive_deletes=True)
+    contests: List[Participation] = relationship('Participation', back_populates='user', passive_deletes=True)
     submissions: List[Submission] = relationship('Submission', back_populates='user',
                                                  passive_deletes=True)
     problems_authored: List[Problem] = relationship('Problem', secondary=lambda: problem_user,
@@ -379,7 +381,7 @@ class User(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class Judge(Base, AttrMixin):
+class Judge(Base):
     __tablename__ = 'judge'
 
     name: str = Column(String, primary_key=True)
@@ -393,7 +395,7 @@ class Judge(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class Language(Base, AttrMixin):
+class Language(Base):
     __tablename__ = 'language'
 
     id: int = Column(Integer, primary_key=True)
@@ -414,7 +416,7 @@ class Language(Base, AttrMixin):
         AttrMixin.__init__(self, obj)
 
 
-class Organization(Base, AttrMixin):
+class Organization(Base):
     __tablename__ = 'organization'
 
     id: int = Column(Integer, primary_key=True)

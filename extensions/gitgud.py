@@ -1,5 +1,5 @@
 import typing as t
-from utils.gitgud import Gitgud as Gitgud_utils
+from utils.gitgud import GitgudUtils
 from utils.query import Query
 from utils.constants import SHORTHANDS, RATING_TO_POINT, POINT_VALUES
 from utils.jomd_common import gimme_common, PointRangeConverter
@@ -50,7 +50,7 @@ async def gitgud(ctx: lightbulb.Context) -> None:
     points = ctx.options.points
     filters = ctx.options.filters
     query = Query()
-    gitgud_util = Gitgud_utils()
+    gitgud_util = GitgudUtils()
     # get the user's dmoj handle
     username = query.get_handle(ctx.author.id, ctx.get_guild().id)
     # user = await query.get_user(username)
@@ -86,7 +86,7 @@ async def gitgud(ctx: lightbulb.Context) -> None:
     filter_list = []
     for filter in filters:
         if filter in SHORTHANDS:
-            filter_list.append(SHORTHANDS[filter])
+            filter_list+=SHORTHANDS[filter]
 
     filters = filter_list
 
@@ -107,7 +107,7 @@ async def gitgud(ctx: lightbulb.Context) -> None:
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def nogud(ctx):
     query = Query()
-    gitgud_util = Gitgud_utils()
+    gitgud_util = GitgudUtils()
 
     username = query.get_handle(ctx.author.id, ctx.get_guild().id)
 
@@ -144,7 +144,7 @@ async def gitlog(ctx):
     if username is None:
         return await ctx.respond("You have not entered a valid DMOJ handle " "or linked with a DMOJ Account")
 
-    gitgud_util = Gitgud_utils()
+    gitgud_util = GitgudUtils()
     history = gitgud_util.get_all(username, ctx.get_guild().id)
 
     if len(history) == 0:
@@ -184,7 +184,7 @@ async def gitlog(ctx):
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def gotgud(ctx):
     query = Query()
-    gitgud_util = Gitgud_utils()
+    gitgud_util = GitgudUtils()
     username = query.get_handle(ctx.author.id, ctx.get_guild().id)
 
     if username is None:
@@ -255,7 +255,7 @@ async def howgud(ctx):
         username = query.get_handle(ctx.author.id, ctx.get_guild().id)
     user = await query.get_user(username)
     username = user.username
-    ret = Gitgud_utils().get_point(username, ctx.get_guild().id)
+    ret = GitgudUtils().get_point(username, ctx.get_guild().id)
     if ret is None:
         ret = 0
     # TODO Add profile pic?

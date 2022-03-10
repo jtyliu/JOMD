@@ -275,6 +275,8 @@ async def rating(ctx):
         order_by(Contest.end_time)
     data = q.all()
 
+    logger.info("DATA: %s", data)
+
     plot_rating(data)
 
     embed = hikari.Embed(

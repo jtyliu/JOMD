@@ -34,7 +34,7 @@ async def on_error(event: lightbulb.CommandErrorEvent) -> None:
         if isinstance(event.exception, lightbulb.CommandInvocationError):
             if isinstance(event.exception.original, hikari.ForbiddenError):
                 return await event.context.respond(
-                    f"I do not have permissions to do this ({event.exception.original.message})"
+                    f"I do not have permissions to do something ({event.exception.original.message})"
                 )
         if isinstance(event.exception, lightbulb.CommandNotFound):
             return await event.context.respond(f"Where command? ({event.exception})")
@@ -95,10 +95,10 @@ async def force(ctx: lightbulb.Context) -> None:
             session.commit()
         query = Query()
         try:
-            await query.get_contest(ctx.options.key)
+            contest = await query.get_contest(ctx.options.key)
         except ObjectNotFound:
             return await ctx.respond("Contest not found")
-        return await ctx.respond(f"Recached contest {ctx.options.key}")
+        return await ctx.respond(f"Recached contest, {contest.name}")
     if ctx.options.type.lower() == "problem":
         q = session.query(Problem).filter(Problem.code == ctx.options.key)
         if q.count() == 0:
@@ -110,20 +110,24 @@ async def force(ctx: lightbulb.Context) -> None:
             session.commit()
         query = Query()
         try:
-            await query.get_problem(ctx.options.key)
+            problem = await query.get_problem(ctx.options.key)
         except ObjectNotFound:
             return await ctx.respond("Problem not found")
-        return await ctx.respond(f"Recached problem {ctx.options.key}")
+        return await ctx.respond(f"Recached problem, {problem.name}")
 
 
 # NOTE: MAYBE CREATE A cache_users COMMAND?
 
 
 @plugin.command()
+@lightbulb.option("delete", "Recache EVERY contest", choices=["+delete"], required=False, default=None)
 @lightbulb.command("cache_contests", "Cache every contest")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def cache_contests(ctx: lightbulb.Context) -> None:
     # TODO Add live counter
+    if ctx.options.delete:
+        session.query(Contest).delete()
+        session.commit()
     query = Query()
     msg = await ctx.respond("Caching...")
     contests = await query.get_contests()

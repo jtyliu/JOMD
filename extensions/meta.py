@@ -44,7 +44,7 @@ async def check(ctx: lightbulb.Context) -> None:
     await api.get_user("JoshuaL")
     user = api.data.object
     if user is None:
-        await ctx.respond("There is something wrong with the api, " "please contact an admin")
+        await ctx.respond("There is something wrong with the api, please contact an admin")
     else:
         await ctx.respond("Api is all good, move along")
 

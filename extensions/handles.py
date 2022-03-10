@@ -128,7 +128,7 @@ async def unlink(ctx: lightbulb.Context) -> None:
         return
     handle = session.query(Handle)\
         .filter(Handle.id == ctx.author.id)\
-        .filter(Handle.guild_id == ctx.guild.id).first()
+        .filter(Handle.guild_id == ctx.get_guild().id).first()
     session.delete(handle)
     session.commit()
     await ctx.respond(escape_markdown(f"Unlinked you with handle {handle.handle}"))
@@ -224,7 +224,7 @@ async def _set(ctx):
     if handle:
         handle = session.query(Handle)\
             .filter(Handle.id == member.id)\
-            .filter(Handle.guild_id == ctx.guild.id).first()
+            .filter(Handle.guild_id == ctx.get_guild().id).first()
         session.delete(handle)
         session.commit()
         await ctx.respond(escape_markdown(f"Unlinked {member.display_name} with handle {handle.handle}"))
@@ -361,9 +361,14 @@ async def update_roles(ctx):
     rating = {handle_id: new_rating for (handle_id, new_rating) in q}
 
     handle_ids = session.query(Handle.id).filter(Handle.guild_id == ctx.get_guild().id).all()
-    members = {handle_id: ctx.guild.get_member(handle_id) for (handle_id,) in handle_ids}
+    members = {handle_id: ctx.get_guild().get_member(handle_id) for (handle_id,) in handle_ids}
 
-    rank_to_role = {role.name: role for role in ctx.guild.roles if role.name in RANKS}
+    rank_to_role = {}
+    rc = lightbulb.RoleConverter(ctx)
+    for role_id in ctx.get_guild().get_roles():
+        role = await rc.convert(str(role_id))
+        if role.name in RANKS:
+            rank_to_role[role.name] = role
 
     await msg.edit(content="Updating roles...")
 

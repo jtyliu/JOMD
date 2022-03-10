@@ -377,15 +377,20 @@ class Query:
         if q.count():
             return q.first()
 
+    def get_user_id(self, username: str):
+        q = session.query(User.id).filter(User.username == username)
+        return q.first()[0]
+
     def get_unsolved_problems(self, username: str, types: List[str] = [], low: int = 1, high: int = 50) -> Problem:
         # Does not find problems if you first
         # +update_problems
         # +gimme
         # This is cause calling the /problems api does not return is_organization_private
         # The original goal of is_organization_private filter is to prevent leaking problems
+        logger.info("Username: %s, types: %s, low: %s, high: %s",username, types, low, high)
+        user_id = self.get_user_id(username)
         sub_q = session.query(Submission, func.max(Submission.points))\
-            .join(Submission.user)\
-            .filter(User.username == username)\
+            .filter(Submission.user_id == user_id)\
             .group_by(Submission.problem_id).subquery()
         q = session.query(Problem)\
             .outerjoin(sub_q, Problem.code == sub_q.c.problem_id)\
@@ -394,20 +399,19 @@ class Query:
             .filter(Problem.is_organization_private == 0)\
             .filter(Problem.is_public == 1)
         if types:
-            conds = [Problem.types == _type for _type in types]
-            q = q.filter(or_(*conds))
+            q = q.filter(Problem.types.in_(types))
         return q.all()
 
     def get_attempted_problems(self, username: str, types: List[str], low: int = 1, high: int = 50) -> List[int]:
+        user_id = self.get_user_id(username)
         sub_q = session.query(Problem.code)\
             .filter(Problem.points.between(low, high))\
             .filter(Problem.is_organization_private == 0)\
             .filter(Problem.is_public == 1)\
-            .filter(or_(*[Problem.types == _type for _type in types])).subquery()
+            .filter(Problem.types.in_(types)).subquery()
         q = session.query(func.max(Submission.points))\
             .join(sub_q, Submission.problem_id == sub_q.c.code)\
-            .join(Submission.user)\
-            .filter(User.username == username)\
+            .filter(User.user_id == user_id)\
             .filter(func.ifnull(Submission.points, 0) != 0)\
             .group_by(Submission.problem_id)
         return [point for (point,) in q.all()]

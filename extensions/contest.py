@@ -39,6 +39,7 @@ async def ranklist(ctx):
         session.commit()
     query = Query()
     try:
+        # TODO: Optimize query
         contest = await query.get_contest(key)
         contest = session.query(Contest).\
             options(
@@ -107,7 +108,7 @@ async def ranklist(ctx):
     for rank_num, ranking in enumerate(contest.rankings):
         # TODO: ok ish, but placements match the rankings
         for username in usernames:
-            if ranking["user"] == username:
+            if ranking.user.username == username:
                 # If contest is not rated, this crashes
                 if contest.is_rated:
                     if username in rankings:
@@ -154,6 +155,9 @@ async def ranklist(ctx):
                     else:
                         rank_dict[label] = '-'
                 data.append(rank_dict)
+
+    data.sort(key=lambda x: x["rank"])
+
     max_len = {}
     max_len["rank"] = len("#")
     max_len["username"] = len("Handle")
@@ -303,7 +307,8 @@ async def postcontest(ctx):
         filter(Participation.virtual_participation_number == 0)
 
     if q.count():
-        end_time = q.scalar()
+        # NOTE: Use this as reference for any timezone errors
+        end_time = q.scalar().replace(tzinfo=timezone.utc)
 
         if end_time > datetime.now(timezone.utc).astimezone():
             return await ctx.respond("Your window is not done")
