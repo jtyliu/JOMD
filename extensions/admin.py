@@ -42,6 +42,9 @@ async def on_error(event: lightbulb.CommandErrorEvent) -> None:
         if isinstance(event.exception, lightbulb.errors.MissingRequiredRole):
             return await event.context.respond(f"Missing required roles ({event.exception})")
 
+        if isinstance(event.exception, lightbulb.errors.NotOwner):
+            return await event.context.respond(f"You are not the owner of this bot!")
+
         trace = "".join(traceback.format_exception(None, event.exception, event.exception.__traceback__))
         await event.context.respond(
             """Unhandled exception ({0})
