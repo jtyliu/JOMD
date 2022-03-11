@@ -84,11 +84,11 @@ async def whois(ctx):
             username = handle
             if author_id:
                 member = ctx.get_guild().get_member(author_id)
-                linked_username = member.nickname or member.name
+                linked_username = member.nickname or member.username
                 pfp = member.avatar_url
     elif member:
         handle = query.get_handle(member.id, ctx.get_guild().id)
-        username = member.nickname or member.name
+        username = member.nickname or member.username
         if handle:
             linked_username = handle
             pfp = await query.get_pfp(handle)
@@ -108,7 +108,7 @@ async def whois(ctx):
 
     name = None
     if member:
-        name = member.nickname or member.name
+        name = member.nickname or member.username
     embed = hikari.Embed(
         title=escape_markdown(f"Nothing found on {handle or name}"),
         color=0xFCDB05,
@@ -196,7 +196,7 @@ async def link(ctx: lightbulb.Context) -> None:
     if rank in rank_to_role:
         await _update_rank(ctx.member, rank_to_role[rank], "Dmoj account linked")
     else:
-        await ctx.respond("You are missing the `" + rank.name + "` role")
+        await ctx.respond("You are missing the `" + rank + "` role")
 
 
 @plugin.command()
