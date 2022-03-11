@@ -192,7 +192,7 @@ async def userinfo(ctx):
 
     discordHandle = ctx.get_guild().get_member(query.get_handle_user(username, ctx.get_guild().id))
     if discordHandle:
-        discordHandle = discordHandle.nickname or discordHandle.name
+        discordHandle = discordHandle.nickname or discordHandle.username
     else:
         discordHandle = "Unknown"
     if user.rating is None:
