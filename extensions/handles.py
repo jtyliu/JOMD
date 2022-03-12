@@ -213,9 +213,12 @@ async def _set(ctx):
     query = Query()
 
     if username != "+remove":
-        user = await query.get_user(username)
+        try:
+            user = await query.get_user(username)
 
-        if user is None:
+            if user is None:
+                raise ObjectNotFound()
+        except ObjectNotFound:
             await ctx.respond(escape_markdown(f"{username} does not exist on dmoj"))
             return
 
