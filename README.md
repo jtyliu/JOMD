@@ -17,7 +17,7 @@ Point prediction
 <img src="images/predict.png" width=500>
 
 # Features
-The features of JOMD are split up into seperate cogs each handling their related commands.
+The features of JOMD are split up into separate cogs, each handling its related commands.
 
 ### User Cog
 ```
@@ -78,7 +78,7 @@ If you also want to add your DMOJ api token use
 export JOMD_TOKEN="INSERT DMOJ API TOKEN HERE"
 ```
 
-**JOMD also uses SQLAlchemy as a orm and Alembic as a migration tool. You need to make sure the database is upto date**
+**JOMD also uses SQLAlchemy as an ORM and Alembic as a migration tool. You need to make sure the database is up to date.**
 
 **If you have cloned this repository before the addition of Alembic, find the corresponding hash in /alembic and run**
 

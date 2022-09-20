@@ -79,7 +79,7 @@ async def ranklist(ctx):
             usernames.append((await query.get_user(arg)).username)
 
     # The only way to calculate rating changes is by getting the volitility of all the users
-    # that means 100+ seperate api calls
+    # that means 100+ separate api calls
     # How does evan do it?
     # TODO: Use the custom api on evan's site
     import requests

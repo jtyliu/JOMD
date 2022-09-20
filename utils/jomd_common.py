@@ -34,7 +34,7 @@ class PointRangeConverter(base.BaseConverter[t.List[int]]):
             if "-" in arg:
                 arg = arg.split("-")
                 if len(arg) != 2:
-                    raise TypeError("Too many arguements, invalid range")
+                    raise TypeError("Too many arguments, invalid range")
                 return list(map(int, arg))
             point_high = point_low = int(arg)
             return [point_high, point_low]

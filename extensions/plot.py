@@ -24,7 +24,7 @@ plugin = lightbulb.Plugin("Plot")
 
 
 class PeakConverter(base.BaseConverter[str]):
-    """Implementation of the base converter for converting arguments into a peak arguement."""
+    """Implementation of the base converter for converting arguments into a peak argument."""
 
     __slots__ = ()
 
@@ -37,7 +37,7 @@ class PeakConverter(base.BaseConverter[str]):
 
 
 class GraphTypeConverter(base.BaseConverter[str]):
-    """Implementation of the base converter for converting arguments into a graph type arguement."""
+    """Implementation of the base converter for converting arguments into a graph type argument."""
 
     __slots__ = ()
 
@@ -50,7 +50,7 @@ class GraphTypeConverter(base.BaseConverter[str]):
 
 
 class PercentageConverter(base.BaseConverter[str]):
-    """Implementation of the base converter for converting arguments into a percentage arguement."""
+    """Implementation of the base converter for converting arguments into a percentage argument."""
 
     __slots__ = ()
 
