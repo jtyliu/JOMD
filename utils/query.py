@@ -324,7 +324,7 @@ class Query:
         self, user: str = None, problem: str = None, language: str = None, result: str = None
     ) -> List[Submission_DB]:
         # This function is the only one which might take a while to run and
-        # has data that is added reguarly. asyncio.gather can apply to all
+        # has data that is added regularly. asyncio.gather can apply to all
         # functions but this one is the only one which really needs it
         a = API()
         page = 1
@@ -333,7 +333,7 @@ class Query:
         start = time.time()
         await a.get_submissions(user=user, problem=problem, language=language, result=result, page=page)
 
-        logger.info("Got submissions for %s, time elasped %s", user, time.time() - start)
+        logger.info("Got submissions for %s, time elapsed %s", user, time.time() - start)
         start = time.time()
         q = session.query(Submission_DB)
         q = q.filter(Submission_DB._user == user)
