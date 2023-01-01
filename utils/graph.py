@@ -18,7 +18,8 @@ def plot_solved(datas):
         solved_num = df.max()
         if isinstance(solved_num, float):
             solved_num = 0
-        df.plot(label="%s (%d)" % (username, solved_num))
+        df.plot(drawstyle="steps-post",
+                label="%s (%d)" % (username, solved_num))
     sns.set_style("whitegrid")
     plt.xlabel("Date")
     plt.ylabel("Problem Solved Count")
@@ -31,7 +32,8 @@ def plot_points(datas):
     plt.subplots()
     for username, data in datas.items():
         df = pd.Series(data)
-        df.plot(label="%s (%.2f)" % (username, df.max()))
+        df.plot(drawstyle="steps-post",
+                label="%s (%.2f)" % (username, df.max()))
     sns.set_style("whitegrid")
     plt.xlabel("Date")
     plt.ylabel("Points")
