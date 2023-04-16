@@ -66,16 +66,10 @@ Install relevant packages
 pip3.7 install -r requirements.txt
 ```
 
-Add your discord bot token with
-
+Add your discord bot token in .env under the format
 ```
-export JOMD_BOT_TOKEN="INSERT BOT TOKEN HERE"
-```
-
-If you also want to add your DMOJ api token use
-
-```
-export JOMD_TOKEN="INSERT DMOJ API TOKEN HERE"
+JOMD_BOT_TOKEN=
+JOMD_TOKEN
 ```
 
 **JOMD also uses SQLAlchemy as an ORM and Alembic as a migration tool. You need to make sure the database is up to date.**
