@@ -716,8 +716,12 @@ class API:
     async def get_pfp(self, username: str) -> str:
         resp = await _query_api(SITE_URL + "user/" + username, "text")
         soup = BeautifulSoup(resp, features="html5lib")
-        pfp = soup.find("div", class_="user-gravatar").find("img")["src"]
-        return pfp
+        try:
+            pfp = soup.find("img", class_="user-gravatar")["src"]
+            return pfp
+        except AttributeError:
+            return None
+
 
     async def get_user_description(self, username: str) -> str:
         resp = await _query_api(SITE_URL + "user/" + username, "text")
