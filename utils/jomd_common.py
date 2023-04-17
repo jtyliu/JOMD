@@ -100,8 +100,9 @@ async def gimme_common(username, points, types):
         description="Points: %s\nProblem Types: %s" % (points, ", ".join(problem.types)),
         color=0xFCDB05,
     )
-
-    embed.set_thumbnail(await query.get_pfp(username))
+    pfp = await query.get_pfp(username)
+    if pfp is not None:
+        embed.set_thumbnail(pfp)
     embed.add_field(name="Group", value=problem.group, inline=True)
     embed.add_field(name="Time", value="%ss" % problem.time_limit, inline=True)
     embed.add_field(name="Memory", value=memory, inline=True)
