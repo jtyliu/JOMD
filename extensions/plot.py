@@ -192,28 +192,40 @@ async def points(ctx):
         problems_ACed = dict()
         code_to_points = dict()
 
-        points_arr = []
+        # O(100N), or O(N)
+        top100 = []  # list of tuples (code, points), sorted by decreasing points
         data_to_plot = {}
-        # O(N^2logN) :blobcreep:
         for submission in submissions:
             code = submission.problem[0].code
             points = submission.points
             result = submission.result
-
-            if points is not None:
-                if result == "AC":
-                    problems_ACed[code] = 1
-                if code not in code_to_points:
-                    # log N search, N insert
-                    code_to_points[code] = points
-                    bisect.insort(points_arr, points)
-                elif points > code_to_points[code]:
-                    # N remove, log N search, N insert
-                    points_arr.remove(code_to_points[code])
-                    code_to_points[code] = points
-                    bisect.insort(points_arr, points)
-                cur_points = calculate_points(points_arr[::-1], len(problems_ACed))
-                data_to_plot[submission.date] = cur_points
+            if points is None or not points > 0.0:
+                continue
+            # seems like DMOJ doesn't count partial AC
+            if result == "AC" and points >= submission.problem[0].points:
+                problems_ACed[code] = 1
+            # doesn't change points
+            if code in code_to_points:
+                if points <= code_to_points[code]:
+                    continue
+            # update top problems
+            if len(top100) < 100 or points > top100[-1][1]:
+                # remove the problem if it's in the list
+                for i in range(len(top100)):
+                    if top100[i][0] == code:
+                        del top100[i]
+                        break
+                # add the problem with updated points to the list
+                for i in range(len(top100)+1):
+                    if i == len(top100) or top100[i][1] < points:
+                        break
+                top100.insert(i, (code, points))
+                top100 = top100[:100]
+            # update
+            code_to_points[code] = points
+            cur_points = calculate_points(
+                [p[1] for p in top100], len(problems_ACed))
+            data_to_plot[submission.date] = cur_points
         total_data[username] = data_to_plot
 
     plot_points(total_data)
