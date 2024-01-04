@@ -1,15 +1,26 @@
-from datetime import datetime
-from operator import add
-from typing import List, Optional
-from sqlalchemy.orm import relation, sessionmaker, relationship
-from sqlalchemy import create_engine, select, event
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Column, String, Integer, DateTime, Float, Boolean, Table, ForeignKey, Text)
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
-from utils.constants import DEBUG
-import time
-import logging
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    Date,
+    TypeDecorator,
+    Float,
+    Boolean,
+    DateTime,
+    JSON,
+    Table,
+    ForeignKey,
+    Text,
+)
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column
+from utils.constants import DEBUG_DB
+from typing import List
+import datetime
+
 
 __all__ = [
     'SubmissionCase',
@@ -43,37 +54,16 @@ __all__ = [
 # Language
 # Organization
 
-URI = 'sqlite:///utils/db/JOMD1.db'
+URI = "postgresql+psycopg2://postgres:postgres@db/postgres"
 
 engine = create_engine(URI, echo=DEBUG)
-Base = declarative_base(bind=engine)
+class Base(DeclarativeBase):
+    type_annotation_map = {
+        dict[str, any]: JSON
+    }
+
 Session = sessionmaker(bind=engine, autoflush=False)
 session = Session()
-logger = logging.getLogger(__name__)
-
-
-total_time = 0
-@event.listens_for(engine, "before_cursor_execute")
-def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    conn.info.setdefault('query_start_time', []).append(time.time())
-
-@event.listens_for(engine, "after_cursor_execute")
-def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    global total_time
-    total = time.time() - conn.info['query_start_time'].pop(-1)
-    logger.info("Start Query: %s", statement)
-    logger.info("Query params: %s", parameters)
-    logger.info("Total Time: %f", total)
-    total_time += total
-
-# import atexit
-
-# def exit_handler():
-#     global total_time
-#     print("Total time communicating with db", total_time)
-
-# atexit.register(exit_handler)
-
 
 class AttrMixin:
 
@@ -118,402 +108,356 @@ class AttrMixin:
             return ret
 
 
-class SubmissionCase(Base):
-    __tablename__ = 'submission_case'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    type: Optional[str] = Column(String)
-    case_id: Optional[int] = Column(Integer)
-    status: Optional[str] = Column(String)
-    time: Optional[float] = Column(Float)
-    memory: Optional[float] = Column(Float)
-    points: Optional[float] = Column(Float, index=True)
-    total: Optional[float] = Column(Float, index=True)
-
-    submission_id: Optional[int] = Column(Integer, ForeignKey('submission.id'))
-    submission: Optional['Submission'] = relationship('Submission', back_populates='cases')
-
-
-class Submission(Base):
-    __tablename__ = 'submission'
-
-    id: int = Column(Integer, primary_key=True)
-    date: Optional[datetime] = Column(DateTime, index=True)
-    time: Optional[float] = Column(Float)
-    memory: Optional[float] = Column(Float)
-    points: Optional[float] = Column(Float)
-    status: Optional[str] = Column(String)
-    result: Optional[str] = Column(String)
-    case_points: Optional[float] = Column(Float)
-    case_total: Optional[float] = Column(Float)
-
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: Optional['Problem'] = relationship('Problem', back_populates='submissions')
-    user_id: Optional[int] = Column(Integer, ForeignKey('user.id'))
-    user: Optional['User'] = relationship('User', back_populates='submissions')
-    language_id: Optional[int] = Column(Integer, ForeignKey('language.id'))
-    language: Optional['Language'] = relationship('Language', back_populates='submissions')
-    cases: Optional[List[SubmissionCase]] = relationship('SubmissionCase', back_populates='submission')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class ParticipationSolution(Base):
-    __tablename__ = 'participation_solution'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    points: Optional[float] = Column(Float, index=True)
-    time: Optional[float] = Column(Float)
-
-    participation_id: Optional[int] = Column(Integer, ForeignKey('participation.id'))
-    participation: Optional['Participation'] = relationship('Participation', back_populates='solutions')
-    contest_id: Optional[int] = Column(String, ForeignKey('contest.key'))
-    contest = relationship('Contest', back_populates='solutions')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class Participation(Base):
-    __tablename__ = 'participation'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    start_time: Optional[datetime] = Column(DateTime)
-    end_time: Optional[datetime] = Column(DateTime)
-    score: Optional[float] = Column(Float)
-    cumulative_time: Optional[int] = Column(Integer)
-    tiebreaker: Optional[float] = Column(Float)
-    old_rating: Optional[int] = Column(Integer)
-    new_rating: Optional[int] = Column(Integer)
-    is_disqualified: Optional[bool] = Column(Boolean)
-    virtual_participation_number: Optional[int] = Column(Integer)
-
-    user_id: Optional[int] = Column(Integer, ForeignKey('user.id'))
-    user: Optional['User'] = relationship('User', back_populates='contests')
-    contest_id: Optional[str] = Column(String, ForeignKey('contest.key'))
-    contest: Optional['Contest'] = relationship('Contest', back_populates='rankings')
-    solutions: Optional[List[ParticipationSolution]] = \
-        relationship('ParticipationSolution', back_populates='participation',
-                     cascade='all, delete', passive_deletes=True)
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class ContestProblem(Base):
-    __tablename__ = 'contest_problem'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    is_pretested: Optional[bool] = Column(Boolean, index=True)
-    max_submissions: Optional[int] = Column(Integer, index=True)
-    label: Optional[str] = Column(String, index=True)
-
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: Optional['Problem'] = relationship('Problem')
-    contest_id: Optional[str] = Column(String, ForeignKey('contest.key'))
-    contest: Optional['Contest'] = relationship('Contest', back_populates='problems')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class ContestTag(Base):
-    __tablename__ = 'contest_tag'
-    # Many to many?
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    tag: Optional[str] = Column(String, index=True)
-
-    contest_id: Optional[str] = Column(String, ForeignKey('contest.key'))
-    contest: Optional['Contest'] = relationship('Contest', back_populates='_tags')
-
-    def __init__(self, tag):
-        self.tag = tag
-
-
-class Contest(Base):
-    __tablename__ = 'contest'
-
-    key: str = Column(String, primary_key=True)
-    name: Optional[str] = Column(String, index=True)
-    start_time: Optional[datetime] = Column(DateTime, index=True)
-    end_time: Optional[datetime] = Column(DateTime, index=True)
-    time_limit: Optional[float] = Column(Float)
-    is_rated: Optional[bool] = Column(Boolean)
-    rate_all: Optional[bool] = Column(Boolean)
-    has_rating: Optional[bool] = Column(Boolean)
-    rating_floor: Optional[int] = Column(Integer)
-    rating_ceiling: Optional[int] = Column(Integer)
-    hidden_scoreboard: Optional[bool] = Column(Boolean, index=True)
-    scoreboard_visibility: Optional[str] = Column(String, index=True)
-    is_organization_private: Optional[bool] = Column(Boolean, index=True)
-    is_private: Optional[bool] = Column(Boolean, index=True)
-    format__name: Optional[str] = Column(String)
-    format__config__cumtime: Optional[bool] = Column(Boolean)
-    format__config__first_ac_bonus: Optional[int] = Column(Integer)
-    format__config__time_bonus: Optional[int] = Column(Integer)
-
-    problems: List[ContestProblem] = \
-        relationship('ContestProblem', back_populates='contest', cascade='all, delete')
-    _tags: List[ContestTag] = \
-        relationship('ContestTag', back_populates='contest', cascade='all, delete')
-    tags: List[str] = association_proxy('_tags', 'tag')
-    # TODO: Check if this has the correct behavior when deleted
-    organizations: List['Organization'] = \
-        relationship('Organization', secondary=lambda: contest_organization, back_populates='contests')
-    solutions = relationship('ParticipationSolution', cascade='all, delete', back_populates='contest')
-    rankings: List[Participation] = relationship('Participation', back_populates='contest',
-                                                 cascade='all, delete')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class ProblemType(Base):
-    # Many to many?
-    __tablename__ = 'problem_type'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    type: Optional[int] = Column(Integer, index=True)
-
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: Optional['Problem'] = relationship('Problem', back_populates='_types')
-
-    def __init__(self, type):
-        self.type = type
-
-
-class ProblemLanguageLimit(Base):
-    __tablename__ = 'problem_language_limit'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    type: Optional[int] = Column(Integer, index=True)
-    time_limit: Optional[float] = Column(Float)
-    memory_limit: Optional[int] = Column(Integer)
-
-    language_id: Optional[str] = Column(String, ForeignKey('language.key'))
-    language: Optional['Language'] = relationship('Language')
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: Optional['Problem'] = relationship('Problem', back_populates='language_resource_limits')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class Problem(Base):
-    __tablename__ = 'problem'
-
-    code: str = Column(String, primary_key=True)
-    name: Optional[str] = Column(String, index=True)
-    group: Optional[str] = Column(String, index=True)
-    time_limit: Optional[float] = Column(Float)
-    memory_limit: Optional[int] = Column(Integer)
-    points: Optional[int] = Column(Integer, index=True)
-    partial: Optional[bool] = Column(Boolean)
-    short_circuit: Optional[bool] = Column(Boolean)
-    is_organization_private: Optional[bool] = Column(Boolean, index=True)
-    is_public: Optional[bool] = Column(Boolean, index=True)
-
-    languages: List['Language'] = relationship('Language', secondary=lambda: language_problem,
-                                               back_populates='problems')
-    organizations: List['Organization'] = relationship('Organization', secondary=lambda: organization_problem,
-                                                       back_populates='problems')
-    _types: List[ProblemType] = relationship('ProblemType', back_populates='problem',
-                                             cascade='all, delete')
-    types: List[str] = association_proxy('_types', 'type')
-    language_resource_limits: List[ProblemLanguageLimit] = \
-        relationship('ProblemLanguageLimit', back_populates='problem', cascade='all, delete')
-    submissions: List[Submission] = relationship('Submission', back_populates='problem')
-    authors: List['User'] = relationship('User', secondary=lambda: problem_user,
-                                         back_populates='problems_authored')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class UserVolatility(Base):
-    # Many to many????
-    __tablename__ = 'user_volatility'
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    volatility: Optional[int] = Column(Integer, index=True)
-
-    user_id: Optional[int] = Column(Integer, ForeignKey('user.id'))
-    user: Optional['User'] = relationship('User', back_populates='vols')
-
-    def __init__(self, volatility):
-        self.volatility = volatility
-
-
-class User(Base):
-    __tablename__ = 'user'
-
-    id: int = Column(Integer, primary_key=True)
-    username: Optional[str] = Column(String, index=True)
-    points: Optional[float] = Column(Float, index=True)
-    performance_points: Optional[float] = Column(Float)
-    problem_count: Optional[int] = Column(Integer)
-    rank: Optional[str] = Column(String)
-    rating: Optional[int] = Column(Integer)
-    volatility: Optional[int] = Column(Integer)
-
-    organizations: List['Organization'] = relationship('Organization', secondary=lambda: organization_user,
-                                                       back_populates='users')
-    # NOTE: For now, the api returns contests in different ways,
-    # will implement volatilities once contests are more consistent
-    vols: List[UserVolatility] = relationship('UserVolatility', back_populates='user',
-                                              cascade='all, delete')
-    volatilities: List[int] = association_proxy('vols', 'volatility')
-    contests: List[Participation] = relationship('Participation', back_populates='user', passive_deletes=True)
-    submissions: List[Submission] = relationship('Submission', back_populates='user',
-                                                 passive_deletes=True)
-    problems_authored: List[Problem] = relationship('Problem', secondary=lambda: problem_user,
-                                                    back_populates='authors', passive_deletes=True)
-    solved_problems: List[Problem] = \
-        relationship("Problem", secondary=Submission.__table__,
-                     primaryjoin="and_(User.id == Submission.user_id, Submission.result == 'AC')",
-                     viewonly=True)
-
-    contests: List[Contest] = relationship('Participation', back_populates='user')
-
-    def __init__(self, obj):
-        # TODO Add max_rating hybrid property
-        AttrMixin.__init__(self, obj)
-
-
-class Judge(Base):
-    __tablename__ = 'judge'
-
-    name: str = Column(String, primary_key=True)
-    start_time: Optional[datetime] = Column(DateTime)
-    ping: Optional[float] = Column(Float)
-    load: Optional[float] = Column(Float)
-    languages: List['Language'] = relationship('Language', secondary=lambda: judge_language,
-                                               back_populates='judges')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class Language(Base):
-    __tablename__ = 'language'
-
-    id: int = Column(Integer, primary_key=True)
-    key: Optional[str] = Column(String, index=True)
-    short_name: Optional[str] = Column(String)
-    common_name: Optional[str] = Column(String)
-    ace_mode_name: Optional[str] = Column(String)
-    pygments_name: Optional[str] = Column(String)
-    code_template: Optional[str] = Column(String)
-
-    judges: List[Judge] = relationship('Judge', secondary=lambda: judge_language,
-                                       back_populates='languages')
-    problems: List[Problem] = relationship('Problem', secondary=lambda: language_problem,
-                                           back_populates='languages')
-    submissions: List[Submission] = relationship('Submission', back_populates='language')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class Organization(Base):
-    __tablename__ = 'organization'
-
-    id: int = Column(Integer, primary_key=True)
-    slug: Optional[str] = Column(String, index=True)
-    short_name: Optional[str] = Column(String)
-    is_open: Optional[bool] = Column(Boolean)
-    member_count: Optional[int] = Column(Integer)
-
-    users: List[User] = relationship('User', secondary=lambda: organization_user,
-                                     back_populates='organizations')
-    problems: List[Problem] = relationship('Problem', secondary=lambda: organization_problem,
-                                           back_populates='organizations')
-    contests: List[Contest] = relationship('Contest', secondary=lambda: contest_organization,
-                                           back_populates='organizations')
-
-    def __init__(self, obj):
-        AttrMixin.__init__(self, obj)
-
-
-class Handle(Base):
-    __tablename__ = 'handle'
-    # NOTE: Should there be a foreign key to user?
-
-    _id: int = Column(Integer, primary_key=True, autoincrement=True)
-    id: Optional[int] = Column(Integer, index=True)
-    handle: Optional[str] = Column(String, index=True)
-    user_id: Optional[int] = Column(Integer, index=True)
-    guild_id: Optional[int] = Column(Integer, index=True)
-
-
-class Gitgud(Base):
-    __tablename__ = 'gitgud'
-    # NOTE: Should there be a foreign key to user?
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    handle: Optional[str] = Column(String, index=True)
-    guild_id: Optional[int] = Column(Integer, index=True)
-    point: Optional[int] = Column(Integer)
-    time: Optional[datetime] = Column(DateTime, index=True)
-
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: List[Problem] = relationship('Problem')
-
-
-class CurrentGitgud(Base):
-    __tablename__ = 'current_gitgud'
-    # NOTE: Should there be a foreign key to user?
-
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    handle: Optional[str] = Column(String)
-    guild_id: Optional[int] = Column(Integer)
-    point: Optional[int] = Column(Integer)
-    time: Optional[datetime] = Column(DateTime, index=True)
-
-    problem_id: Optional[str] = Column(String, ForeignKey('problem.code'))
-    problem: List[Problem] = relationship('Problem')
-
-
-contest_organization = Table(
-    'contest_organization', Base.metadata,
-    Column('contest_id', String, ForeignKey('contest.key'), primary_key=True),
-    Column('organization_id', Integer, ForeignKey('organization.id'), primary_key=True),
+contest_problem = Table(
+    "contest_problem",
+    Base.metadata,
+    Column("contest_id", ForeignKey("contest.key")),
+    Column("problem_id", ForeignKey("problem.code")),
 )
 
-judge_language = Table(
-    'judge_language', Base.metadata,
-    Column('judge_id', String, ForeignKey('judge.name'), primary_key=True),
-    Column('language_id', Integer, ForeignKey('language.id'), primary_key=True),
-)
-
-language_problem = Table(
-    'language_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code'), primary_key=True),
-    Column('language_id', Integer, ForeignKey('language.id'), primary_key=True),
-)
-
-organization_problem = Table(
-    'organization_problem', Base.metadata,
-    Column('problem_id', String, ForeignKey('problem.code'), primary_key=True),
-    Column('organization_id', Integer, ForeignKey('organization.id'), primary_key=True),
-)
-
-organization_user = Table(
-    'organization_user', Base.metadata,
-    Column('organization_id', Integer, ForeignKey('organization.id'), primary_key=True),
-    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
-)
-
-participation_user = Table(
-    'participation_user', Base.metadata,
-    Column('participation_id', Integer, ForeignKey('participation.id'), primary_key=True),
-    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
+contest_user = Table(
+    "contest_user",
+    Base.metadata,
+    Column("contest_id", ForeignKey("contest.key")),
+    Column("user_id", ForeignKey("user.id")),
 )
 
 problem_user = Table(
-    'problem_user', Base.metadata,
-    Column('problem_code', String, ForeignKey('problem.code'), primary_key=True),
-    Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
+    "problem_user",
+    Base.metadata,
+    Column("problem_id", ForeignKey("problem.code")),
+    Column("user_id", ForeignKey("user.id")),
 )
-# Base.metadata.create_all(engine)
+
+language_problem = Table(
+    "language_problem",
+    Base.metadata,
+    Column("problem_id", ForeignKey("problem.code")),
+    Column("language_id", ForeignKey("language.id")),
+)
+
+organization_problem = Table(
+    "organization_problem",
+    Base.metadata,
+    Column("problem_id", ForeignKey("problem.code")),
+    Column("organization_id", ForeignKey("organization.id")),
+)
+
+contest_organization = Table(
+    "contest_organization",
+    Base.metadata,
+    Column("contest_id", ForeignKey("contest.key")),
+    Column("organization_id", ForeignKey("organization.id")),
+)
+
+organization_user = Table(
+    "organization_user",
+    Base.metadata,
+    Column("organization_id", ForeignKey("organization.id")),
+    Column("user_id", ForeignKey("user.id")),
+)
+
+judge_language = Table(
+    "judge_language",
+    Base.metadata,
+    Column("judge_id", ForeignKey("judge.name")),
+    Column("language_id", ForeignKey("language.id")),
+)
+
+
+class Problem(Base):
+    __tablename__ = "problem"
+
+    code: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    # authors = relationship('User', secondary=problem_author_user,
+    #                        back_populates='authored')
+    authors: Mapped[dict[str, any]]
+    types: Mapped[dict[str, any]]
+    group: Mapped[str]
+    time_limit: Mapped[float]
+    memory_limit: Mapped[int]
+    language_resource_limits: Mapped[dict[str, any]]
+    points: Mapped[int]
+    partial: Mapped[bool]
+    short_circuit: Mapped[bool]
+    languages = relationship("Language", secondary=language_problem, back_populates="problems")
+    is_organization_private: Mapped[bool]
+    organizations = relationship("Organization", secondary=organization_problem, back_populates="problems")
+    is_public: Mapped[bool]
+
+    contests = relationship("Contest", secondary=contest_problem, back_populates="problems")
+    solved_users = relationship("User", secondary=problem_user, back_populates="solved_problems")
+    submissions: Mapped[List["Submission"]] = relationship(back_populates="problem")
+
+    def __init__(self, problem):
+        self.code = problem.code
+        self.name = problem.name
+        # Authors is stored as array on usernames
+        # Perhaps I can figure out a way to store an array of user objects
+        # without creating a reference cycle
+        # for username in problem.authors:
+        #     user = session.query(User).\
+        #         filter(User.username == username)
+        #     self.authors.append(user)
+        self.authors = problem.authors
+        self.types = problem.types
+        self.group = problem.group
+        self.time_limit = problem.time_limit
+        self.memory_limit = problem.memory_limit
+        self.language_resource_limits = problem.language_resource_limits
+        self.points = problem.points
+        self.partial = problem.partial
+        self.short_circuit = problem.short_circuit
+        self.languages += problem.languages
+        self.is_organization_private = problem.is_organization_private
+        self.organizations += problem.organizations
+        self.is_public = problem.is_public
+
+
+class Contest(Base):
+    __tablename__ = "contest"
+
+    key: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    start_time: Mapped[datetime.datetime]
+    end_time: Mapped[datetime.datetime]
+    time_limit: Mapped[int]
+    is_rated: Mapped[bool]
+    rate_all: Mapped[bool]
+    has_rating: Mapped[bool]
+    rating_floor: Mapped[int]
+    rating_ceiling: Mapped[int]
+    hidden_scoreboard: Mapped[bool]
+    is_organization_private: Mapped[bool]
+    organizations = relationship("Organization", secondary=contest_organization, back_populates="contest")
+    is_private: Mapped[bool]
+    tags: Mapped[dict[str, any]]
+    _format: Mapped[dict[str, any]] = mapped_column("format")
+    rankings: Mapped[dict[str, any]]
+    problems = relationship("Problem", secondary=contest_problem, back_populates="contests")
+
+    participations: Mapped[List["Participation"]] = relationship(back_populates="contest")
+    users = relationship("User", secondary=contest_user, back_populates="contests")
+
+    def __init__(self, contest):
+        self.key = contest.key
+        self.name = contest.name
+        self.start_time = contest.start_time
+        self.end_time = contest.end_time
+        self.time_limit = contest.time_limit
+        self.is_rated = contest.is_rated
+        self.rate_all = contest.rate_all
+        self.has_rating = contest.has_rating
+        self.rating_floor = contest.rating_floor
+        self.rating_ceiling = contest.rating_ceiling
+        self.hidden_scoreboard = contest.hidden_scoreboard
+        self.is_organization_private = contest.is_organization_private
+        self.organizations += contest.organizations
+        self.is_private = contest.is_private
+        self.tags = contest.tags
+        self._format = contest.format
+        self.rankings = contest.rankings
+        self.problems += contest.problems
+
+
+class Participation(Base):
+    __tablename__ = "participation"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(back_populates="participation")
+    contest_id: Mapped[str] = mapped_column(ForeignKey("contest.key"))
+    contest: Mapped["Contest"] = relationship(back_populates="participations")
+    score: Mapped[float]
+    cumulative_time: Mapped[int]
+    tiebreaker: Mapped[float]
+    is_disqualified: Mapped[bool]
+    virtual_participation_number: Mapped[int]
+
+    def __init__(self, part):
+        self.id = part.id
+        self.user.append(part.user)
+        self._contest = part.contest
+        self.contest.append(part.contest)
+        self.score = part.score
+        self.cumulative_time = part.cumulative_time
+        self.tiebreaker = part.tiebreaker
+        self.is_disqualified = part.is_disqualified
+        self.virtual_participation_number = part.virtual_participation_number
+
+
+class User(Base):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str]
+    points: Mapped[float]
+    performance_points: Mapped[float]
+    problem_count: Mapped[int]
+    rank: Mapped[str]
+    rating: Mapped[int]
+    max_rating: Mapped[int]
+    solved_problems = relationship("Problem", secondary=problem_user, back_populates="solved_users")
+    organizations = relationship("Organization", secondary=organization_user, back_populates="users")
+    contests = relationship("Contest", secondary=contest_user, back_populates="users")
+
+    # authored = relationship('Problem', secondary=problem_author_user,
+    #                         back_populates='authors')
+    participation: Mapped[List["Participation"]] = relationship(back_populates="user")
+    submissions: Mapped[List["Submission"]] = relationship(back_populates="user")
+
+    def __init__(self, user):
+        self.id = user.id
+        self.username = user.username
+        self.points = user.points
+        self.performance_points = user.performance_points
+        self.problem_count = user.problem_count
+        self.rank = user.rank
+        self.rating = user.rating
+        self.solved_problems += user.solved_problems
+        self.organizations += user.organizations
+        self.contests += user.contests
+        self.max_rating = user.max_rating
+
+
+class Submission(Base):
+    __tablename__ = "submission"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # TODO: Should only be a single foreign key
+    problem_id: Mapped[str] = mapped_column(ForeignKey("problem.code"))
+    problem: Mapped["Problem"] = relationship(back_populates="submissions")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(back_populates="submissions")
+    date: Mapped[datetime.datetime]
+    language_id: Mapped[int] = mapped_column(ForeignKey("language.id"))
+    language: Mapped["Language"] = relationship(back_populates="submissions")
+    time: Mapped[float]
+    memory: Mapped[float]
+    points: Mapped[float]
+    result: Mapped[str]
+    status: Mapped[str]
+    case_points: Mapped[float]
+    case_total: Mapped[float]
+    cases: Mapped[dict[str, any]]
+    # This is for +gimme to retrieve unsolved problems
+    _code: Mapped[str]
+    _user: Mapped[str]
+
+    def __init__(self, submission):
+        self.id = submission.id
+        self.problem += submission.problem
+        self._code = submission._problem
+        self._user = submission._user
+        self.user += submission.user
+        self.date = submission.date
+        self.language += submission.language
+        self.time = submission.time
+        self.memory = submission.memory
+        self.points = submission.points
+        self.result = submission.result
+        self.status = submission.status
+        self.case_points = submission.case_points
+        self.case_total = submission.case_total
+        self.cases = submission.cases
+
+
+class Organization(Base):
+    __tablename__ = "organization"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    slug: Mapped[str]
+    short_name: Mapped[str]
+    is_open: Mapped[bool]
+    member_count: Mapped[int]
+
+    problems = relationship("Problem", secondary=organization_problem, back_populates="organizations")
+    contest = relationship("Contest", secondary=contest_organization, back_populates="organizations")
+    users = relationship("User", secondary=organization_user, back_populates="organizations")
+
+    def __init__(self, organization):
+        self.id = organization.id
+        self.slug = organization.slug
+        self.short_name = organization.short_name
+        self.is_open = organization.is_open
+        self.member_count = organization.member_count
+
+
+class Language(Base):
+    __tablename__ = "language"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str]
+    short_name: Mapped[str]
+    common_name: Mapped[str]
+    ace_mode_name: Mapped[str]
+    pygments_name: Mapped[str]
+    code_template: Mapped[str]
+
+    problems = relationship("Problem", secondary=language_problem, back_populates="languages")
+    submissions: Mapped[List["Submission"]] = relationship(back_populates="language")
+    judges = relationship("Judge", secondary=judge_language, back_populates="languages")
+
+    def __init__(self, language):
+        self.id = language.id
+        self.key = language.key
+        self.short_name = language.short_name
+        self.common_name = language.common_name
+        self.ace_mode_name = language.ace_mode_name
+        self.pygments_name = language.pygments_name
+        self.code_template = language.code_template
+
+
+# I don't think I'll ever use this
+class Judge(Base):
+    __tablename__ = "judge"
+
+    name: Mapped[str] = mapped_column(primary_key=True)
+    start_time: Mapped[datetime.datetime]
+    ping: Mapped[float]
+    load: Mapped[float]
+    languages = relationship("Language", secondary=judge_language, back_populates="judges")
+
+    def __init__(self, judge):
+        self.name = judge.name
+        self.start_time = judge.start_time
+        self.ping = judge.ping
+        self.load = judge.load
+        for language_key in judge.languages:
+            language = session.query(Language).filter(Language.key == language_key).first()
+            self.languages.append(language)
+
+
+class Handle(Base):
+    __tablename__ = "handle"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    author_id: Mapped[int] = mapped_column(index=True)
+    handle: Mapped[int] = mapped_column(index=True)
+    user_id: Mapped[int]
+    guild_id: Mapped[int] = mapped_column(index=True)
+
+
+class Gitgud(Base):
+    __tablename__ = "gitgud"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    handle: Mapped[str]
+    guild_id: Mapped[int]
+    point: Mapped[int]
+    # TODO: make it a foreign key problem table
+    problem_id: Mapped[str]
+    time: Mapped[datetime.datetime]
+
+
+class CurrentGitgud(Base):
+    __tablename__ = "current_gitgud"
+    _id: Mapped[int] = mapped_column(primary_key=True)
+    handle: Mapped[str]
+    guild_id: Mapped[int]
+    # TODO: make it a foreign key problem table
+    problem_id: Mapped[str]
+    point: Mapped[int]
+    time: Mapped[datetime.datetime]
+
+
+Base.metadata.create_all(engine)

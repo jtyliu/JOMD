@@ -368,7 +368,7 @@ class Query:
             filter(Handle.handle == handle).\
             filter(Handle.guild_id == guild_id)
         if q.count():
-            return q.first().id
+            return q.first().author_id
 
     def get_random_problem(self, low: int = 1, high: int = 10) -> Problem:
         q = session.query(Problem)\
