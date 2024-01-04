@@ -216,10 +216,7 @@ class Problem:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if (
-                        organization.id not in organization_q
-                        and organization.id in self._organizations
-                    ):
+                    if (organization.id not in organization_q and organization.id in self._organizations):
                         session.add(Organization_DB(organization))
                         session.commit()
                 break
@@ -271,10 +268,7 @@ class Contest:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if (
-                        organization.id not in organization_q
-                        and organization.id in self._organizations
-                    ):
+                    if (organization.id not in organization_q and organization.id in self._organizations):
                         session.add(Organization_DB(organization))
                         session.commit()
                 break
@@ -307,11 +301,7 @@ class Contest:
 class Participation:
     def __init__(self, data):
         self.id = (
-            data["user"]
-            + "&" +
-            data["contest"]
-            + "&" +
-            str(data["virtual_participation_number"])
+            data["user"] + "&" + data["contest"] + "&" + str(data["virtual_participation_number"])
         )
         self._user = data["user"]
         self.user = None
