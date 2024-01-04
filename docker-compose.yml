@@ -1,0 +1,16 @@
+version: '3.3'
+
+services:
+  jomd:
+    build: .
+    environment:
+      - JOMD_BOT_TOKEN=NOU
+      - JOMD_TOKEN=REE
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
