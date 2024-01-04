@@ -59,7 +59,10 @@ class RateLimiter:
                 current_consumption_time = time.monotonic()
                 total_tokens = self.tokens_queue.qsize()
                 tokens_to_consume = self.get_tokens_amount_to_consume(
-                    consumption_rate, current_consumption_time, last_consumption_time, total_tokens
+                    consumption_rate,
+                    current_consumption_time,
+                    last_consumption_time,
+                    total_tokens,
                 )
 
                 for i in range(0, tokens_to_consume):
@@ -76,9 +79,13 @@ class RateLimiter:
             raise
 
     @staticmethod
-    def get_tokens_amount_to_consume(consumption_rate, current_consumption_time, last_consumption_time, total_tokens):
+    def get_tokens_amount_to_consume(
+        consumption_rate, current_consumption_time, last_consumption_time, total_tokens
+    ):
         time_from_last_consumption = current_consumption_time - last_consumption_time
-        calculated_tokens_to_consume = math.floor(time_from_last_consumption / consumption_rate)
+        calculated_tokens_to_consume = math.floor(
+            time_from_last_consumption / consumption_rate
+        )
         tokens_to_consume = min(total_tokens, calculated_tokens_to_consume)
         return tokens_to_consume
 
@@ -131,7 +138,9 @@ async def _query_api(url, resp_obj):
             if API_TOKEN is None:
                 _session = aiohttp.ClientSession()
             else:
-                _session = aiohttp.ClientSession(headers={"Authorization": "Bearer " + API_TOKEN})
+                _session = aiohttp.ClientSession(
+                    headers={"Authorization": "Bearer " + API_TOKEN}
+                )
         async with _session.get(url) as resp:
             if resp_obj == "text":
                 resp = await resp.text()
@@ -173,8 +182,14 @@ class Problem:
         await asyncio.gather(*to_gather)
 
     async def async_init(self):
-        language_qq = session.query(Language_DB).filter(Language_DB.key.in_(self._languages))
-        language_q = session.query(Language_DB.key).filter(Language_DB.key.in_(self._languages)).all()
+        language_qq = session.query(Language_DB).filter(
+            Language_DB.key.in_(self._languages)
+        )
+        language_q = (
+            session.query(Language_DB.key)
+            .filter(Language_DB.key.in_(self._languages))
+            .all()
+        )
         language_q = list(map(itemgetter(0), language_q))
         for language_key in self._languages:
             if language_key not in language_q:
@@ -187,15 +202,21 @@ class Problem:
                 break
         self.languages = language_qq.all()
 
-        organization_qq = session.query(Organization_DB).filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_qq = session.query(Organization_DB).filter(
+            Organization_DB.id.in_(self._organizations)
+        )
+        organization_q = (
+            session.query(Organization_DB.id)
+            .filter(Organization_DB.id.in_(self._organizations))
+            .all()
+        )
         organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id not in organization_q and organization.id in self._organizations:
+                    if (organization.id not in organization_q and organization.id in self._organizations):
                         session.add(Organization_DB(organization))
                         session.commit()
                 break
@@ -233,15 +254,21 @@ class Contest:
         await asyncio.gather(*to_gather)
 
     async def async_init(self):
-        organization_qq = session.query(Organization_DB).filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_qq = session.query(Organization_DB).filter(
+            Organization_DB.id.in_(self._organizations)
+        )
+        organization_q = (
+            session.query(Organization_DB.id)
+            .filter(Organization_DB.id.in_(self._organizations))
+            .all()
+        )
         organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id not in organization_q and organization.id in self._organizations:
+                    if (organization.id not in organization_q and organization.id in self._organizations):
                         session.add(Organization_DB(organization))
                         session.commit()
                 break
@@ -249,8 +276,14 @@ class Contest:
 
         # perhaps I should check if it's the general or detailed version
         self._problem_codes = list(map(itemgetter("code"), self._problems))
-        problem_qq = session.query(Problem_DB).filter(Problem_DB.code.in_(self._problem_codes))
-        problem_q = session.query(Problem_DB.code).filter(Problem_DB.code.in_(self._problem_codes)).all()
+        problem_qq = session.query(Problem_DB).filter(
+            Problem_DB.code.in_(self._problem_codes)
+        )
+        problem_q = (
+            session.query(Problem_DB.code)
+            .filter(Problem_DB.code.in_(self._problem_codes))
+            .all()
+        )
         problem_q = list(map(itemgetter(0), problem_q))
         for problem_dict in self._problems:
             problem_code = problem_dict["code"]
@@ -267,7 +300,9 @@ class Contest:
 
 class Participation:
     def __init__(self, data):
-        self.id = data["user"] + "&" + data["contest"] + "&" + str(data["virtual_participation_number"])
+        self.id = (
+            data["user"] + "&" + data["contest"] + "&" + str(data["virtual_participation_number"])
+        )
         self._user = data["user"]
         self.user = None
         self._contest = data["contest"]
@@ -333,8 +368,14 @@ class User:
         await asyncio.gather(*to_gather)
 
     async def async_init(self):
-        problem_qq = session.query(Problem_DB).filter(Problem_DB.code.in_(self._solved_problems))
-        problem_q = session.query(Problem_DB.code).filter(Problem_DB.code.in_(self._solved_problems)).all()
+        problem_qq = session.query(Problem_DB).filter(
+            Problem_DB.code.in_(self._solved_problems)
+        )
+        problem_q = (
+            session.query(Problem_DB.code)
+            .filter(Problem_DB.code.in_(self._solved_problems))
+            .all()
+        )
         problem_q = list(map(itemgetter(0), problem_q))
         for problem_code in self._solved_problems:
             try:
@@ -347,15 +388,23 @@ class User:
                 pass
         self.solved_problems = problem_qq.all()
 
-        organization_qq = session.query(Organization_DB).filter(Organization_DB.id.in_(self._organizations))
-        organization_q = session.query(Organization_DB.id).filter(Organization_DB.id.in_(self._organizations)).all()
+        organization_qq = session.query(Organization_DB).filter(
+            Organization_DB.id.in_(self._organizations)
+        )
+        organization_q = (
+            session.query(Organization_DB.id)
+            .filter(Organization_DB.id.in_(self._organizations))
+            .all()
+        )
         organization_q = list(map(itemgetter(0), organization_q))
         for organization_id in self._organizations:
             if organization_id not in organization_q:
                 api = API()
                 await api.get_organizations()
                 for organization in api.data.objects:
-                    if organization.id not in organization_q and organization.id in self._organizations:
+                    if (
+                        organization.id not in organization_q and organization.id in self._organizations
+                    ):
                         session.add(Organization_DB(organization))
                         session.commit()
                 break
@@ -367,8 +416,14 @@ class User:
 
         self._contest_keys = list(map(itemgetter("key"), self._contests))
 
-        contest_qq = session.query(Contest_DB).filter(Contest_DB.key.in_(self._contest_keys))
-        contest_q = session.query(Contest_DB.key).filter(Contest_DB.key.in_(self._contest_keys)).all()
+        contest_qq = session.query(Contest_DB).filter(
+            Contest_DB.key.in_(self._contest_keys)
+        )
+        contest_q = (
+            session.query(Contest_DB.key)
+            .filter(Contest_DB.key.in_(self._contest_keys))
+            .all()
+        )
         contest_q = list(map(itemgetter(0), contest_q))
         for contest_key in self._contest_keys:
             try:
@@ -377,7 +432,11 @@ class User:
                     await api.get_contest(contest_key)
                     # This causes db errors, and in the case the above doesn't catch it.
                     # This will be a last ditch effort
-                    if session.query(Contest_DB).filter(Contest_DB.key == contest_key).count():
+                    if (
+                        session.query(Contest_DB)
+                        .filter(Contest_DB.key == contest_key)
+                        .count()
+                    ):
                         continue
                     session.add(Contest_DB(api.data.object))
                     session.commit()
@@ -604,13 +663,17 @@ class API:
             dat = self.Data()
             self.data = await dat.parse(data["data"], _type)
 
-    async def get_contests(self, tag: str = None, organization: str = None, page: int = None) -> None:
+    async def get_contests(
+        self, tag: str = None, organization: str = None, page: int = None
+    ) -> None:
         params = {
             "tag": tag,
             "organization": organization,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/contests" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/contests" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Contest)
 
     async def get_contest(self, contest_key: str) -> None:
@@ -632,7 +695,9 @@ class API:
             "virtual_participation_number": virtual_participation_number,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/participations" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/participations" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Participation)
 
     async def get_problems(
@@ -652,7 +717,9 @@ class API:
             "search": search,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/problems" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/problems" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Problem)
 
     async def get_problem(self, code: str) -> None:
@@ -664,7 +731,9 @@ class API:
             "organization": organization,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/users" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/users" + self.url_encode(params), "json"
+        )
         await self.parse(resp, User)
 
     async def get_user(self, username: str) -> None:
@@ -672,7 +741,12 @@ class API:
         await self.parse(resp, User)
 
     async def get_submissions(
-        self, user: str = None, problem: str = None, language: str = None, result: str = None, page: int = None
+        self,
+        user: str = None,
+        problem: str = None,
+        language: str = None,
+        result: str = None,
+        page: int = None,
     ) -> None:
         params = {
             "user": user,
@@ -681,13 +755,17 @@ class API:
             "result": result,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/submissions" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/submissions" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Submission)
 
     async def get_submission(self, submission_id: typing.Union[int, str]) -> None:
         # Should only accept a string, perhaps I should do something
         # if it were an int
-        resp = await _query_api(SITE_URL + "api/v2/submission/" + str(submission_id), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/submission/" + str(submission_id), "json"
+        )
         await self.parse(resp, Submission)
 
     async def get_organizations(self, is_open: bool = None, page: int = None) -> None:
@@ -695,7 +773,9 @@ class API:
             "is_open": is_open,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/organizations" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/organizations" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Organization)
 
     async def get_languages(self, common_name: str = None, page: int = None) -> None:
@@ -703,14 +783,18 @@ class API:
             "common_name": common_name,
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/languages" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/languages" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Language)
 
     async def get_judges(self, page: int = None) -> None:
         params = {
             "page": page,
         }
-        resp = await _query_api(SITE_URL + "api/v2/judges" + self.url_encode(params), "json")
+        resp = await _query_api(
+            SITE_URL + "api/v2/judges" + self.url_encode(params), "json"
+        )
         await self.parse(resp, Judge)
 
     async def get_pfp(self, username: str) -> str:
@@ -721,7 +805,6 @@ class API:
             return pfp
         except AttributeError:
             return None
-
 
     async def get_user_description(self, username: str) -> str:
         resp = await _query_api(SITE_URL + "user/" + username, "text")
@@ -735,7 +818,9 @@ class API:
             submission_id = soup["id"]
             result = soup.find(class_="sub-result")["class"][-1]
             try:
-                score = soup.find(class_="sub-result").find(class_="score").text.split("/")
+                score = (
+                    soup.find(class_="sub-result").find(class_="score").text.split("/")
+                )
                 score_num, score_denom = map(int, score)
                 points = score_num / score_denom
             except ValueError:
@@ -798,6 +883,10 @@ class API:
     async def get_placement(self, username: str) -> int:
         resp = await _query_api(SITE_URL + f"user/{username}", "text")
         soup = BeautifulSoup(resp, features="html5lib")
-        rank_str = soup.find("div", class_="user-sidebar").findChildren(recursive=False)[3].text
+        rank_str = (
+            soup.find("div", class_="user-sidebar")
+            .findChildren(recursive=False)[3]
+            .text
+        )
         rank = int(rank_str.split("#")[-1])
         return rank

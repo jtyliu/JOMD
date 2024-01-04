@@ -10,8 +10,18 @@ import typing as t
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import alias, func, not_, orm
-from utils.db import Problem as Problem_DB, Contest as Contest_DB, User as User_DB, Submission as Submission_DB
-from utils.jomd_common import is_int, calculate_points, PointRangeConverter, gimme_common
+from utils.db import (
+    Problem as Problem_DB,
+    Contest as Contest_DB,
+    User as User_DB,
+    Submission as Submission_DB,
+)
+from utils.jomd_common import (
+    is_int,
+    calculate_points,
+    PointRangeConverter,
+    gimme_common,
+)
 from utils.api import ObjectNotFound
 from utils.constants import SITE_URL, TZ, SHORTHANDS
 import asyncio
@@ -40,11 +50,13 @@ class StrNotIntConverter(base.BaseConverter[str]):
 
 
 @plugin.command()
-@lightbulb.option("amount", "List last N submissions", int, required=False)
-@lightbulb.option("username", "Dmoj username", StrNotIntConverter, required=False)
-@lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
+@lightbulb.option("amount", "List last N submissions", type=int, required=False)
+@lightbulb.option("username", "Dmoj username", required=False)
+@lightbulb.set_help(
+    "Use surround your username with '' if it can be interpreted as a number"
+)
 @lightbulb.command("user", "Show user profile and latest submissions")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def user(ctx):
     # TODO Optimize the two calls to /user
     username = ctx.options.username
@@ -86,10 +98,14 @@ async def user(ctx):
     )
 
     embed.set_thumbnail(await query.get_pfp(username))
-    embed.add_field(name="Rank by points", value=await query.get_placement(username), inline=False)
+    embed.add_field(
+        name="Rank by points", value=await query.get_placement(username), inline=False
+    )
     embed.add_field(name="Problems Solved", value=user.problem_count, inline=False)
     embed.add_field(name="Rating", value=user.rating, inline=True)
-    embed.add_field(name="Contests Written", value=sum(map(is_rated, user.contests)), inline=True)
+    embed.add_field(
+        name="Contests Written", value=sum(map(is_rated, user.contests)), inline=True
+    )
 
     await ctx.respond(embed=embed)
 
@@ -151,151 +167,22 @@ async def user(ctx):
 
 
 @plugin.command()
-@lightbulb.option("amount", "List last N submissions", int, required=False)
-@lightbulb.option("username", "List last N submissions", StrNotIntConverter, required=False)
-@lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
-@lightbulb.command("userinfo", "Show user profile and latest submissions (Adelaide command)", aliases=["ui"])
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def userinfo(ctx):
-    """Show user profile and latest submissions
-
-    Use surround your username with '' if it can be interpreted as a number
-    """
-    username = ctx.options.username
-    amount = ctx.options.amount
-    query = Query()
-    username = username or query.get_handle(ctx.author.id, ctx.get_guild().id)
-    # If user is not found in db
-    if username is None:
-        username = str(amount)
-        amount = None
-
-    if username is None:
-        return await ctx.respond("No username given!")
-
-    username = username.replace("'", "")
-
-    if amount is not None:
-        amount = min(amount, 8)
-        if amount < 1:
-            return await ctx.respond("Please request at least one submission")
-
-    try:
-        user = await query.get_user(username)
-    except ObjectNotFound:
-        return await ctx.respond(f"{username} does not exist on DMOJ")
-
-    username = user.username
-
-    def is_rated(contest):
-        return 1 if contest.is_rated else 0
-
-    discordHandle = ctx.get_guild().get_member(query.get_handle_user(username, ctx.get_guild().id))
-    if discordHandle:
-        discordHandle = discordHandle.nickname or discordHandle.username
-    else:
-        discordHandle = "Unknown"
-    if user.rating is None:
-        color = 0xFEFEFE  # it breaks when I set it to white
-    elif user.rating >= 3000:
-        color = 0x000000
-    elif user.rating >= 2700:
-        color = 0xA00000
-    elif user.rating >= 2400:
-        color = 0xEE0000
-    elif user.rating >= 1900:
-        color = 0xFFB100
-    elif user.rating >= 1600:
-        color = 0x800080
-    elif user.rating >= 1300:
-        color = 0x0000FF
-    elif user.rating >= 1000:
-        color = 0x00A900
-    elif user.rating >= 0:
-        color = 0x999999
-    else:
-        color = 0x000000
-    description = f"Discord name: {discordHandle}"
-    embed = hikari.Embed(
-        title=username,
-        url=f"https://dmoj.ca/user/{username}",
-        description=description,
-        color=color,  # rating color
-    )
-
-    embed.set_thumbnail(await query.get_pfp(username))
-    embed.add_field(
-        name="Points", value=str(round(user.performance_points)) + "/" + str(round(user.points)), inline=True
-    )
-    embed.add_field(name="Problems Solved", value=user.problem_count, inline=True)
-    embed.add_field(name="Rating", value=str(user.rating) + "/" + str(user.max_rating), inline=True)
-    embed.add_field(name="Contests Written", value=sum(map(is_rated, user.contests)), inline=True)
-
-    await ctx.respond(embed=embed)
-
-    if amount is None:
-        return
-
-    submissions = await query.get_latest_submissions(username, amount)
-
-    embed = hikari.Embed(title=f"{username}'s latest submissions", color=0xFFFF00)
-    for submission in submissions:
-        problem = submission.problem[0]
-        if problem.points is not None:
-            points = str(int(problem.points)) + "p"
-            if problem.partial:
-                points += "p"
-        else:
-            points = "???"
-
-        true_short_name = submission.language[0].short_name
-        if true_short_name == "":
-            # wtf dmoj
-            true_short_name = submission.language[0].key
-
-        embed.add_field(
-            name="%s / %s" % (str(submission.score_num), str(submission.score_denom)),
-            value="%s | %s" % (submission.result, true_short_name),
-            inline=True,
-        )
-
-        embed.add_field(
-            name="%s (%s)" % (submission.problem[0].name, points),
-            value="%s | [Problem](https://dmoj.ca/problem/%s)"
-            % (
-                submission.date.astimezone(TZ)
-                .strftime("%b. %d, %Y, %I:%M %p")
-                .replace("AM", "a.m.")
-                .replace("PM", "p.m."),
-                submission.problem[0].code,
-            ),
-            # Jan. 13, 2021, 12:17 a.m.
-            # %b. %d, %Y, %I:%M %p
-            inline=True,
-        )
-        try:
-            embed.add_field(
-                name="%.2fs" % submission.time,
-                value="%s" % submission.memory_str,
-                inline=True,
-            )
-        except TypeError:
-            embed.add_field(
-                name="---",
-                value="%s" % submission.memory_str,
-                inline=True,
-            )
-
-    await ctx.respond(embed=embed)
-    return None
-
-
-@plugin.command()
-@lightbulb.option("point_vals", "Points values", int, modifier=OptionModifier.GREEDY, required=False, default=[])
-@lightbulb.option("username", "Dmoj username", StrNotIntConverter, required=False)
-@lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
+@lightbulb.option(
+    "point_vals",
+    "Points values",
+    type=list[int],
+    modifier=OptionModifier.GREEDY,
+    required=False,
+    default=[],
+)
+@lightbulb.option("username", "Dmoj username", required=False)
+@lightbulb.set_help(
+    "Use surround your username with '' if it can be interpreted as a number"
+)
 @lightbulb.command("predict", "Predict total points after solving N point problem(s)")
-@lightbulb.implements(lightbulb.PrefixCommand)  # No way to implement the list in slash commands
+@lightbulb.implements(
+    lightbulb.SlashCommand
+)  # No way to implement the list in slash commands
 async def predict(ctx):
     username = ctx.options.username
     amounts = ctx.options.point_vals
@@ -332,7 +219,10 @@ async def predict(ctx):
         submissions = q.all()
         msg = None
     else:
-        await ctx.respond("No submissions cached, " "Please use +cache or /cache to get new submissions")
+        await ctx.respond(
+            "No submissions cached, "
+            "Please use +cache or /cache to get new submissions"
+        )
         return
 
     problems_ACed = dict()
@@ -389,7 +279,7 @@ async def predict(ctx):
     default=[],
 )
 @lightbulb.command("vc", "Suggest a contest")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def vc(ctx):
     usernames = ctx.options.usernames
     print(usernames)
@@ -459,7 +349,12 @@ async def vc(ctx):
 
 @plugin.command()
 @lightbulb.option(
-    "args", "Usernames participating in contest", str, modifier=OptionModifier.GREEDY, required=False, default=[]
+    "args",
+    "Usernames participating in contest",
+    str,
+    modifier=OptionModifier.GREEDY,
+    required=False,
+    default=[],
 )
 @lightbulb.command("gimmie", ":monkey:", hidden=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
@@ -468,18 +363,29 @@ async def gimmie(ctx):
 
 
 @plugin.command()
-@lightbulb.option("filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[])
 @lightbulb.option(
-    "points",
-    "point range, e.g. ('1', '1-10') DOES NOT WORK WITH SLASH COMMANDS",
-    PointRangeConverter,
+    "filters",
+    "Problem filters",
+    str,
     required=False,
-    default=[1, 50],
+    modifier=OptionModifier.GREEDY,
+    default=[],
+)
+@lightbulb.option(
+    "min_points",
+    "filter problem rated between min_points and max_points",
+    type=int,
+    required=True,
+)
+@lightbulb.option(
+    "max_points",
+    "filter problem rated between min_points and max_points",
+    type=int,
+    required=True,
 )
 @lightbulb.option(
     "username",
     "Dmoj username",
-    StrNotIntConverter,
     required=False,
     default=None,
 )
@@ -499,7 +405,7 @@ async def gimmie(ctx):
     - string"""
 )
 @lightbulb.command("gimme", "Recommend a problem")
-@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def gimme(ctx):
     """
     Recommend a problem
@@ -521,7 +427,7 @@ async def gimme(ctx):
     - string
     """
     username = ctx.options.username
-    points = ctx.options.points
+    points = [ctx.options.min_points, ctx.options.max_points]
     filters = ctx.options.filters
     query = Query()
     username = username or query.get_handle(ctx.author.id, ctx.get_guild().id)
@@ -555,11 +461,21 @@ async def gimme(ctx):
 
 
 @plugin.command()
-@lightbulb.option("args", "[username] [p<=points, p>=points]", str, modifier=OptionModifier.GREEDY, required=False)
+@lightbulb.option(
+    "args",
+    "[username] [p<=points, p>=points]",
+    str,
+    modifier=OptionModifier.GREEDY,
+    required=False,
+)
 @lightbulb.set_help(
     "Usage: [username] [p<=points, p>=points]\nUse surround your username with '' if it can be interpreted as a number"
 )
-@lightbulb.command("solved", "Shows a user's last solved problems (Adelaide command)", aliases=["stalk", "sp"])
+@lightbulb.command(
+    "solved",
+    "Shows a user's last solved problems (Adelaide command)",
+    aliases=["stalk", "sp"],
+)
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def solved(ctx):
     """Shows a user's last solved problems"""
@@ -602,14 +518,18 @@ async def solved(ctx):
 
     for sub in uniqueSubmissions:
         age = (datetime.now() - sub.date).days
-        pag.add_line(f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)")
+        pag.add_line(
+            f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)"
+        )
 
     if len(uniqueSubmissions) == 0:
         pag.add_line("No submission")
 
     @pag.embed_factory()
     def build_embed(page_index, content):
-        return hikari.Embed().add_field(name="Recently solved problems by " + username, value=content)
+        return hikari.Embed().add_field(
+            name="Recently solved problems by " + username, value=content
+        )
 
     navigator = nav.ButtonNavigator(pag.build_pages())
     await navigator.run(ctx)
