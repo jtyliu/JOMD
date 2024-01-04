@@ -4,8 +4,20 @@ import typing as t
 from utils.api import ObjectNotFound
 import typing
 from utils.query import Query
-from utils.db import session, Contest as Contest_DB, Submission as Submission_DB, User as User_DB, Problem as Problem_DB
-from utils.graph import plot_type_radar, plot_type_bar, plot_rating, plot_points, plot_solved
+from utils.db import (
+    session,
+    Contest as Contest_DB,
+    Submission as Submission_DB,
+    User as User_DB,
+    Problem as Problem_DB,
+)
+from utils.graph import (
+    plot_type_radar,
+    plot_type_bar,
+    plot_rating,
+    plot_points,
+    plot_solved,
+)
 from utils.jomd_common import calculate_points
 from lightbulb.commands.base import OptionModifier
 from operator import attrgetter, itemgetter
@@ -97,7 +109,9 @@ async def solved(ctx):
         usernames = [query.get_handle(ctx.author.id, ctx.get_guild().id)]
 
     try:
-        users = await asyncio.gather(*[query.get_user(username) for username in usernames])
+        users = await asyncio.gather(
+            *[query.get_user(username) for username in usernames]
+        )
     except ObjectNotFound:
         return await ctx.respond("User not found")
 
@@ -112,7 +126,9 @@ async def solved(ctx):
     for username in usernames:
         q = session.query(Submission_DB).filter(Submission_DB._user == username)
         if q.count() == 0:
-            await ctx.respond(f"`{username}` does not have any cached submissions, caching now")
+            await ctx.respond(
+                f"`{username}` does not have any cached submissions, caching now"
+            )
             await query.get_submissions(username)
 
         q = (
@@ -163,7 +179,9 @@ async def points(ctx):
         usernames = [query.get_handle(ctx.author.id, ctx.get_guild().id)]
 
     try:
-        users = await asyncio.gather(*[query.get_user(username) for username in usernames])
+        users = await asyncio.gather(
+            *[query.get_user(username) for username in usernames]
+        )
     except ObjectNotFound:
         return await ctx.respond("User not found")
 
@@ -186,7 +204,9 @@ async def points(ctx):
 
         submissions = q.all()
         if len(submissions) == 0:
-            await ctx.respond(f"`{username}` does not have any cached submissions, caching now")
+            await ctx.respond(
+                f"`{username}` does not have any cached submissions, caching now"
+            )
             await query.get_submissions(username)
             submissions = q.all()
         problems_ACed = dict()
@@ -256,7 +276,9 @@ async def rating(ctx):
         usernames = [query.get_handle(ctx.author.id, ctx.get_guild().id)]
 
     try:
-        users = await asyncio.gather(*[query.get_user(username) for username in usernames])
+        users = await asyncio.gather(
+            *[query.get_user(username) for username in usernames]
+        )
     except ObjectNotFound:
         return await ctx.respond("User not found")
 
@@ -348,7 +370,9 @@ async def type(ctx):
         usernames = [query.get_handle(ctx.author.id, ctx.get_guild().id)]
 
     try:
-        users = await asyncio.gather(*[query.get_user(username) for username in usernames])
+        users = await asyncio.gather(
+            *[query.get_user(username) for username in usernames]
+        )
     except ObjectNotFound:
         return await ctx.respond("User not found")
 
@@ -398,7 +422,9 @@ async def type(ctx):
     for username in usernames:
         q = session.query(Submission_DB).filter(Submission_DB._user == username)
         if q.count() == 0:
-            await ctx.respond(f"`{username}` does not have any cached submissions, caching now")
+            await ctx.respond(
+                f"`{username}` does not have any cached submissions, caching now"
+            )
             await query.get_submissions(username)
 
     for i, types in enumerate(important_types):

@@ -34,7 +34,14 @@ plugin = lightbulb.Plugin("GitGud")
 
 
 @plugin.command()
-@lightbulb.option("filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[])
+@lightbulb.option(
+    "filters",
+    "Problem filters",
+    str,
+    required=False,
+    modifier=OptionModifier.GREEDY,
+    default=[],
+)
 @lightbulb.option(
     "min_points",
     "filter problem rated at min_points (or [min_points, max_points] if the other param is used)",
@@ -78,12 +85,18 @@ async def gitgud(ctx: lightbulb.Context) -> None:
     # user = await query.get_user(username)
 
     if username is None:
-        return await ctx.respond("You are not linked to a DMOJ Account. " "Please link your account before continuing")
+        return await ctx.respond(
+            "You are not linked to a DMOJ Account. "
+            "Please link your account before continuing"
+        )
 
     user = await query.get_user(username)
 
     if min_points is None and max_points is not None:
-        await ctx.respond("You have only inputted ``max_points`` without ``min_points``, if you want to get recommended a problem rated at ``N`` points, use the ``min_points`` argument.")
+        await ctx.respond(
+            "You have only inputted ``max_points`` without ``min_points``"
+            "if you want to get recommended a problem rated at ``N`` points, use the ``min_points`` argument."
+        )
     # if the user didn't suggest any point range, map it to their user rating
     elif min_points is None:
         if user.rating is None:
@@ -121,9 +134,14 @@ async def gitgud(ctx: lightbulb.Context) -> None:
     if embed is None:
         return await ctx.respond("No problems that satisfies the filter")
 
-    gitgud_util.bind(username, ctx.get_guild().id, problem.code, problem.points, datetime.now())
+    gitgud_util.bind(
+        username, ctx.get_guild().id, problem.code, problem.points, datetime.now()
+    )
 
-    embed.description = "Points: %s\nProblem Types ||%s||" % (problem.points, ", ".join(problem.types))
+    embed.description = "Points: %s\nProblem Types ||%s||" % (
+        problem.points,
+        ", ".join(problem.types),
+    )
 
     return await ctx.respond(embed=embed)
 
@@ -168,7 +186,9 @@ async def gitlog(ctx):
     except TypeError:
         username = None
     if username is None:
-        return await ctx.respond("You have not entered a valid DMOJ handle " "or linked with a DMOJ Account")
+        return await ctx.respond(
+            "You have not entered a valid DMOJ handle " "or linked with a DMOJ Account"
+        )
 
     gitgud_util = Gitgud_utils()
     history = gitgud_util.get_all(username, ctx.get_guild().id)
@@ -189,14 +209,20 @@ async def gitlog(ctx):
             days_str = "yesterday"
         else:
             days_str = f"{days} days ago"
-        pag.add_line(f"[{problem.name}](https://dmoj.ca/problem/{problem.code}) " f"[+{solved.point}] ({days_str})")
+        pag.add_line(
+            f"[{problem.name}](https://dmoj.ca/problem/{problem.code}) "
+            f"[+{solved.point}] ({days_str})"
+        )
         if idx == 100:
             break
 
     @pag.embed_factory()
     def build_embed(page_index, content):
-        return hikari.Embed(color=0xFCDB05,).add_field(
-            name=f"Gitgud Log for {username} " f"(page {page_index})",  # Can't put total length :/
+        return hikari.Embed(
+            color=0xFCDB05,
+        ).add_field(
+            name=f"Gitgud Log for {username} "
+            f"(page {page_index})",  # Can't put total length :/
             value=content,
             inline=True,
         )
@@ -242,12 +268,16 @@ async def gotgud(ctx):
                 closest = key
         # convert rating to point and get difference
         rating_point = RATING_TO_POINT[closest]
-        point_diff = POINT_VALUES.index(current.point) - POINT_VALUES.index(rating_point)
+        point_diff = POINT_VALUES.index(current.point) - POINT_VALUES.index(
+            rating_point
+        )
 
         point = 10 + 2 * (point_diff)
         point = max(point, 0)
 
-        gitgud_util.insert(username, ctx.get_guild().id, point, current.problem_id, datetime.now())
+        gitgud_util.insert(
+            username, ctx.get_guild().id, point, current.problem_id, datetime.now()
+        )
         gitgud_util.clear(username, ctx.get_guild().id)
 
         completion_time = datetime.now() - current.time
@@ -270,7 +300,9 @@ async def gotgud(ctx):
         if cnt < 3 and completion_time.seconds % 60 != 0:
             ret += f" {completion_time.seconds % 60} seconds"
 
-        return await ctx.respond(f"Challenge took{ret}. " f"{current.handle} gained {point} points")
+        return await ctx.respond(
+            f"Challenge took{ret}. " f"{current.handle} gained {point} points"
+        )
 
     else:
         return await ctx.respond("You have not completed the challenge")
@@ -297,6 +329,7 @@ async def howgud(ctx):
         color=0xFCDB05,
     )
     return await ctx.respond(embed=embed)
+
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

@@ -10,8 +10,18 @@ import typing as t
 from utils.query import Query
 from utils.db import session
 from sqlalchemy import alias, func, not_, orm
-from utils.db import Problem as Problem_DB, Contest as Contest_DB, User as User_DB, Submission as Submission_DB
-from utils.jomd_common import is_int, calculate_points, PointRangeConverter, gimme_common
+from utils.db import (
+    Problem as Problem_DB,
+    Contest as Contest_DB,
+    User as User_DB,
+    Submission as Submission_DB,
+)
+from utils.jomd_common import (
+    is_int,
+    calculate_points,
+    PointRangeConverter,
+    gimme_common,
+)
 from utils.api import ObjectNotFound
 from utils.constants import SITE_URL, TZ, SHORTHANDS
 import asyncio
@@ -38,10 +48,13 @@ class StrNotIntConverter(base.BaseConverter[str]):
             raise TypeError("This is an integer")  # kevinyang theorem
         return arg
 
+
 @plugin.command()
 @lightbulb.option("amount", "List last N submissions", type=int, required=False)
 @lightbulb.option("username", "Dmoj username", required=False)
-@lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
+@lightbulb.set_help(
+    "Use surround your username with '' if it can be interpreted as a number"
+)
 @lightbulb.command("user", "Show user profile and latest submissions")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def user(ctx):
@@ -85,10 +98,14 @@ async def user(ctx):
     )
 
     embed.set_thumbnail(await query.get_pfp(username))
-    embed.add_field(name="Rank by points", value=await query.get_placement(username), inline=False)
+    embed.add_field(
+        name="Rank by points", value=await query.get_placement(username), inline=False
+    )
     embed.add_field(name="Problems Solved", value=user.problem_count, inline=False)
     embed.add_field(name="Rating", value=user.rating, inline=True)
-    embed.add_field(name="Contests Written", value=sum(map(is_rated, user.contests)), inline=True)
+    embed.add_field(
+        name="Contests Written", value=sum(map(is_rated, user.contests)), inline=True
+    )
 
     await ctx.respond(embed=embed)
 
@@ -149,13 +166,23 @@ async def user(ctx):
     return None
 
 
-
 @plugin.command()
-@lightbulb.option("point_vals", "Points values", type=list[int], modifier=OptionModifier.GREEDY, required=False, default=[])
+@lightbulb.option(
+    "point_vals",
+    "Points values",
+    type=list[int],
+    modifier=OptionModifier.GREEDY,
+    required=False,
+    default=[],
+)
 @lightbulb.option("username", "Dmoj username", required=False)
-@lightbulb.set_help("Use surround your username with '' if it can be interpreted as a number")
+@lightbulb.set_help(
+    "Use surround your username with '' if it can be interpreted as a number"
+)
 @lightbulb.command("predict", "Predict total points after solving N point problem(s)")
-@lightbulb.implements(lightbulb.SlashCommand)  # No way to implement the list in slash commands
+@lightbulb.implements(
+    lightbulb.SlashCommand
+)  # No way to implement the list in slash commands
 async def predict(ctx):
     username = ctx.options.username
     amounts = ctx.options.point_vals
@@ -192,7 +219,10 @@ async def predict(ctx):
         submissions = q.all()
         msg = None
     else:
-        await ctx.respond("No submissions cached, " "Please use +cache or /cache to get new submissions")
+        await ctx.respond(
+            "No submissions cached, "
+            "Please use +cache or /cache to get new submissions"
+        )
         return
 
     problems_ACed = dict()
@@ -319,7 +349,12 @@ async def vc(ctx):
 
 @plugin.command()
 @lightbulb.option(
-    "args", "Usernames participating in contest", str, modifier=OptionModifier.GREEDY, required=False, default=[]
+    "args",
+    "Usernames participating in contest",
+    str,
+    modifier=OptionModifier.GREEDY,
+    required=False,
+    default=[],
 )
 @lightbulb.command("gimmie", ":monkey:", hidden=True)
 @lightbulb.implements(lightbulb.PrefixCommand)
@@ -328,7 +363,14 @@ async def gimmie(ctx):
 
 
 @plugin.command()
-@lightbulb.option("filters", "Problem filters", str, required=False, modifier=OptionModifier.GREEDY, default=[])
+@lightbulb.option(
+    "filters",
+    "Problem filters",
+    str,
+    required=False,
+    modifier=OptionModifier.GREEDY,
+    default=[],
+)
 @lightbulb.option(
     "min_points",
     "filter problem rated between min_points and max_points",
@@ -419,11 +461,21 @@ async def gimme(ctx):
 
 
 @plugin.command()
-@lightbulb.option("args", "[username] [p<=points, p>=points]", str, modifier=OptionModifier.GREEDY, required=False)
+@lightbulb.option(
+    "args",
+    "[username] [p<=points, p>=points]",
+    str,
+    modifier=OptionModifier.GREEDY,
+    required=False,
+)
 @lightbulb.set_help(
     "Usage: [username] [p<=points, p>=points]\nUse surround your username with '' if it can be interpreted as a number"
 )
-@lightbulb.command("solved", "Shows a user's last solved problems (Adelaide command)", aliases=["stalk", "sp"])
+@lightbulb.command(
+    "solved",
+    "Shows a user's last solved problems (Adelaide command)",
+    aliases=["stalk", "sp"],
+)
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def solved(ctx):
     """Shows a user's last solved problems"""
@@ -466,14 +518,18 @@ async def solved(ctx):
 
     for sub in uniqueSubmissions:
         age = (datetime.now() - sub.date).days
-        pag.add_line(f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)")
+        pag.add_line(
+            f"[{sub.problem[0].name}]({SITE_URL}/problem/{sub._code}) [{sub.points}] ({age} days ago)"
+        )
 
     if len(uniqueSubmissions) == 0:
         pag.add_line("No submission")
 
     @pag.embed_factory()
     def build_embed(page_index, content):
-        return hikari.Embed().add_field(name="Recently solved problems by " + username, value=content)
+        return hikari.Embed().add_field(
+            name="Recently solved problems by " + username, value=content
+        )
 
     navigator = nav.ButtonNavigator(pag.build_pages())
     await navigator.run(ctx)
