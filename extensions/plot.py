@@ -294,8 +294,12 @@ async def rating(ctx):
                 data[contest.end_time].append(change)
             else:
                 data[contest.end_time].append(None)
+    print(data)
+    print(len(data))
+    if len(data) == 1:
+        print(data)
+        return await ctx.respond("No rated contests found")
     plot_rating(data)
-
     embed = hikari.Embed(
         title="Rating Progression",
         color=0xFCDB05,
